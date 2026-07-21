@@ -1,0 +1,22 @@
+{
+  "trials": 200,
+  "seed": 1000,
+  "fast": {
+    "episodes": 203,
+    "observed_failures": 3,
+    "km_median_lifetime": null,
+    "median_lifetime_reached": false,
+    "median_positive_loading_rate": 0.363827365786884
+  },
+  "slow": {
+    "episodes": 203,
+    "observed_failures": 3,
+    "km_median_lifetime": null,
+    "median_lifetime_reached": false,
+    "median_positive_loading_rate": 0.48452430564438487
+  },
+  "acceptance": {
+    "fast_has_lower_loading_rate": true,
+    "fast_has_longer_cluster_lifetime": false
+  }
+}
