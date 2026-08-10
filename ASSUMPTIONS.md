@@ -1,44 +1,37 @@
 # Assumption and evidence register
 
-This file separates facts transferred from papers from choices made because the original simulation
-code and complete calibration data are unavailable.
+| ID | Version | Choice | Evidence status | Required follow-up |
+|---|---|---|---|---|
+| A1 | V1–V4 | Overdamped bead dynamics; no inertia | Professor's requested baseline. Drag dissipates energy but is not SLS material memory. | timestep/drag convergence and experimental timescale fit |
+| A2 | V2–V4 | 2D 100 µm domain; cell radius 9 µm | representative cell-scale geometry, not cell-line-specific | replace using microscopy for the selected tumor/immune cell |
+| A3 | V2–V4 | finite 24–78 µm fibers, 0.30 µm effective diameter | inside Lee et al.'s reported 20–200 µm fiber and 0.20–0.35 µm thickness ranges | image-derived length/orientation/pore distributions |
+| A4 | V2–V4 | 0.75 µm bead spacing | numerical resolution choice | repeat at 0.50 and 1.0 µm with segment-level observables |
+| A5 | V2–V4 | initialize 12 near-cell fibers, four per required side sector | avoids silently coupling to remote collagen; deliberate initialization | sample image-derived networks and report failed contact realizations |
+| A6 | V2–V4 | 3 µm hard contact shell then 1.5 µm Gaussian | professor-approved hybrid; numerical contact width not fitted | sweep contact width and sigma separately |
+| A7 | V2–V4 | one closest material segment per fiber contact patch | reduces bead-density bias | compare multi-patch clustering and contact-area data |
+| A8 | V2–V4 | two distant ends of each finite fiber fixed | requested far-field anchoring; stronger than a true percolating bulk boundary | enlarge domain and test boundary sensitivity |
+| A9 | V2–V4 | intersection crosslinks are permanent, freely hinged | elastic baseline inspired by explicit crosslink bead models | compare crosslink density/stiffness to shear data |
+| A10 | V2–V4 | linear stretching and bending | mechanism-isolation baseline | add buckling and strain stiffening after baseline validation |
+| A11 | V3 | 12 effective clutches per side | coarse adhesion units, not molecules | calibrate to adhesion/traction measurements |
+| A12 | V3 | Bell slip-bond off-rate and linear motor force–velocity law | standard minimal motor–clutch starting laws | test catch bonds/glassy kinetics only if data require |
+| A13 | V3 | rigid translating cell; no rotation/deformation | isolates reaction-force-driven motion | add torque, rotation, then a deformable boundary |
+| A14 | V3 | same counter-addressed random stream in both conditions | variance-reduction design | ensemble over seeds and report uncertainty |
+| A15 | V4 | 50% dynamic links; force-accelerated rupture and same-neighborhood re-formation | new mechanism-first hypothesis, not literature-calibrated | sweep kinetics and fit load–unload/residual-alignment data |
+| A16 | V4 | new rest vector equals geometry at re-formation | minimal plastic rest-state reset | replace with evidence-based sliding, merging, or new-partner search |
 
-| ID | Current choice | Status and evidence | How it will be tested or replaced |
-|---|---|---|---|
-| A1 | Use a 2D network and cell. | Modeling choice. Adebowale's CMS is a 2D migration simulator, while Zhao demonstrates that the same filament framework can be run in 2D and 3D. | Reproduce the 2D trends first; add a 3D network only after calibration. |
-| A2 | Use a diluted triangular lattice with freely hinged crosslinks. | Zhao uses a bond-diluted hexagonal/triangular lattice in 2D; Licup and related collagen-network models use diluted subisostatic fiber networks. | Compare against image-derived or random off-lattice collagen geometry later. |
-| A3 | Apply bending only to surviving collinear segment pairs. | Directly follows Zhao's definition that remaining collinear lattice bonds belong to the same filament and that crosslinks are freely hinged. | Unit-test the undeformed network and bending response. |
-| A4 | Replace every intrafiber axial spring by one SLS element. | Requested hypothesis. Single collagen fibrils are intrinsically viscoelastic, but experiments often require multiple relaxation modes (Shen 2011; Chasiotis group 2022/2023). | Begin with one relaxation time so the causal effect is identifiable; generalize to a Prony series if one SLS cannot fit data. |
-| A5 | Keep bending elasticity time-independent. | Simplifying choice. The user specifically requested replacement of bead-to-bead springs; no evidence currently identifies the correct bending-relaxation law. | Add viscoelastic bending only if bulk relaxation cannot be fitted by axial SLS bonds. |
-| A6 | Do not allow fiber or crosslink breaking/rebinding. | Zhao neglects plasticity for reversible chromatin deformation. Collagen can be plastic through crosslink and entanglement dynamics, but that is a distinct mechanism. | Add dynamic crosslinks only in a later plastic-remodeling experiment. |
-| A7 | Use overdamped bead dynamics without inertia, hydrodynamic coupling, or thermal noise. | Direct transfer from Zhao's minimal bead dynamics. It is appropriate for an athermal mesoscopic network prototype. | Check timestep convergence and, if needed, add Brownian noise or hydrodynamic mobility. |
-| A8 | Clutches bind beads rather than a continuum substrate. | Required coupling choice. It is the discrete counterpart of the clutch–substrate link in Adebowale. | Later allow binding to any point on a segment and distribute force to its endpoint beads to remove mesh bias. |
-| A9 | A simulated clutch is a coarse adhesion unit. | Necessary coarse-graining choice: Adebowale's CMS uses many molecular clutches, while this prototype uses tens of effective clutches. | Fit effective `kon`, `koff0`, `Fb`, and `kc` to bond-lifetime and traction data. |
-| A10 | Default fast and slow SLS times are 5 s and 50 s. | Literature-informed starting values, not a fit. Isolated fibrils show fast relaxation around 2–7 s and slower modes around 60–160 s. | Replace with the exact Adebowale substrate values for reproduction, then with collagen relaxation data for the biological model. |
-| A11 | Use linear axial SLS forces in tension and compression. | Deliberate reproduction baseline. Real collagen networks buckle easily in compression and stiffen through alignment/stretching. | After baseline verification, introduce a small compression/tension stiffness ratio and test whether nonlinear collagen behavior is required. |
-| A12 | Default network stiffness is numerical, not yet mapped to 2 kPa. | A collagen fibril modulus cannot be equated with bulk gel modulus; network geometry and connectivity strongly renormalize the response. | Run virtual shear/step-strain tests and optimize segment parameters until network-level `E0`, `Einf`, and relaxation curve match target data. |
-| A13 | The 1D fibre has 10 beads and nine identical serial SLS bonds, with per-bond stiffness multiplied by nine. | Numerical discretization choice. Axial segment stiffness follows `k = EA/L`; shortening a fixed fibre segment by a factor of nine increases its stiffness by nine (Lee 2014). | Confirm identical end-to-end step-relaxation responses with 5, 9, and 19 bonds. |
-| A14 | The 1D internal beads are massless and remain at uniform axial strain. | Mechanism-isolation choice. It removes an additional bead-drag timescale while retaining SLS relaxation, force loading, and rupture. | Introduce consistently scaled bead drag only in the later 2D network stage and perform resolution convergence. |
-| A15 | Use `Fb`, `kc`, and `v0` as force, stiffness, and velocity scales. | Motor–clutch nondimensionalization: `L*=Fb/kc` and `t_load=Fb/(kc*v0)`. Defaults compare `tau/t_load` and `Kchain/kc`, not fitted physical units. | Map the scales to pN, nm, and s only after clutch and collagen calibration. |
-| A16 | A clutch transmits tension but not compression. | Adhesion-link modeling choice; a detached or slack molecular link should not push the collagen fibre. | Compare with a signed linear clutch as a numerical control. |
-| A17 | Cluster episodes still active at the end of a run are right-censored. | Statistical requirement; treating the 30-`t_load` cutoff as a failure would bias lifetime downward. | Report Kaplan–Meier medians and observed-failure counts; extend duration if the median is not reached. |
+The default bead drag is `ζ = 1` model force·s/µm.  It was selected so that
+crosslink-mediated propagation is resolvable during the 6–8 s demonstration
+window; it is not a measured collagen drag.  A diagnostic run at `ζ = 8`
+confined nearly all visible motion to direct contacts.  Drag and observation
+time must therefore be calibrated together before physical times are claimed.
 
-## Parameter calibration order
+## Required validation order
 
-1. Match single-bond analytical relaxation (implementation check).
-2. Match the network's instantaneous bulk modulus by adjusting axial and bending stiffnesses.
-3. Match the long-time/instantaneous modulus ratio by adjusting `kinf/k0`.
-4. Match the network relaxation curve by adjusting `tau` (or adding Prony modes).
-5. Fit clutch kinetics to bond lifetime and traction-force distributions.
-6. Only then compare migration speed, MSD, and persistence between fast and slow conditions.
-
-## Excluded from version 0.1
-
-- condensate phase fields and all Cahn–Hilliard terms from Zhao;
-- collagen degradation or synthesis;
-- crosslink rupture, rebinding, or plastic rest-length remodeling;
-- ligand-density heterogeneity;
-- catch-bond integrin kinetics;
-- steric contact between fibers;
-- fluid poroelasticity;
-- cell shape, nucleus, lamellipodia, and explicit filopodium length dynamics.
+1. Verify elastic forces, fixed boundaries, zero-force equilibrium, and timestep convergence.
+2. Fit network mechanics to collagen shear/tensile or microrheology data.
+3. Verify V2 spatial decay: direct force is zero outside contact; remote motion
+   vanishes or decreases strongly in the no-crosslink control.
+4. Run a V3 seed ensemble; report displacement, persistence, reaction force,
+   clutch occupancy, and left/right imbalance distributions.
+5. Only then fit V4 using load–unload data and quantify residual alignment and
+   densification after force removal.

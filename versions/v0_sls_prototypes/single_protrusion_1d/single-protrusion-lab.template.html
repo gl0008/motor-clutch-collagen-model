@@ -1,0 +1,289 @@
+<div id="single-protrusion-lab-7f31">
+  <style>
+    #single-protrusion-lab-7f31 { color: var(--foreground); width: 100%; }
+    #single-protrusion-lab-7f31 .sp-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+    #single-protrusion-lab-7f31 .sp-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    #single-protrusion-lab-7f31 .sp-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    #single-protrusion-lab-7f31 .sp-panel { min-width: 0; }
+    #single-protrusion-lab-7f31 .sp-panel svg,
+    #single-protrusion-lab-7f31 .sp-chart { display: block; width: 100%; height: auto; overflow: visible; }
+    #single-protrusion-lab-7f31 .sp-chart-wrap { margin-top: 12px; }
+    #single-protrusion-lab-7f31 .sp-legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 6px; color: var(--muted-foreground); }
+    #single-protrusion-lab-7f31 .sp-key { display: inline-flex; align-items: center; gap: 6px; }
+    #single-protrusion-lab-7f31 .sp-swatch { width: 18px; height: 3px; display: inline-block; }
+    #single-protrusion-lab-7f31 .sp-slider { flex: 1 1 240px; min-width: 160px; }
+    #single-protrusion-lab-7f31 .sp-axis { stroke: var(--border); stroke-width: 1; }
+    #single-protrusion-lab-7f31 .sp-grid { stroke: var(--border); stroke-width: 1; opacity: .55; }
+    #single-protrusion-lab-7f31 .sp-label { fill: var(--muted-foreground); font-size: 11px; font-weight: 400; }
+    #single-protrusion-lab-7f31 .sp-value { fill: var(--foreground); font-size: 12px; font-weight: 500; }
+    #single-protrusion-lab-7f31 .sp-fast { stroke: var(--viz-series-1); }
+    #single-protrusion-lab-7f31 .sp-slow { stroke: var(--viz-series-2); }
+    #single-protrusion-lab-7f31 .sp-fast-fill { fill: var(--viz-series-1); }
+    #single-protrusion-lab-7f31 .sp-slow-fill { fill: var(--viz-series-2); }
+    #single-protrusion-lab-7f31 .sp-structure { stroke: var(--border); fill: none; }
+    #single-protrusion-lab-7f31 .sp-cell { fill: var(--muted); stroke: var(--border); }
+    #single-protrusion-lab-7f31 .sp-cursor { stroke: var(--foreground); stroke-width: 1; opacity: .65; }
+    @media (max-width: 600px) {
+      #single-protrusion-lab-7f31 .sp-comparison { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="sp-header">
+    <div class="sp-status" aria-live="polite">
+      <span><strong id="sp-time">t = 0.00</strong> <span class="text-muted">t<sub>load</sub></span></span>
+      <span class="viz-badge" id="sp-fast-phase">Fast: unbound</span>
+      <span class="viz-badge" id="sp-slow-phase">Slow: unbound</span>
+    </div>
+    <div class="viz-controls" aria-label="Playback controls">
+      <button type="button" class="btn btn-primary" id="sp-play">Play</button>
+      <button type="button" class="btn" id="sp-step">Step</button>
+      <button type="button" class="btn btn-ghost" id="sp-reset">Reset</button>
+      <label class="form-label" for="sp-speed">Speed
+        <select class="form-select" id="sp-speed">
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="5">5×</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="sp-comparison">
+    <div class="sp-panel">
+      <svg id="sp-fast-model" viewBox="0 0 360 220" role="img" aria-label="Fast-relaxing collagen chain, actin, and twelve clutches"></svg>
+    </div>
+    <div class="sp-panel">
+      <svg id="sp-slow-model" viewBox="0 0 360 220" role="img" aria-label="Slow-relaxing collagen chain, actin, and twelve clutches"></svg>
+    </div>
+  </div>
+
+  <label class="form-label sp-slider" for="sp-scrubber"><span class="sr-only">Simulation time</span>
+    <input class="form-range" id="sp-scrubber" type="range" min="0" value="0" step="1">
+  </label>
+
+  <div class="sp-chart-wrap">
+    <svg id="sp-chart" class="sp-chart" viewBox="0 0 700 252" role="img" aria-label="Traction force, bound clutch count, and actin velocity over time for fast and slow relaxation">
+      <title>Paired motor–clutch time series</title>
+      <desc>Three aligned plots compare traction, bound-clutch count, and actin velocity. A vertical cursor follows playback time.</desc>
+    </svg>
+    <div class="sp-legend text-small" aria-label="Legend">
+      <span class="sp-key"><span class="sp-swatch" style="background:var(--viz-series-1)"></span>Fast relaxation, τ = 0.1</span>
+      <span class="sp-key"><span class="sp-swatch" style="background:var(--viz-series-2)"></span>Slow relaxation, τ = 10</span>
+      <span>Filled clutch = bound · stem length = clutch force</span>
+    </div>
+  </div>
+
+  <script type="application/json" id="sp-data">__SINGLE_PROTRUSION_DATA__</script>
+  <script>
+    (() => {
+      const root = document.getElementById('single-protrusion-lab-7f31');
+      const data = JSON.parse(root.querySelector('#sp-data').textContent);
+      const fast = data.fast;
+      const slow = data.slow;
+      const count = fast.time.length;
+      const scrubber = root.querySelector('#sp-scrubber');
+      const playButton = root.querySelector('#sp-play');
+      const stepButton = root.querySelector('#sp-step');
+      const resetButton = root.querySelector('#sp-reset');
+      const speedSelect = root.querySelector('#sp-speed');
+      const timeLabel = root.querySelector('#sp-time');
+      const fastPhase = root.querySelector('#sp-fast-phase');
+      const slowPhase = root.querySelector('#sp-slow-phase');
+      const chart = root.querySelector('#sp-chart');
+      const ns = 'http://www.w3.org/2000/svg';
+      let index = 0;
+      let playing = false;
+      let lastTimestamp = null;
+      let cursor = null;
+
+      scrubber.max = String(count - 1);
+
+      function element(name, attrs = {}, text = '') {
+        const node = document.createElementNS(ns, name);
+        Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
+        if (text) node.textContent = text;
+        return node;
+      }
+
+      function clear(svg) {
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+      }
+
+      function model(svg, condition, label, seriesClass) {
+        clear(svg);
+        const title = element('title', {}, `${label} collagen chain at t=${condition.time[index].toFixed(2)}`);
+        const description = element('desc', {}, `${condition.bound[index].reduce((a, b) => a + b, 0)} of 12 clutches bound; traction ${condition.traction[index].toFixed(2)}.`);
+        svg.append(title, description);
+
+        const restLength = data.config.fibre_rest_length;
+        const positions = condition.beads[index];
+        const terminalDisplacement = positions[positions.length - 1] - restLength;
+        const terminalX = 42 + 220 * (positions[positions.length - 1] / restLength);
+        const qMagnitude = Math.abs(condition.q[index]);
+        const boundCount = condition.bound[index].reduce((a, b) => a + b, 0);
+
+        svg.appendChild(element('text', {x: 18, y: 20, class: 'sp-value'}, `${label} · τ=${condition.tau}`));
+        svg.appendChild(element('text', {x: 18, y: 39, class: 'sp-label'}, `traction ${condition.traction[index].toFixed(2)} · bound ${boundCount}/12 · v ${condition.velocity[index].toFixed(2)}`));
+
+        svg.appendChild(element('line', {x1: 42, y1: 88, x2: 282, y2: 88, class: 'sp-structure', 'stroke-width': 1}));
+        for (let i = 0; i < positions.length - 1; i += 1) {
+          const x1 = 42 + 220 * (positions[i] / restLength);
+          const x2 = 42 + 220 * (positions[i + 1] / restLength);
+          svg.appendChild(element('line', {
+            x1, y1: 88, x2, y2: 88,
+            class: seriesClass,
+            'stroke-width': Math.min(6, 2 + qMagnitude * 0.45),
+            'stroke-linecap': 'round'
+          }));
+        }
+        positions.forEach((position, bead) => {
+          const x = 42 + 220 * (position / restLength);
+          svg.appendChild(element('circle', {
+            cx: x, cy: 88, r: bead === positions.length - 1 ? 4.5 : 3,
+            class: bead === 0 ? 'sp-cell' : seriesClass + '-fill',
+            fill: bead === 0 ? 'var(--muted)' : (seriesClass === 'sp-fast' ? 'var(--viz-series-1)' : 'var(--viz-series-2)'),
+            stroke: 'var(--background)', 'stroke-width': 1
+          }));
+        });
+
+        svg.appendChild(element('path', {d: 'M34 78 L42 88 L34 98 Z', fill: 'var(--muted-foreground)'}));
+        svg.appendChild(element('text', {x: 18, y: 116, class: 'sp-label'}, 'fixed'));
+        svg.appendChild(element('rect', {x: 310, y: 54, width: 38, height: 70, rx: 18, class: 'sp-cell'}));
+        svg.appendChild(element('text', {x: 316, y: 91, class: 'sp-label'}, 'cell'));
+
+        const arrowEnd = Math.min(303, terminalX + 8 + condition.traction[index] * 4);
+        svg.appendChild(element('line', {x1: terminalX + 3, y1: 72, x2: arrowEnd, y2: 72, class: seriesClass, 'stroke-width': 2}));
+        svg.appendChild(element('path', {d: `M${arrowEnd} 72 l-7 -4 v8 z`, fill: seriesClass === 'sp-fast' ? 'var(--viz-series-1)' : 'var(--viz-series-2)'}));
+
+        condition.bound[index].forEach((isBound, clutch) => {
+          const column = clutch % 6;
+          const row = Math.floor(clutch / 6);
+          const x = 70 + column * 41;
+          const y = 158 + row * 34;
+          const force = condition.clutchForce[index][clutch];
+          if (isBound) {
+            svg.appendChild(element('line', {
+              x1: x, y1: y - 5, x2: x, y2: y - 5 - Math.min(24, force * 10),
+              class: seriesClass, 'stroke-width': 2
+            }));
+          }
+          svg.appendChild(element('circle', {
+            cx: x, cy: y, r: 5,
+            fill: isBound ? (seriesClass === 'sp-fast' ? 'var(--viz-series-1)' : 'var(--viz-series-2)') : 'transparent',
+            stroke: isBound ? 'var(--background)' : 'var(--muted-foreground)',
+            'stroke-width': 1.5
+          }));
+        });
+        svg.appendChild(element('text', {x: 18, y: 162, class: 'sp-label'}, 'clutches'));
+        svg.appendChild(element('text', {x: 18, y: 211, class: 'sp-label'}, `end displacement ${terminalDisplacement.toFixed(2)} · phase ${condition.phase[index]}`));
+      }
+
+      function extent(valuesA, valuesB, floor = 0) {
+        return [floor, Math.max(floor + 1e-6, ...valuesA, ...valuesB)];
+      }
+
+      function pathFor(values, xScale, yScale) {
+        return values.map((value, i) => `${i === 0 ? 'M' : 'L'}${xScale(fast.time[i]).toFixed(2)},${yScale(value).toFixed(2)}`).join(' ');
+      }
+
+      function buildChart() {
+        clear(chart);
+        chart.appendChild(element('title', {}, 'Traction, bound clutches, and actin velocity'));
+        chart.appendChild(element('desc', {}, 'Fast and slow relaxation conditions share one time axis.'));
+        const left = 58;
+        const right = 682;
+        const plotWidth = right - left;
+        const timeMax = fast.time[fast.time.length - 1];
+        const xScale = value => left + plotWidth * value / timeMax;
+        const rows = [
+          {label: 'Traction', unit: 'F/Fb', key: 'traction', top: 12, bottom: 72, domain: extent(fast.traction, slow.traction)},
+          {label: 'Bound', unit: 'count', key: 'bound', top: 91, bottom: 151, domain: [0, data.config.n_clutches]},
+          {label: 'Actin v', unit: 'v/v0', key: 'velocity', top: 170, bottom: 230, domain: [0, 1]}
+        ];
+        rows.forEach(row => {
+          const fastValues = row.key === 'bound' ? fast.bound.map(items => items.reduce((a, b) => a + b, 0)) : fast[row.key];
+          const slowValues = row.key === 'bound' ? slow.bound.map(items => items.reduce((a, b) => a + b, 0)) : slow[row.key];
+          const yScale = value => row.bottom - (row.bottom - row.top) * (value - row.domain[0]) / (row.domain[1] - row.domain[0]);
+          chart.appendChild(element('line', {x1: left, y1: row.bottom, x2: right, y2: row.bottom, class: 'sp-axis'}));
+          chart.appendChild(element('line', {x1: left, y1: row.top, x2: right, y2: row.top, class: 'sp-grid'}));
+          chart.appendChild(element('text', {x: 4, y: row.top + 13, class: 'sp-value'}, row.label));
+          chart.appendChild(element('text', {x: 4, y: row.top + 29, class: 'sp-label'}, row.unit));
+          chart.appendChild(element('text', {x: left - 6, y: row.top + 4, class: 'sp-label', 'text-anchor': 'end'}, row.domain[1].toFixed(row.key === 'bound' ? 0 : 1)));
+          chart.appendChild(element('text', {x: left - 6, y: row.bottom + 4, class: 'sp-label', 'text-anchor': 'end'}, '0'));
+          chart.appendChild(element('path', {d: pathFor(fastValues, xScale, yScale), fill: 'none', class: 'sp-fast', 'stroke-width': 1.8}));
+          chart.appendChild(element('path', {d: pathFor(slowValues, xScale, yScale), fill: 'none', class: 'sp-slow', 'stroke-width': 1.8}));
+        });
+        [0, timeMax / 2, timeMax].forEach(value => {
+          chart.appendChild(element('text', {x: xScale(value), y: 249, class: 'sp-label', 'text-anchor': 'middle'}, value.toFixed(0)));
+        });
+        chart.appendChild(element('text', {x: right, y: 249, class: 'sp-label', 'text-anchor': 'end'}, 't / tload'));
+        cursor = element('line', {x1: left, y1: 8, x2: left, y2: 232, class: 'sp-cursor'});
+        chart.appendChild(cursor);
+      }
+
+      function render() {
+        model(root.querySelector('#sp-fast-model'), fast, 'Fast relaxation', 'sp-fast');
+        model(root.querySelector('#sp-slow-model'), slow, 'Slow relaxation', 'sp-slow');
+        const t = fast.time[index];
+        timeLabel.textContent = `t = ${t.toFixed(2)}`;
+        fastPhase.textContent = `Fast: ${fast.phase[index]}`;
+        slowPhase.textContent = `Slow: ${slow.phase[index]}`;
+        scrubber.value = String(index);
+        if (cursor) {
+          const x = 58 + (682 - 58) * t / fast.time[fast.time.length - 1];
+          cursor.setAttribute('x1', x);
+          cursor.setAttribute('x2', x);
+        }
+      }
+
+      function stop() {
+        playing = false;
+        lastTimestamp = null;
+        playButton.textContent = 'Play';
+      }
+
+      function frame(timestamp) {
+        if (!playing) return;
+        if (lastTimestamp === null) lastTimestamp = timestamp;
+        const elapsed = (timestamp - lastTimestamp) / 1000;
+        lastTimestamp = timestamp;
+        const sampleDt = fast.time[1] - fast.time[0];
+        const advance = Math.max(1, Math.round(elapsed * Number(speedSelect.value) / sampleDt));
+        index = Math.min(count - 1, index + advance);
+        render();
+        if (index >= count - 1) stop();
+        else requestAnimationFrame(frame);
+      }
+
+      playButton.addEventListener('click', () => {
+        if (playing) {
+          stop();
+        } else {
+          if (index >= count - 1) index = 0;
+          playing = true;
+          playButton.textContent = 'Pause';
+          requestAnimationFrame(frame);
+        }
+      });
+      stepButton.addEventListener('click', () => {
+        stop();
+        index = Math.min(count - 1, index + 1);
+        render();
+      });
+      resetButton.addEventListener('click', () => {
+        stop();
+        index = 0;
+        render();
+      });
+      scrubber.addEventListener('input', () => {
+        stop();
+        index = Number(scrubber.value);
+        render();
+      });
+
+      buildChart();
+      render();
+    })();
+  </script>
+</div>
