@@ -1,0 +1,44 @@
+{
+  "status": "mechanism-first prototype; not mapped to physical units",
+  "equation": "zeta * velocity = F_stretch + F_bend + F_active",
+  "coupling": "w_i proportional to exp(-((|r_i-r_c|-R)/sigma)^2), normalized every step",
+  "cell": "fixed rigid circle",
+  "active_traction": "prescribed ramp to constant total force; stochastic clutch kinetics deferred",
+  "config": {
+    "n_fibers": 5,
+    "beads_per_fiber": 25,
+    "bead_spacing": 0.75,
+    "cell_center": [
+      0.0,
+      0.0
+    ],
+    "cell_radius": 2.5,
+    "surface_gap": 0.65,
+    "fiber_angles_deg": [
+      0.0,
+      34.0,
+      72.0,
+      116.0,
+      154.0
+    ],
+    "offset_signs": [
+      1,
+      -1,
+      1,
+      -1,
+      1
+    ],
+    "stretch_stiffness": 18.0,
+    "bend_stiffness": 0.32,
+    "bead_drag": 6.0,
+    "total_pull_force": 12.0,
+    "gaussian_sigma": 1.1,
+    "force_ramp_time": 0.8,
+    "dt": 0.004,
+    "duration": 8.0,
+    "sample_interval": 0.04
+  },
+  "initial_radial_alignment": 0.3097387430635709,
+  "final_radial_alignment": 0.5013458218782448,
+  "final_rms_displacement": 0.23654258951810916
+}
