@@ -27,6 +27,7 @@ jobs:
           mkdir _site
           cp docs/index.html _site/index.html
           cp -R versions _site/versions
+          cp -R generations _site/generations
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
