@@ -1,78 +1,117 @@
-# Motor–clutch collagen model: versioned research path
+# Motor–clutch collagen model
 
-This repository records the model as a sequence of controlled scientific
-questions.  Each version changes one conceptual layer, keeps its own source,
-tests, assumptions, and animation, and states what cannot yet be concluded.
+This repository now keeps **two complete model generations on one website**.
+The first generation is preserved exactly as the historical development path;
+the second generation corrects the boundary conditions, network coupling,
+physical units, migration comparison, and visualization without overwriting the
+older work.
 
-> **Current recommendation:** use V2 to explain collagen force transmission,
-> V3 to explain fixed-versus-moving cell mechanics, and V4 only as an explicit
-> hypothesis for permanent remodeling.  V0 and V1 are archived baselines.
+- Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
+- Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
 
-## Version map
+## Generation 1 — original V0–V4 archive
 
-| Version | Question isolated | Added mechanism | Cell | Crosslinks | Visualization |
-|---|---|---|---|---|---|
-| [V0](versions/v0_sls_prototypes/) | Can SLS relaxation alter clutch lifetime? | 1D SLS chain and old SLS lattice | fixed / early point cell | lattice | archived templates |
-| [V1](versions/v1_few_fiber/) | Can elastic fibers reorganize under overdamped pull? | five connected bead chains; no SLS | fixed | none | [five-fiber lab](versions/v1_few_fiber/demo/index.html) |
-| [V2](versions/v2_crosslinked_elastic/) | How does local force spread through collagen? | µm scale, finite fibers, permanent hinged links, contact-shell + Gaussian | fixed | permanent | [crosslinked lab](versions/v2_crosslinked_elastic/demo/index.html) |
-| [V3](versions/v3_two_sided_migration/) | Can left/right clutch imbalance move the cell? | Bell clutches, force–velocity motor, cell force balance | fixed vs moving | permanent | [synchronized lab](versions/v3_two_sided_migration/demo/index.html) |
-| [V4](versions/v4_plastic_remodeling/) | What remains after force removal? | stress-activated link turnover and rest-state reset | fixed load–unload test | permanent vs dynamic | [remodeling lab](versions/v4_plastic_remodeling/demo/index.html) |
+The original folders remain under [`versions/`](versions/).  They document how
+the project progressed from the SLS hypothesis to the first few-fibre,
+crosslink, moving-cell, and rest-state-reset prototypes.  Their old URLs remain
+valid.  They are useful for explaining the research history, but their V2–V4
+animations should not be used as the corrected physical baseline.
 
-The visualizations draw each fiber as a continuous polyline.  Beads are its
-numerical discretization, not independent particles that appear and disappear.
+| Stage | Historical question | Animation |
+|---|---|---|
+| V0 | Can SLS relaxation alter one protrusion's clutch lifetime? | archived code/templates |
+| V1 | Can five elastic bead chains respond to active pull? | [legacy V1](versions/v1_few_fiber/demo/index.html) |
+| V2 | First fixed-cell crosslinked network | [legacy V2](versions/v2_crosslinked_elastic/demo/index.html) |
+| V3 | First fixed-versus-moving comparison | [legacy V3](versions/v3_two_sided_migration/demo/index.html) |
+| V4 | First same-partner rest-reset plasticity test | [legacy V4](versions/v4_plastic_remodeling/demo/index.html) |
 
-## Causal progression for a presentation
+## Generation 2 — corrected baseline
 
-```text
-V0  SLS hypothesis and first motor–clutch implementation
- ↓  remove bond-memory to isolate professor's overdamped equation
-V1  stretching + bending + active pull + drag, but no network coupling
- ↓  correct physical scale and add permanent links
-V2  contacted fiber → crosslink force transmission → remote elastic response
- ↓  add opposing stochastic adhesion systems and release cell constraint
-V3  left/right force imbalance → rigid-cell translation
- ↓  only after elastic and migration baselines are understood, test unloading
-V4  stress-activated link turnover → candidate residual remodeling
-```
+Generation 2 uses one shared bead–spring collagen engine under
+[`generations/g2_corrected/`](generations/g2_corrected/).  There is no SLS in
+these models.
+
+| Stage | Question isolated | Difference between synchronized panels | Animation |
+|---|---|---|---|
+| [V2](generations/g2_corrected/v2_crosslink_transmission/) | Do permanent links transmit a local cell pull to non-contact fibres? | crosslink force off vs on | [corrected V2](generations/g2_corrected/v2_crosslink_transmission/demo/index.html) |
+| [V3](generations/g2_corrected/v3_two_sided_migration/) | Does a persistent left/right clutch imbalance move a released rigid cell? | fixed centre vs x-axis translation | [corrected V3](generations/g2_corrected/v3_two_sided_migration/demo/index.html) |
+| [V4](generations/g2_corrected/v4_contact_plasticity/) | Does the validated baseline bring new fibre pairs close enough to form weak links and leave excess post-unload change? | elastic vs approach-gated new links | [corrected V4](generations/g2_corrected/v4_contact_plasticity/demo/index.html) |
+
+### Shared corrected mechanics
+
+- 180 × 180 µm domain, adopted after the 140/180 µm boundary check exceeded
+  the preregistered 5% tolerance;
+- 99 finite 20–80 µm collagen fibres, 0.30 µm effective diameter;
+- 0.75 µm bead spacing (with 0.50/0.75/1.0 sensitivity saved);
+- only beads in the outer boundary band are fixed;
+- all cell-contact fibres and at least 85% of fibres must connect to the outer
+  boundary through the crosslink graph; the saved seed reaches 100%;
+- axial stiffness `EA/l0`, bending coefficient `EI/l0^3`, and 10% compression
+  stiffness as the microbuckling baseline;
+- hard 3 µm contact shell plus Gaussian weighting with `sigma = 1.5 µm`;
+- 5 nN total active pull (2.5/5/10 nN sensitivity saved);
+- overdamped bead dynamics; no inertial term and no SLS material memory.
+
+## What is visible in every corrected animation
+
+- every circle is a collagen bead and every connecting segment is a spring;
+- gold diamonds are permanent crosslinks; purple diamonds are newly formed weak
+  links in V4;
+- black squares are the **only** fixed beads and occur at the outside boundary;
+- orange halos/arrows are the current direct cell contacts and their
+  Gaussian-weighted forces;
+- red/blue bonds indicate tension/compression;
+- the faint network is the initial geometry;
+- geometry always stays at true 1× scale.  The optional 5× control magnifies
+  displacement vectors only;
+- near-cell zoom is available without changing the mechanics.
+
+The orange contacts are present in frame zero, so they do not disappear once
+per loop as they did in the legacy V2 animation.
+
+## Validation status
+
+[`validation_summary.json`](generations/g2_corrected/validation_summary.json)
+records the accepted gates and sensitivity runs.
+
+- V2 network gate: **pass** — 7,173 beads, 7,074 bonds, 383 permanent links,
+  and 100% boundary-connected fibres.
+- V2 mechanics gate: **pass** — conserved Gaussian force, no cell penetration,
+  99th-percentile strain 0.029%, maximum strain 0.104%, and overdamped energy
+  balance error below 0.01%.
+- Crosslinks increase the intermediate-shell response by 21.6% relative to the
+  same no-crosslink network.
+- V3 mobility gate: **pass** — 20-seed median path speed 0.280 µm/min for the
+  MDA-MB-231 calibration target of 0.2–0.4 µm/min.
+- V3 saved moving trajectory: 8.18 µm path and 4.76 µm net x displacement in
+  30 min; the fixed centre remains exactly zero.
+- V4 currently forms only one genuinely newly approached weak link and produces
+  no resolved excess residual over the elastic control.  This is a negative
+  baseline result, not evidence of permanent remodeling.
 
 ## Run and test
 
-Python and NumPy are the only model dependencies.
-
 ```bash
-python3 -m unittest discover -s versions/v2_crosslinked_elastic/tests -v
-python3 -m unittest discover -s versions/v3_two_sided_migration/tests -v
-python3 -m unittest discover -s versions/v4_plastic_remodeling/tests -v
+python3 -m unittest discover -s generations/g2_corrected/v2_crosslink_transmission/tests -v
+python3 -m unittest discover -s generations/g2_corrected/v3_two_sided_migration/tests -v
+python3 -m unittest discover -s generations/g2_corrected/v4_contact_plasticity/tests -v
 
-python3 versions/v2_crosslinked_elastic/run.py
-python3 versions/v3_two_sided_migration/run.py
-python3 versions/v4_plastic_remodeling/run.py
+python3 generations/g2_corrected/validate.py
+python3 generations/g2_corrected/v2_crosslink_transmission/run.py
+python3 generations/g2_corrected/v3_two_sided_migration/run.py
+python3 generations/g2_corrected/v4_contact_plasticity/run.py
 ```
 
-Each `run.py` precomputes the physics into `demo/data.js`.  The HTML pages only
-play those data; there is no hidden second physics implementation in JavaScript.
+Python precomputes all physics into each `demo/data.js`.  The web pages only
+play saved frames; JavaScript does not implement a second hidden model.
 
-## Default V2 geometry
+See [`ASSUMPTIONS.md`](ASSUMPTIONS.md), [`RESULTS.md`](RESULTS.md), and
+[`CITATIONS.md`](CITATIONS.md) for interpretation boundaries and sources.
 
-- cell radius: 9 µm (18 µm diameter);
-- domain: 100 × 100 µm;
-- fiber contour length: 24–78 µm;
-- effective displayed fiber diameter: 0.30 µm;
-- bead spacing: 0.75 µm;
-- direct contact shell: 3 µm;
-- within-shell Gaussian width: 1.5 µm;
-- far ends fixed; crosslinks permanent and freely hinged.
+## Separate future biology track
 
-The collagen length and thickness ranges originate from Lee et al.'s
-cell-scale bead-network paper.  The 18 µm cell is a transparent representative
-tumor-cell geometry, not a universal value.  Mechanical parameters remain
-uncalibrated model units.  See [saved default results](RESULTS.md),
-[ASSUMPTIONS.md](ASSUMPTIONS.md), and [CITATIONS.md](CITATIONS.md).
-
-## GitHub Pages
-
-After this branch is merged and GitHub Pages is configured to use **GitHub
-Actions**, the included workflow publishes a presentation landing page and all
-four interactive labs.  The expected URL is:
-
-`https://gl0008.github.io/motor-clutch-collagen-model/`
+The Kolade/Adebowale U937 monocyte mechanism is kept conceptually separate.
+That work emphasizes adhesion-dispensable outward protrusive path opening,
+whereas Generation 2 V2/V3 implements the professor's inward, attachment-based
+collagen pulling experiment.  A later U937 model should not silently combine
+the two force directions or cell types.

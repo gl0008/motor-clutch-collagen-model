@@ -1,61 +1,109 @@
-# Literature map: which paper informed which model choice
+# Literature map: which source informed which choice
 
-The papers motivate model structure; most default parameter values are still
-assumptions and are labeled as such in `ASSUMPTIONS.md`.
+The sources motivate structure and plausible scales.  They do not turn the
+coarse-grained defaults into a fit; assumptions remain explicit in
+[`ASSUMPTIONS.md`](ASSUMPTIONS.md).
 
 1. **Lee et al. (2014), “A Three-Dimensional Computational Model of Collagen
    Network Mechanics.”** PLOS ONE 9:e111896.
    [doi:10.1371/journal.pone.0111896](https://doi.org/10.1371/journal.pone.0111896)
-   - Basis for a bead-and-spring collagen network with explicit inter-fiber
-     elastic links and local deformation propagation.
-   - Source for the reported collagen-fiber scale: 20–200 µm length and
-     200–350 nm thickness.  Their tropocollagen/fibril molecular values are nm;
-     those are different hierarchical objects, not contradictory measurements.
+   - Explicit bead-and-spring collagen fibres and inter-fibre links.
+   - Source for the fibre-level 20–200 µm length, 200–350 nm thickness and
+     32 MPa wet-modulus scales.
+   - Their ≈300 nm long, ≈1.5 nm diameter object is a molecular fibril-level
+     object, not the 20–200 µm fibre represented by one bead chain.
 
-2. **Vader et al. (2009), “Strain-Induced Alignment in Collagen Gels.”** PLOS
-   ONE 4:e5902.
-   [doi:10.1371/journal.pone.0005902](https://doi.org/10.1371/journal.pone.0005902)
-   - Supports measuring alignment and densification under load.
-   - Motivates the elastic permanent-link control: crosslinked gels can align
-     while loaded yet recover, so alignment during loading alone is not proof
-     of plastic remodeling.
+2. **Abhilash et al. (2014), “Remodeling of Fibrous Extracellular Matrices by
+   Contractile Cells: Predictions from Discrete Fiber Network Simulations.”**
+   Biophysical Journal 107:1829–1840.
+   [doi:10.1016/j.bpj.2014.08.029](https://doi.org/10.1016/j.bpj.2014.08.029)
+   - Supports discrete-fibre alignment, heterogeneous deformation and
+     long-range force transmission through connected fibre tracts.
+   - Motivates outer-boundary anchoring and the radial displacement/alignment
+     profiles rather than judging only the directly pulled fibre.
 
-3. **Bangasser & Odde (2013), “Master equation-based analysis of a
+3. **Wang et al. (2014), “Long-Range Force Transmission in Fibrous Matrices
+   Enabled by Tension-Driven Alignment of Fibers.”** Biophysical Journal
+   107:2592–2603.
+   [doi:10.1016/j.bpj.2014.09.044](https://doi.org/10.1016/j.bpj.2014.09.044)
+   - Supports tension-driven fibre recruitment/alignment as a source of
+     long-range nonlinear response; Generation 2 reports strain rather than
+     assuming a purely visual reorientation is validated.
+
+4. **Notbohm et al. (2015), “Microbuckling of Fibrin Provides a Mechanism for
+   Cell Mechanosensing.”** Journal of the Royal Society Interface.
+   [arXiv:1407.3510](https://arxiv.org/abs/1407.3510)
+   - Motivates testing compression softening/microbuckling rather than giving
+     fibres identical tensile and compressive response.
+
+5. **Bell (1978), “Models for the Specific Adhesion of Cells to Cells.”**
+   Science 200:618–627.
+   [doi:10.1126/science.347575](https://doi.org/10.1126/science.347575)
+   - Basis for the minimal force-accelerated slip-bond off-rate.
+
+6. **Bangasser & Odde (2013), “Master equation-based analysis of a
    motor-clutch model for cell traction force.”** Cellular and Molecular
    Bioengineering 6:449–459.
    [doi:10.1007/s12195-013-0296-5](https://doi.org/10.1007/s12195-013-0296-5)
-   - Basis for stochastic effective clutches and stiffness-dependent traction.
+   - Basis for stochastic effective clutches and motor–clutch loading.
 
-4. **Bell (1978), “Models for the Specific Adhesion of Cells to Cells.”**
-   Science 200:618–627.
-   [doi:10.1126/science.347575](https://doi.org/10.1126/science.347575)
-   - Basis for the minimal force-accelerated slip-bond off-rate in V0/V3.
-
-5. **Prahl et al. (2020), “Predicting Confined 1D Cell Migration from
+7. **Prahl et al. (2020), “Predicting Confined 1D Cell Migration from
    Parameters Calibrated to a 2D Motor-Clutch Model.”** Biophysical Journal
    118:1709–1720.
    [doi:10.1016/j.bpj.2020.01.048](https://doi.org/10.1016/j.bpj.2020.01.048)
-   - Supports opposing protrusion modules connected to a cell body and motion
-     governed by force balance.  V3 is a simplified network-coupled analogue,
-     not a reproduction of the full CMS.
+   - Supports opposing protrusion modules and the requirement for persistent
+     polarity to obtain directional rather than zero-mean migration.
+   - Motivates keeping corrected V3 on one left/right migration axis before
+     adding full 2-D translation and rotation.
 
-6. **Adebowale et al. (2021), “Enhanced substrate stress relaxation promotes
-   filopodia-mediated cell migration.”** Nature Materials 20:1290–1299.
-   [doi:10.1038/s41563-021-00981-w](https://doi.org/10.1038/s41563-021-00981-w)
-   - Motivation for the original V0 SLS hypothesis and protrusion-lifetime
-     question.  It does not by itself establish that collagen bonds should be
-     SLS elements in V2.
+8. **Steinwachs et al. (2016), “Three-dimensional force microscopy of cells in
+   biopolymer networks.”** Nature Methods 13:171–176.
+   [doi:10.1038/nmeth.3685](https://doi.org/10.1038/nmeth.3685)
+   - Supports using MDA-MB-231 in collagen as the pulling-model calibration
+     context and motivates future force fitting.
 
-7. **Adebowale et al. (2025), “Monocytes use protrusive forces to generate
-   migration paths in viscoelastic collagen-based extracellular matrices.”**
-   PNAS 122:e2309772122.
-   [doi:10.1073/pnas.2309772122](https://doi.org/10.1073/pnas.2309772122)
-   - Biological motivation for eventually calibrating protrusive force and
-     collagen-network remodeling in an actual collagen-based matrix.
+9. **Aguilar-Rojas et al. (2024), “Three-dimensional cell culture conditions
+   promoted the Mesenchymal-Amoeboid Transition in the Triple-Negative Breast
+   Cancer cell line MDA-MB-231.”** Frontiers in Cell and Developmental Biology.
+   [PMCID: PMC11327030](https://pmc.ncbi.nlm.nih.gov/articles/PMC11327030/)
+   - Reports mean instantaneous speeds of about 0.4, 0.3 and 0.07 µm/min in 1,
+     3 and 6 mg/mL collagen, respectively.
+   - Basis for the mechanism-first 0.2–0.4 µm/min V3 mobility target, not a fit
+     to a single concentration-specific trajectory.
 
-8. **Kim et al. (2017), “Stress-induced plasticity of dynamic collagen
-   networks.”** Nature Communications 8:842.
-   [doi:10.1038/s41467-017-01011-7](https://doi.org/10.1038/s41467-017-01011-7)
-   - Motivates V4's explicit elastic-versus-plastic and load–unload comparison.
-   - The paper models irreversible sliding/merging; V4's rest-state reset is a
-     simpler provisional hypothesis and must not be presented as their exact law.
+10. **Han et al. (2018), “Cell contraction induces long-ranged stress
+    stiffening in the extracellular matrix.”** PNAS.
+    [PMCID: PMC5910866](https://pmc.ncbi.nlm.nih.gov/articles/PMC5910866/)
+    - Demonstrates MDA-MB-231-induced long-range effects in 1.5 mg/mL collagen
+      and motivates near/intermediate/far response metrics.
+
+11. **Ban et al. (2018), “Mechanisms of Plastic Deformation in Collagen
+    Networks Induced by Cellular Forces.”** Biophysical Journal 114:450–461.
+    [doi:10.1016/j.bpj.2017.11.3739](https://doi.org/10.1016/j.bpj.2017.11.3739)
+    - Motivates stretch/approach-dependent formation of new weak crosslinks
+      between nearby fibres and load–unload comparison.
+    - Corrected V4 implements only a minimal candidate of this mechanism and
+      currently produces a negative baseline result.
+
+12. **Kim et al. (2017), “Stress-induced plasticity of dynamic collagen
+    networks.”** Nature Communications 8:842.
+    [doi:10.1038/s41467-017-01011-7](https://doi.org/10.1038/s41467-017-01011-7)
+    - Shows irreversible sliding/merging as another plasticity mechanism.
+    - This mechanism is not yet implemented; it is a defined alternative if the
+      weak-link candidate remains inactive.
+
+13. **Adebowale et al. (2021), “Enhanced substrate stress relaxation promotes
+    filopodia-mediated cell migration.”** Nature Materials 20:1290–1299.
+    [doi:10.1038/s41563-021-00981-w](https://doi.org/10.1038/s41563-021-00981-w)
+    - Motivation for the legacy V0 SLS/clutch-lifetime hypothesis.
+    - It does not establish that corrected collagen bonds should contain SLS
+      elements.
+
+14. **Adebowale et al. (2025), “Monocytes use protrusive forces to generate
+    migration paths in viscoelastic collagen-based extracellular matrices.”**
+    PNAS 122:e2309772122.
+    [doi:10.1073/pnas.2309772122](https://doi.org/10.1073/pnas.2309772122)
+    - U937 monocytes open paths using outward protrusive forces and can migrate
+      without the same adhesion-based pulling mechanism.
+    - This is reserved for a separate future biology track and is not mixed
+      into corrected V2/V3.
