@@ -68,3 +68,10 @@ different.
 
 [Open the V4 load–unload lab](demo/index.html)
 
+## Repository record
+
+- **Lineage:** G1 V3 → **G1 V4**; its flaw motivates the separate G2 V4 rule.
+- **Stable tag:** `g1-v4`; the negative result remains preserved.
+- **Notebook:** [purpose, complete equations, evidence boundaries and HOWEVER](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g1-v4).
+- **References used:** R2 Abhilash; R11 Ban; R12 Kim. See the
+  [version-to-reference registry](../../references/README.md).

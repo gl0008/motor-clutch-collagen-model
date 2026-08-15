@@ -9,6 +9,24 @@ older work.
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
 
+## How the repository is organized
+
+Generation 1 is the conceptual mainline; Generation 2 is the corrected branch
+from the frozen G1 archive. The default Git branch `main` is the published
+catalogue, so it intentionally contains both generations for side-by-side
+comparison.
+
+- [`VERSION_MAP.md`](VERSION_MAP.md) — branch/tag lineage, permanent folder map
+  and the rule that prevents versions from overwriting one another;
+- [`references/README.md`](references/README.md) — every paper mapped to the
+  model version and decision it supports;
+- [`CITATIONS.md`](CITATIONS.md) — detailed evidence boundaries;
+- [`ASSUMPTIONS.md`](ASSUMPTIONS.md) — assumption IDs and required follow-up.
+
+Stable tags `g1-v0` through `g1-v4` and `g2-v2` through `g2-v4` identify the
+documented snapshots. Scientific versions live in permanent directories;
+temporary `agent/...` branches are implementation history, not models.
+
 ## Generation 1 — original V0–V4 archive
 
 The original folders remain under [`versions/`](versions/).  They document how

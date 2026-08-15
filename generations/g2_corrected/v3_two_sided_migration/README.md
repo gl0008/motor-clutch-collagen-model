@@ -59,3 +59,12 @@ The visualization draws the initial cell outline and an accumulated trajectory,
 so a several-micrometre translation cannot be hidden by a 180 µm field of view.
 Actual bound clutches appear as spokes between the cell surface and the current
 left/right collagen contact points.
+
+## Repository record
+
+- **Lineage:** G2 V2 → **G2 V3** → G2 V4.
+- **Stable tag:** `g2-v3`; the G1 V3 prototype remains separately accessible.
+- **Notebook:** [purpose, complete equations, evidence boundaries and current limitation](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v3).
+- **References used:** R5 Bell; R6 Bangasser & Odde; R7 Prahl; R8
+  Steinwachs; R9 Aguilar-Rojas. See the
+  [version-to-reference registry](../../../references/README.md).

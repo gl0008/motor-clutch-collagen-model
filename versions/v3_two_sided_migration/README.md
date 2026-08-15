@@ -61,3 +61,11 @@ intentional difference is whether the cell force balance is integrated.
 
 [Open the synchronized V3 lab](demo/index.html)
 
+## Repository record
+
+- **Lineage:** G1 V2 → **G1 V3** → G1 V4; corrected later by G2 V3.
+- **Stable tag:** `g1-v3`; the corrected migration model is separate.
+- **Notebook:** [purpose, complete equations, evidence boundaries and HOWEVER](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g1-v3).
+- **References used:** R5 Bell; R6 Bangasser & Odde; R7 Prahl; R9
+  Aguilar-Rojas. See the
+  [version-to-reference registry](../../references/README.md).
