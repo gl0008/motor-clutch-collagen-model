@@ -41,3 +41,10 @@ fixes both problems.
 
 [Open the V1 animation](demo/index.html)
 
+## Repository record
+
+- **Lineage:** G1 V0 → **G1 V1** → G1 V2.
+- **Stable tag:** `g1-v1`; later crosslink models do not modify this folder.
+- **Notebook:** [purpose, complete equations, evidence boundaries and HOWEVER](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g1-v1).
+- **References used:** R1 Lee; R2 Abhilash; R8 Steinwachs. See the
+  [version-to-reference registry](../../references/README.md).

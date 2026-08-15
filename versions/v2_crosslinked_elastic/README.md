@@ -82,3 +82,11 @@ reported without retuning.  Use the no-crosslink control to test whether remote
 deformation actually depends on network coupling.
 
 [Open the V2 interactive lab](demo/index.html)
+
+## Repository record
+
+- **Lineage:** G1 V1 → **G1 V2** → G1 V3; corrected later by G2 V2.
+- **Stable tag:** `g1-v2`; the corrected network lives in a different folder.
+- **Notebook:** [purpose, complete equations, evidence boundaries and HOWEVER](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g1-v2).
+- **References used:** R1 Lee; R2 Abhilash; R3 Wang; R4 Notbohm. See the
+  [version-to-reference registry](../../references/README.md).

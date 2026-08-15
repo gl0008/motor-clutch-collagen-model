@@ -77,3 +77,11 @@ the Lee et al. bead-network scale; the 400 kPa crosslink modulus is used only as
 a literature-scale reference because mapping it to one 2-D point-link spring is
 not unique.  The effective 75 nN/µm link penalty is therefore still an explicit
 coarse-graining assumption.
+
+## Repository record
+
+- **Lineage:** frozen G1 V2 → **G2 V2** → G2 V3.
+- **Stable tag:** `g2-v2`; G1 V2 remains in `versions/` unchanged.
+- **Notebook:** [purpose, complete equations, evidence boundaries and current limitation](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v2).
+- **References used:** R1 Lee; R2 Abhilash; R3 Wang; R4 Notbohm; R10 Han.
+  See the [version-to-reference registry](../../../references/README.md).

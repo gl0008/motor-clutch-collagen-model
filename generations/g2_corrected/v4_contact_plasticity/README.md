@@ -47,3 +47,12 @@ after the active force has returned to exactly zero.
 
 The molecular identity and kinetics of these weak links remain a hypothesis.
 This stage is not evidence that all collagen plasticity occurs by this route.
+
+## Repository record
+
+- **Lineage:** G2 V3 → **G2 V4**; future plastic mechanisms must use a new
+  version instead of changing this negative baseline.
+- **Stable tag:** `g2-v4`.
+- **Notebook:** [purpose, complete equations, evidence boundaries and current limitation](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v4).
+- **References used:** R1 Lee; R2 Abhilash; R11 Ban; R12 Kim. See the
+  [version-to-reference registry](../../../references/README.md).
