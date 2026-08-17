@@ -44,6 +44,19 @@ def assign_clutch_pool(clutches: ClutchState, protrusions: ProtrusionState) -> N
         clutches.sector_id[:] = -1
         return
 
+    # In normal operation the assignment changes only when a protrusion turns over. Avoid
+    # rebuilding identical masks, pools and anchor offsets on every 0.005 s physics step.
+    if np.all(clutches.sector_id >= 0):
+        base, remainder = divmod(clutches.n_clutches, active.size)
+        expected = np.zeros(protrusions.active.size, dtype=int)
+        expected[active] = base
+        expected[active[:remainder]] += 1
+        observed = np.bincount(
+            clutches.sector_id, minlength=protrusions.active.size
+        )[:protrusions.active.size]
+        if np.array_equal(observed, expected):
+            return
+
     inactive_assignment = ~np.isin(clutches.sector_id, active)
     changed = np.flatnonzero(inactive_assignment & (clutches.sector_id >= 0))
     clutches.detach(changed)

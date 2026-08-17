@@ -114,6 +114,7 @@ def run_g3(
 
     for step in range(n_steps + 1):
         time = step * cfg.dt
+        diagnostic_step = step % metrics_every == 0 or step == n_steps
         if step % geometry_every == 0:
             geometry_scores(protrusions, cell, positions, fixture, cfg)
 
@@ -124,11 +125,16 @@ def run_g3(
         material, _, motor, _ = update_spatial_clutches(
             clutches, protrusions, cell, positions, fixture, cfg, time, rng)
         bead_traction = project_clutch_forces(clutches, material, positions, fixture, cfg)
-        cell_force, cell_torque = reaction_force_and_torque(clutches, motor, cell)
-        force_error, torque_error = conservation_errors(
-            clutches, material, motor, bead_traction, positions, cell)
+        # Reaction drives G3C every step. Fixed-cell stages need it only when a diagnostic is
+        # recorded. Conservation is an identity checked by unit tests and sampled here at the
+        # registered metrics cadence; recomputing it on every unrecorded step changes no state.
+        if stage == "g3c" or diagnostic_step:
+            cell_force, cell_torque = reaction_force_and_torque(clutches, motor, cell)
+        if diagnostic_step:
+            force_error, torque_error = conservation_errors(
+                clutches, material, motor, bead_traction, positions, cell)
 
-        if step % metrics_every == 0 or step == n_steps:
+        if diagnostic_step:
             foi = fibre_orientation_index(positions, fixture, cell.center)
             active = np.flatnonzero(protrusions.active)
             angles = cell.body_angle + protrusions.sector_angles[active]
