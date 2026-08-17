@@ -1,0 +1,11 @@
+{
+  "created": "2026-08-18",
+  "reason": "G3B calibration gate failed: 7 of 20 isotropic runs had invalid rigid-cell geometry overlap",
+  "blocked_actions": [
+    "additional G3B calibration",
+    "configuration freeze",
+    "validation seeds 1000-1099",
+    "G3C calibration or validation"
+  ],
+  "clearance_rule": "Document and implement the geometry/contact decision, rerun seeds 0-19 for every G3B condition, and remove this marker only after all G3B calibration gates pass."
+}

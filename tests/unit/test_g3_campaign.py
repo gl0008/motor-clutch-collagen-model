@@ -1,4 +1,7 @@
+import json
 from dataclasses import replace
+
+import pytest
 
 from g3.campaign import (
     ALL_CONDITIONS,
@@ -7,6 +10,7 @@ from g3.campaign import (
     _checkpoint_is_terminal,
     campaign_fingerprint,
     evaluate_gates,
+    run_campaign,
     selected_conditions,
     summarize_condition,
 )
@@ -71,6 +75,13 @@ def test_checkpoint_resume_retries_worker_errors_but_preserves_negative_results(
     assert not _checkpoint_is_terminal(malformed)
 
 
+def test_halt_marker_blocks_campaign_before_workers_start(tmp_path):
+    marker = tmp_path / "HALT.json"
+    marker.write_text(json.dumps({"reason": "G3B calibration gate failed"}), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="G3B calibration gate failed"):
+        run_campaign(tmp_path, "calibration", G3Config(), 600.0, 1, [])
+
+
 def test_gate_evaluator_handles_partial_campaign_without_inventing_missing_gates():
     summary = {
         "g3b/aligned": {
@@ -84,3 +95,27 @@ def test_gate_evaluator_handles_partial_campaign_without_inventing_missing_gates
     assert gates["g3b_aligned_plus_minus_40_60"]
     assert gates["g3b/aligned_all_runs_valid"]
     assert "g3b_feedback_reduces_guidance_50pct" not in gates
+
+
+def test_all_runs_valid_requires_nonempty_complete_phase():
+    empty = {
+        "g3c/aligned": {
+            "n_records": 0, "n_valid": 0, "n_invalid_overlap": 0,
+            "n_worker_error": 0,
+        }
+    }
+    partial = {
+        "g3c/aligned": {
+            "n_records": 13, "n_valid": 13, "n_invalid_overlap": 0,
+            "n_worker_error": 0,
+        }
+    }
+    complete = {
+        "g3c/aligned": {
+            "n_records": 20, "n_valid": 20, "n_invalid_overlap": 0,
+            "n_worker_error": 0,
+        }
+    }
+    assert not evaluate_gates(empty, expected_records=20)["g3c/aligned_all_runs_valid"]
+    assert not evaluate_gates(partial, expected_records=20)["g3c/aligned_all_runs_valid"]
+    assert evaluate_gates(complete, expected_records=20)["g3c/aligned_all_runs_valid"]

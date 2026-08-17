@@ -217,6 +217,15 @@ def selected_conditions(stages: set[str], names: set[str] | None = None):
 
 def run_campaign(root: Path, phase: str, cfg: G3Config, duration: float, workers: int,
                  conditions):
+    halt_path = root / "HALT.json"
+    if halt_path.exists():
+        try:
+            halt = json.loads(halt_path.read_text(encoding="utf-8"))
+            reason = halt.get("reason", "campaign halted")
+        except (OSError, json.JSONDecodeError):
+            reason = "campaign halted (HALT.json is unreadable)"
+        raise RuntimeError(f"{reason}; remove {halt_path} only after the documented gate is cleared")
+
     seeds = CALIBRATION_SEEDS if phase == "calibration" else VALIDATION_SEEDS
     fingerprint = campaign_fingerprint(cfg, duration)
     if phase == "validation":
@@ -380,14 +389,15 @@ def summarize_campaign(root: Path, phase: str, conditions):
             writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
             writer.writeheader()
             writer.writerows(rows)
-    gates = evaluate_gates(summaries)
+    expected_records = len(CALIBRATION_SEEDS if phase == "calibration" else VALIDATION_SEEDS)
+    gates = evaluate_gates(summaries, expected_records=expected_records)
     _atomic_json(root / phase / "gates.json", gates)
     print(json.dumps(summaries, indent=2), flush=True)
     print(json.dumps({"gates": gates}, indent=2), flush=True)
     return summaries
 
 
-def evaluate_gates(summaries):
+def evaluate_gates(summaries, expected_records=None):
     """Evaluate only gates whose required conditions are present; never tune from this output."""
     gates = {}
 
@@ -483,7 +493,9 @@ def evaluate_gates(summaries):
 
     for name, summary in summaries.items():
         gates[f"{name}_all_runs_valid"] = (
-            summary["n_records"] == summary["n_valid"]
+            summary["n_records"] > 0
+            and (expected_records is None or summary["n_records"] == expected_records)
+            and summary["n_records"] == summary["n_valid"]
             and summary["n_invalid_overlap"] == 0
             and summary["n_worker_error"] == 0
         )

@@ -8,6 +8,8 @@
 G3B calibration is complete, but the stage is **not cleared for final validation**. Do not
 freeze the configuration, inspect seeds 1000--1099, or resume G3C until the isotropic-fixture
 geometry-overlap failure is resolved and the full G3B calibration gate is rerun.
+This stop is code-enforced by `results/g3_validation/HALT.json`; stale resume commands fail
+before creating worker processes.
 
 ## Campaign definition
 
@@ -73,14 +75,14 @@ opening the final seeds.
 ## Premature G3C records
 
 A separate campaign process launched with `--stage both` before the G3B gate was available.
-It produced 169 G3C calibration records, including 8/20 overlap failures in the isotropic
+It produced 173 G3C calibration records, including 8/20 overlap failures in the isotropic
 condition, and was then stopped. These files are retained as exploratory audit records only.
 They are incomplete, were generated before G3B clearance, and must not be cited as G3C
 validation.
 
 ## Software checks
 
-- Active G3 unit suite: 41 passed (`PYTHONPATH=src`, `tests/unit`).
+- Active G3 unit suite: 42 passed (`PYTHONPATH=src`, `tests/unit`).
 - Frozen G2 V2 suite: 5 passed.
 - Frozen G2 V3 suite: 4 passed.
 - Frozen G2 V4 suite: 2 passed.

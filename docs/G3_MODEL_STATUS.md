@@ -48,10 +48,12 @@ inside the rigid cell. The valid-run subset must not be treated as an unbiased i
 ensemble. At 20 seeds, the balanced and valid-isotropic residual polar ratios (0.182 and
 0.276) also cannot establish the preregistered <0.1 final-ensemble criterion.
 
-A concurrently launched `--stage both` job produced 169 partial G3C calibration records
+A concurrently launched `--stage both` job produced 173 partial G3C calibration records
 before this G3B failure was summarized. Those records are retained for audit only and are
 excluded from formal evidence. The job was stopped; G3C calibration/final validation must
 not resume until the G3B geometry-overlap mechanism is resolved and G3B calibration passes.
+`results/g3_validation/HALT.json` enforces this boundary in the campaign runner so stale
+resume commands cannot silently continue the campaign.
 
 See `docs/results/g3b_calibration_2026-08-18.md` and
 `results/g3_validation/calibration/` for the complete summary and per-seed records.
