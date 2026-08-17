@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from .config import G3Config
-from .elastic import bending_forces, extensional_forces, overdamped_step
+from .elastic import NUMBA_ENABLED, bending_forces, extensional_forces, njit, overdamped_step
 from .fixtures import G3Fixture
 from .state import ClutchState, ProtrusionState, RigidCellState
 
@@ -92,8 +92,8 @@ def assign_clutch_pool(clutches: ClutchState, protrusions: ProtrusionState) -> N
         clutches.body_anchor_angle[assigned] = protrusions.sector_angles[sector] + offsets
 
 
-def clutch_geometry(clutches: ClutchState, cell: RigidCellState, positions,
-                    fibre_bonds):
+def clutch_geometry_numpy(clutches: ClutchState, cell: RigidCellState, positions,
+                          fibre_bonds):
     """Return evolving material points, surface anchors, and motor-side endpoints."""
     n = clutches.n_clutches
     material = np.full((n, 2), np.nan, dtype=float)
@@ -111,7 +111,59 @@ def clutch_geometry(clutches: ClutchState, cell: RigidCellState, positions,
     return material, anchors, motor_points, normals
 
 
-def _point_forces(clutches: ClutchState, material, motor_points, cfg: G3Config):
+if njit is not None:
+    @njit(cache=True)
+    def _clutch_geometry_numba(bound, segment_id, alpha, body_anchor_angle,
+                               actin_displacement, center, body_angle, radius,
+                               positions, fibre_bonds):
+        n_clutches = bound.size
+        material = np.empty((n_clutches, 2), dtype=np.float64)
+        material[:, :] = np.nan
+        anchors = np.empty((n_clutches, 2), dtype=np.float64)
+        motor_points = np.empty((n_clutches, 2), dtype=np.float64)
+        normals = np.empty((n_clutches, 2), dtype=np.float64)
+        for clutch_id in range(n_clutches):
+            angle = body_angle + body_anchor_angle[clutch_id]
+            normal_x = np.cos(angle)
+            normal_y = np.sin(angle)
+            normals[clutch_id, 0] = normal_x
+            normals[clutch_id, 1] = normal_y
+            anchors[clutch_id, 0] = center[0] + radius * normal_x
+            anchors[clutch_id, 1] = center[1] + radius * normal_y
+            motor_points[clutch_id, 0] = (
+                anchors[clutch_id, 0] - actin_displacement[clutch_id] * normal_x
+            )
+            motor_points[clutch_id, 1] = (
+                anchors[clutch_id, 1] - actin_displacement[clutch_id] * normal_y
+            )
+            if bound[clutch_id]:
+                segment = segment_id[clutch_id]
+                first = fibre_bonds[segment, 0]
+                second = fibre_bonds[segment, 1]
+                fraction = alpha[clutch_id]
+                material[clutch_id, 0] = (
+                    (1.0 - fraction) * positions[first, 0]
+                    + fraction * positions[second, 0]
+                )
+                material[clutch_id, 1] = (
+                    (1.0 - fraction) * positions[first, 1]
+                    + fraction * positions[second, 1]
+                )
+        return material, anchors, motor_points, normals
+
+
+def clutch_geometry(clutches: ClutchState, cell: RigidCellState, positions,
+                    fibre_bonds):
+    if NUMBA_ENABLED:
+        return _clutch_geometry_numba(
+            clutches.bound, clutches.segment_id, clutches.alpha,
+            clutches.body_anchor_angle, clutches.actin_displacement,
+            cell.center, cell.body_angle, cell.radius, positions, fibre_bonds,
+        )
+    return clutch_geometry_numpy(clutches, cell, positions, fibre_bonds)
+
+
+def _point_forces_numpy(clutches: ClutchState, material, motor_points, cfg: G3Config):
     forces = np.zeros_like(clutches.force_vector)
     idx = np.flatnonzero(clutches.bound)
     if idx.size == 0:
@@ -122,6 +174,33 @@ def _point_forces(clutches: ClutchState, material, motor_points, cfg: G3Config):
     nonzero = distance > 0.0
     forces[idx[nonzero]] = (cfg.clutch_stiffness * extension[nonzero] / distance[nonzero])[:, None] * vector[nonzero]
     return forces
+
+
+if njit is not None:
+    @njit(cache=True)
+    def _point_forces_numba(bound, rest_length, material, motor_points, stiffness):
+        forces = np.zeros_like(motor_points)
+        for clutch_id in range(bound.size):
+            if not bound[clutch_id]:
+                continue
+            dx = motor_points[clutch_id, 0] - material[clutch_id, 0]
+            dy = motor_points[clutch_id, 1] - material[clutch_id, 1]
+            distance = np.sqrt(dx * dx + dy * dy)
+            extension = max(distance - rest_length[clutch_id], 0.0)
+            if distance > 0.0:
+                scale = stiffness * extension / distance
+                forces[clutch_id, 0] = scale * dx
+                forces[clutch_id, 1] = scale * dy
+        return forces
+
+
+def _point_forces(clutches: ClutchState, material, motor_points, cfg: G3Config):
+    if NUMBA_ENABLED:
+        return _point_forces_numba(
+            clutches.bound, clutches.rest_length, material, motor_points,
+            cfg.clutch_stiffness,
+        )
+    return _point_forces_numpy(clutches, material, motor_points, cfg)
 
 
 def closest_material_point(anchor, positions, fibre_bonds, segment_fiber_id):
@@ -206,7 +285,7 @@ def update_spatial_clutches(
     return material, anchors, motor_points, speeds
 
 
-def project_clutch_forces(
+def project_clutch_forces_numpy(
     clutches: ClutchState,
     material_points: np.ndarray,
     positions: np.ndarray,
@@ -222,7 +301,7 @@ def project_clutch_forces(
             continue
         point = material_points[clutch_id]
         fibre = clutches.fiber_id[clutch_id]
-        bead_ids = np.flatnonzero(fixture.network.fiber_id == fibre)
+        bead_ids = fixture.bead_ids_by_fibre[fibre]
         distance = np.linalg.norm(positions[bead_ids] - point[None, :], axis=1)
         support = distance <= cfg.gaussian_support_sigma * cfg.gaussian_sigma
         local_ids = bead_ids[support]
@@ -247,6 +326,77 @@ def project_clutch_forces(
             bead_forces[j] += correction_at_j
 
     return bead_forces
+
+
+if njit is not None:
+    @njit(cache=True)
+    def _project_clutch_forces_numba(bound, fibre_ids, segment_ids, force_vectors,
+                                     material_points, positions, bonds, beads_per_fibre,
+                                     gaussian_sigma, support_sigma):
+        bead_forces = np.zeros_like(positions)
+        support_distance = support_sigma * gaussian_sigma
+        for clutch_id in range(bound.size):
+            if not bound[clutch_id]:
+                continue
+            force_x = force_vectors[clutch_id, 0]
+            force_y = force_vectors[clutch_id, 1]
+            if force_x == 0.0 and force_y == 0.0:
+                continue
+            point_x = material_points[clutch_id, 0]
+            point_y = material_points[clutch_id, 1]
+            first_bead = fibre_ids[clutch_id] * beads_per_fibre
+            last_bead = min(first_bead + beads_per_fibre, positions.shape[0])
+            weight_sum = 0.0
+            for bead_id in range(first_bead, last_bead):
+                dx = positions[bead_id, 0] - point_x
+                dy = positions[bead_id, 1] - point_y
+                distance = np.sqrt(dx * dx + dy * dy)
+                if distance <= support_distance:
+                    weight_sum += np.exp(-0.5 * (distance / gaussian_sigma) ** 2)
+            raw_moment = 0.0
+            if weight_sum > 0.0:
+                for bead_id in range(first_bead, last_bead):
+                    dx = positions[bead_id, 0] - point_x
+                    dy = positions[bead_id, 1] - point_y
+                    distance = np.sqrt(dx * dx + dy * dy)
+                    if distance <= support_distance:
+                        weight = np.exp(-0.5 * (distance / gaussian_sigma) ** 2) / weight_sum
+                        projected_x = weight * force_x
+                        projected_y = weight * force_y
+                        bead_forces[bead_id, 0] += projected_x
+                        bead_forces[bead_id, 1] += projected_y
+                        raw_moment += dx * projected_y - dy * projected_x
+            segment = segment_ids[clutch_id]
+            first = bonds[segment, 0]
+            second = bonds[segment, 1]
+            edge_x = positions[second, 0] - positions[first, 0]
+            edge_y = positions[second, 1] - positions[first, 1]
+            edge_sq = edge_x * edge_x + edge_y * edge_y
+            if edge_sq > 0.0 and raw_moment != 0.0:
+                correction_x = (-raw_moment / edge_sq) * (-edge_y)
+                correction_y = (-raw_moment / edge_sq) * edge_x
+                bead_forces[first, 0] -= correction_x
+                bead_forces[first, 1] -= correction_y
+                bead_forces[second, 0] += correction_x
+                bead_forces[second, 1] += correction_y
+        return bead_forces
+
+
+def project_clutch_forces(
+    clutches: ClutchState,
+    material_points: np.ndarray,
+    positions: np.ndarray,
+    fixture: G3Fixture,
+    cfg: G3Config,
+):
+    if NUMBA_ENABLED:
+        return _project_clutch_forces_numba(
+            clutches.bound, clutches.fiber_id, clutches.segment_id,
+            clutches.force_vector, material_points, positions,
+            fixture.network.fiber_bonds, cfg.beads_per_fibre,
+            cfg.gaussian_sigma, cfg.gaussian_support_sigma,
+        )
+    return project_clutch_forces_numpy(clutches, material_points, positions, fixture, cfg)
 
 
 def reaction_force_and_torque(clutches: ClutchState, motor_points, cell: RigidCellState):

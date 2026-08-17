@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 
@@ -17,12 +17,22 @@ class G3Fixture:
     initial_positions: np.ndarray
     fixed_mask: np.ndarray
     director_angle: float | None
+    _segment_fiber_id: np.ndarray = field(init=False, repr=False)
+    bead_ids_by_fibre: tuple[np.ndarray, ...] = field(init=False, repr=False)
+
+    def __post_init__(self):
+        bonds = self.network.fiber_bonds
+        self._segment_fiber_id = (
+            self.network.fiber_id[bonds[:, 0]] if bonds.size else np.empty(0, dtype=int)
+        )
+        self.bead_ids_by_fibre = tuple(
+            np.flatnonzero(self.network.fiber_id == fibre)
+            for fibre in range(self.network.n_fibers)
+        )
 
     @property
     def segment_fiber_id(self) -> np.ndarray:
-        if self.network.fiber_bonds.size == 0:
-            return np.empty(0, dtype=int)
-        return self.network.fiber_id[self.network.fiber_bonds[:, 0]]
+        return self._segment_fiber_id
 
 
 def _network_from_rays(starts, directions, cfg: G3Config, name: str, director=None):
