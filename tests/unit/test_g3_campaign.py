@@ -99,23 +99,24 @@ def test_gate_evaluator_handles_partial_campaign_without_inventing_missing_gates
 
 def test_all_runs_valid_requires_nonempty_complete_phase():
     empty = {
-        "g3c/aligned": {
+        "g3c/completeness_control": {
             "n_records": 0, "n_valid": 0, "n_invalid_overlap": 0,
             "n_worker_error": 0,
         }
     }
     partial = {
-        "g3c/aligned": {
+        "g3c/completeness_control": {
             "n_records": 13, "n_valid": 13, "n_invalid_overlap": 0,
             "n_worker_error": 0,
         }
     }
     complete = {
-        "g3c/aligned": {
+        "g3c/completeness_control": {
             "n_records": 20, "n_valid": 20, "n_invalid_overlap": 0,
             "n_worker_error": 0,
         }
     }
-    assert not evaluate_gates(empty, expected_records=20)["g3c/aligned_all_runs_valid"]
-    assert not evaluate_gates(partial, expected_records=20)["g3c/aligned_all_runs_valid"]
-    assert evaluate_gates(complete, expected_records=20)["g3c/aligned_all_runs_valid"]
+    gate = "g3c/completeness_control_all_runs_valid"
+    assert not evaluate_gates(empty, expected_records=20)[gate]
+    assert not evaluate_gates(partial, expected_records=20)[gate]
+    assert evaluate_gates(complete, expected_records=20)[gate]
