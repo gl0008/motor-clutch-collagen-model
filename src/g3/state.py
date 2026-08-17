@@ -104,4 +104,3 @@ class G3Snapshot:
     foi: float
     cell_force: np.ndarray
     cell_torque: float
-
