@@ -35,3 +35,20 @@ def test_g3_seeded_short_run_is_replayable():
     second = run_g3("g3a", "single_fibre", cfg, seed=11, duration=0.03)
     assert np.array_equal(first.final_positions, second.final_positions)
     assert np.array_equal(first.traces["bound_count"], second.traces["bound_count"])
+
+
+def test_g3b_keeps_cell_fixed_while_g3c_releases_reaction_motion():
+    cfg = replace(_fast_config(), protrusion_lifetime=0.1)
+    fixed = run_g3("g3b", "asymmetric_torque", cfg, seed=2, duration=0.5)
+    mobile = run_g3("g3c", "asymmetric_torque", cfg, seed=2, duration=0.5)
+    assert np.allclose(fixed.traces["cell_x"], 0.0)
+    assert np.allclose(fixed.traces["cell_angle"], 0.0)
+    assert mobile.summary["cell_net_displacement_m"] > 0.0
+    assert abs(mobile.summary["cell_final_angle_rad"]) > 0.0
+
+
+def test_g3c_empty_fixture_has_no_hidden_self_propulsion_or_rotation():
+    result = run_g3("g3c", "empty", _fast_config(), seed=9, duration=0.05)
+    assert result.summary["cell_net_displacement_m"] == 0.0
+    assert result.summary["cell_path_length_m"] == 0.0
+    assert result.summary["cell_final_angle_rad"] == 0.0
