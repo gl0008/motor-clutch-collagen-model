@@ -10,13 +10,17 @@ G1 V0  →  G1 V1  →  G1 V2  →  G1 V3  →  G1 V4
                                       │
                                       └── G2 corrected baseline
                                            G2 V2 → G2 V3 → G2 V4
+                                                       │
+                                                       └── G3 emergent guidance
+                                                            G3A → G3B → G3C
 ```
 
 Generation 1 is the conceptual mainline: it records how the question developed
 from the SLS prototype to elastic fibres, crosslinks, cell motion and the first
 plasticity hypothesis. Generation 2 branches from the frozen G1 archive and
 repeats V2–V4 with corrected mechanics, boundary conditions, calibration and
-visual encoding.
+visual encoding. Generation 3 preserves G2 as evidence and replaces its prescribed
+directional imbalance with spatial clutches and unbiased protrusion feedback.
 
 The repository's default Git branch remains `main` because it is the published
 catalogue and GitHub Pages source. It contains both generations so that the
@@ -29,6 +33,7 @@ website can compare them. This does **not** mean that G2 overwrote G1.
 | `main` | Published catalogue containing every preserved model | receives reviewed merges |
 | `generation/g1` | Frozen G1 lineage at the pre-correction archive | do not modify |
 | `generation/g2` | Corrected branch descended from G1 | may receive later G2-only work |
+| `codex/g3-emergent-guidance` | Active G3 implementation and review branch | merge only after staged review |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
 | `g2-v2` … `g2-v4` | Stable pointers to the documented corrected release | immutable tags |
 
@@ -54,6 +59,7 @@ are not scientific model versions.
 | G2 V2 | [`generations/g2_corrected/v2_crosslink_transmission/`](generations/g2_corrected/v2_crosslink_transmission/) | [`?model=g2-v2`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v2) | `g2-v2` |
 | G2 V3 | [`generations/g2_corrected/v3_two_sided_migration/`](generations/g2_corrected/v3_two_sided_migration/) | [`?model=g2-v3`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v3) | `g2-v3` |
 | G2 V4 | [`generations/g2_corrected/v4_contact_plasticity/`](generations/g2_corrected/v4_contact_plasticity/) | [`?model=g2-v4`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v4) | `g2-v4` |
+| G3 A–C | [`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/) | saved GIF/PNG smoke outputs under [`figures/g3/`](figures/g3/) | pending reviewed G3 tag |
 
 ## Rule for adding a future model
 

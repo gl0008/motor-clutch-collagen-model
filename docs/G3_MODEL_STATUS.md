@@ -26,28 +26,26 @@ interactions, SLS, transient crosslinks, or irreversible plasticity.
 3. **G3C — rigid-body motion.** The cell translates and rotates only from equal-and-opposite
    clutch reactions. No prescribed self-propulsion velocity is present.
 
-## External G2 reference
+## Relationship to Generation 2
 
-Gloria's G2 code is frozen and external to this implementation.
+The existing `generations/g2_corrected/` implementation remains frozen and unchanged.
 
 - V2 supports force transmission through permanent crosslinks in its specified 2D network.
 - V3 supports reaction-driven motion under a prescribed persistent clutch imbalance.
 - Neither result establishes emergent direction selection or realistic 3D migration.
 
-The nested checkout must not be modified or committed into this parent repository.
+G3 is a new branch-level extension in the same repository. It does not rewrite G2 files or
+reinterpret G2 V2/V3 as realistic tumor migration.
 
 ## Active/superseded map
 
 | Path | Status |
 |---|---|
 | `src/g3/` | Active G3 implementation |
-| `src/ecm/forces.py` | Active reusable elastic force laws |
-| `src/simulation/integrator.py` | Active reusable overdamped integrator |
-| `src/cells/traction.py` | Superseded prescribed dipole |
-| `src/cells/motility.py` | Superseded direct polarity torque and self-propulsion |
-| `src/simulation/cell_ecm.py` | Superseded Phase-B coupled loop |
-| `versions/v1/` | Frozen archive |
-| `test/v1_5/` | Archived SLS experiments |
+| `src/config/params_g3.yaml` | Active G3 configuration |
+| `generations/g3_emergent_guidance/` | G3 scientific-version entry and run instructions |
+| `generations/g2_corrected/` | Frozen G2 mechanism demonstrations |
+| `versions/` | Frozen Generation 1 archive |
 
 ## Interpretation rule
 

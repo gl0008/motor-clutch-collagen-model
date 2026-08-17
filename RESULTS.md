@@ -64,6 +64,42 @@ network is still slowly relaxing.  Permanent change must therefore be judged
 as an excess over the synchronized elastic control.  No such excess is resolved
 in the default run, so V4 is a documented negative baseline.
 
+## Generation 3 — mechanism smoke outputs
+
+These outputs verify that the new mechanisms execute; they do not replace the preregistered
+100-seed final ensemble.
+
+### G3A spatial clutch
+
+- single tangential fibre, fixed cell, seed 4, 15 s;
+- FOI `0.604614 → 0.623941` (`ΔFOI = +0.019326`);
+- maximum bead displacement `0.394767 µm`;
+- maximum bound clutches `173/200`;
+- relative force and torque errors below `4e-16` and `9e-18`;
+- a five-seed short dose smoke check produced positive pull responses above the zero-drift
+  control, but is not the final validation ensemble.
+
+### G3B protrusion turnover
+
+- aligned eight-fibre fixture, fixed cell, seed 23, 120 s;
+- active sectors turned over during the trajectory and spatial clutches bound;
+- one trajectory does **not** establish collagen-guided direction selection, nematic symmetry,
+  or the feedback-ablation gate.
+
+### G3C reaction-driven rigid body
+
+- asymmetric-torque fixture, seed 3, 30 s;
+- nonzero displacement (`0.00187 µm`) and rotation (`6.68e-5 rad`) arose from clutch reactions;
+- the small magnitude is a mechanism check, not realistic migration.
+
+### Load–unload diagnostic
+
+- measured initial/pre/post FOI: `0.604614 / 0.623941 / 0.614069`;
+- `kappa = 0.489` and final elastic energy remained about 1.27% of peak after 600 s;
+- status: `unresolved_recovery`, not plasticity. G3 contains no irreversible material law.
+
+Machine-readable smoke values are in [`figures/g3/demo_metrics.json`](figures/g3/demo_metrics.json).
+
 ## Sensitivity and convergence notes
 
 The complete machine-readable values are in

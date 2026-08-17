@@ -22,6 +22,7 @@ should only be copied into the repository when redistribution rights are clear.
 | G2 V2 | R1–R4, R10 | physical fibre scale, connected transmission, compression softening and spatial response metrics |
 | G2 V3 | R5–R9 | clutch law, motor feedback, polarity, migration speed and future force calibration |
 | G2 V4 | R1, R2, R11, R12 | new-contact weak-link hypothesis, load–unload control and alternative sliding/merging mechanism |
+| G3 A–C | R1, R5, R13, R15–R17 | bead fibres, Bell kinetics, motor-clutch scales, protrusion feedback, FOI/κ diagnostics and elastic parameter scales |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography
@@ -75,6 +76,16 @@ should only be copied into the repository when redistribution rights are clear.
   generate migration paths in viscoelastic collagen-based extracellular
   matrices.” *PNAS* 122:e2309772122.
   [doi:10.1073/pnas.2309772122](https://doi.org/10.1073/pnas.2309772122)
+- **R15 — Carey et al. (2016).** “Local extracellular matrix alignment directs
+  cellular protrusion dynamics and migration through Rac1 and FAK.” *Integrative
+  Biology* 8:821–835.
+  [doi:10.1039/C6IB00030D](https://doi.org/10.1039/C6IB00030D)
+- **R16 — Nam et al. (2016).** “Viscoplasticity Enables Mechanical Remodeling
+  of Matrix by Cells.” *Biophysical Journal* 111:2296–2308.
+  [doi:10.1016/j.bpj.2016.10.002](https://doi.org/10.1016/j.bpj.2016.10.002)
+- **R17 — Saraswathibhatla et al. (2025).** “Swirling motion of breast cancer
+  cells radially aligns collagen fibers to enable collective invasion.” *bioRxiv* preprint.
+  [doi:10.1101/2025.01.31.635980](https://doi.org/10.1101/2025.01.31.635980)
 
 ## Evidence boundary
 

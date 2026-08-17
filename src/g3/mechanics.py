@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ecm.forces import bending_forces, extensional_forces
-from simulation.integrator import euler_maruyama_step
-
 from .config import G3Config
+from .elastic import bending_forces, extensional_forces, overdamped_step
 from .fixtures import G3Fixture
 from .state import ClutchState, ProtrusionState, RigidCellState
 
@@ -259,7 +257,7 @@ def advance_ecm(positions, active_forces, fixture: G3Fixture, cfg: G3Config,
     sub_dt = cfg.dt / cfg.ecm_substeps
     for _ in range(cfg.ecm_substeps):
         total = elastic_forces(updated, fixture, cfg) + active_forces
-        updated = euler_maruyama_step(updated, total, cfg.bead_drag, 0.0, sub_dt, rng)
+        updated = overdamped_step(updated, total, cfg.bead_drag, sub_dt)
         updated[fixture.fixed_mask] = fixture.initial_positions[fixture.fixed_mask]
     return updated
 

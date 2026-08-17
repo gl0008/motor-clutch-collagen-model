@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from ecm.network_init import ECMNetwork
 from .config import G3Config
+from .elastic import ECMNetwork
 
 
 @dataclass

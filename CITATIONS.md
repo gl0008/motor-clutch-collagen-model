@@ -107,3 +107,25 @@ coarse-grained defaults into a fit; assumptions remain explicit in
       without the same adhesion-based pulling mechanism.
     - This is reserved for a separate future biology track and is not mixed
       into corrected V2/V3.
+
+15. **Carey et al. (2016), “Local extracellular matrix alignment directs
+    cellular protrusion dynamics and migration through Rac1 and FAK.”**
+    Integrative Biology 8:821–835.
+    [doi:10.1039/C6IB00030D](https://doi.org/10.1039/C6IB00030D)
+    - Shows that aligned 3D collagen biases protrusion formation, length and persistence along
+      the matrix axis in MDA-MB-231 cells.
+    - Motivates the sign of G3's geometry/persistence feedback, but not its coarse-grained
+      coefficients or turnover rates.
+
+16. **Nam et al. (2016), “Viscoplasticity Enables Mechanical Remodeling of
+    Matrix by Cells.”** Biophysical Journal 111:2296–2308.
+    [doi:10.1016/j.bpj.2016.10.002](https://doi.org/10.1016/j.bpj.2016.10.002)
+    - Provides the load–unload plasticity metric used as G3's elastic-recovery diagnostic.
+    - G3 has no irreversible material mechanism; unresolved recovery is not called plasticity.
+
+17. **Saraswathibhatla et al. (2025), “Swirling motion of breast cancer cells
+    radially aligns collagen fibers to enable collective invasion.”** bioRxiv preprint.
+    [doi:10.1101/2025.01.31.635980](https://doi.org/10.1101/2025.01.31.635980)
+    - Provides G3's bead spacing, elastic stiffness and bending coefficient scales.
+    - Its annular spheroid geometry and full-density network are later validation/scale-up
+      targets, not features of the current eight-fibre fixtures.

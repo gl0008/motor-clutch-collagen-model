@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from ecm.forces import bending_energy, extensional_energy
+from .elastic import bending_energy, extensional_energy
 
 from .config import G3Config
 from .fixtures import G3Fixture

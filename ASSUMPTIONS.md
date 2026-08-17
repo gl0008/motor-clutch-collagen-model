@@ -26,6 +26,22 @@ Generation 2 baseline.
 | G2-A18 | V4 | new link is stress-free at formation and has 15 nN/µm stiffness | minimal Ban-style coarse-grained hypothesis; weaker than permanent links | sweep stiffness/rate only after a load regime creates measurable new contacts |
 | G2-A19 | future | Kolade/Adebowale U937 outward-pushing model is separate | different cell type, force direction and adhesion dependence from the professor's MDA-MB-231 pulling baseline | implement as a separate generation/biology track |
 
+## Generation 3 assumptions
+
+| ID | Stage | Choice | Evidence / reason | Remaining follow-up |
+|---|---|---|---|---|
+| G3-A1 | G3A–C | Eight 40 µm fibres, 1 µm bead spacing, fixed endpoints | deliberately inspectable few-fibre fixtures | replace with 3D image/concentration-calibrated topology only in G4 |
+| G3-A2 | G3A | Clutch binds one segment material coordinate until Bell unbinding | prevents unphysical nearest-bead jumping | validate against spatial adhesion tracking when available |
+| G3-A3 | G3A–C | Engagement begins surface-normal; subsequent force follows the evolving clutch vector | preserves a physical moment arm and permits rigid-cell torque | compare with an explicit cortex/adhesion geometry later |
+| G3-A4 | G3A–C | Same-fibre Gaussian force projection with first-moment correction | represent a point clutch on discrete beads while conserving force and torque | test sensitivity to projection width/resolution |
+| G3-A5 | G3B–C | 24 unbiased sectors, at most two active protrusions | minimal 2D probing model with no prescribed `+x` polarity | validate protrusion counts and lifetimes from microscopy |
+| G3-A6 | G3B–C | Geometry and traction reinforce protrusion persistence | Carey et al. 2016 supports the feedback direction | sweep all provisional rates/gains; do not treat them as measured constants |
+| G3-A7 | G3C | Rigid circular cell, reaction-only translation/rotation | isolates mechanical guidance without hidden self-propulsion | deformable cell, nucleus and pore confinement are deferred |
+| G3-A8 | G3C | 300 nN·s/µm translational drag and dimensional rotational drag | calibrated timescale closure, not an independent prediction | report direction/symmetry before speed; sweep drag |
+| G3-A9 | all | Permanent elastic ECM; no SLS or irreversible remodeling | isolates guidance before material memory | report unresolved recovery as unresolved, not plasticity |
+
+Full values and provenance are in [`docs/parameter_provenance.md`](docs/parameter_provenance.md).
+
 ## Important negative result
 
 At the accepted 5 nN baseline, V4 creates only one pair that satisfies the
