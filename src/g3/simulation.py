@@ -194,34 +194,50 @@ def run_load_unload(
     cfg: G3Config | None = None,
     fixture_name: str = "single_fibre",
     seed: int = 0,
-    pull_duration: float = 120.0,
+    pull_duration: float = 15.0,
     recovery_duration: float = 600.0,
 ):
     """G3 elastic load--unload protocol for FOI recovery and Nam's kappa diagnostic."""
     cfg = cfg or G3Config()
+    # Fixtures are constructed exactly at their elastic rest lengths, so the planned 60 s
+    # no-load equilibration is an analytical no-op (zero force at every step).
     loaded = run_g3("g3a", fixture_name, cfg, seed, duration=pull_duration)
     positions = loaded.final_positions.copy()
+    foi_initial = fibre_orientation_index(
+        loaded.initial_positions, loaded.fixture, loaded.cell.center)
     foi_pre = fibre_orientation_index(positions, loaded.fixture, loaded.cell.center)
     peak_energy = elastic_energy(positions, loaded.fixture, cfg)
+    signal = abs(foi_pre - foi_initial)
     rng = np.random.default_rng(seed + 1_000_000)
     max_steps = int(round(recovery_duration / cfg.dt))
     recovery_time = 0.0
-    resolved = peak_energy <= np.finfo(float).eps
+    resolved = peak_energy <= np.finfo(float).tiny
     for step in range(max_steps):
         positions = advance_ecm(positions, np.zeros_like(positions), loaded.fixture, cfg, rng)
         recovery_time = (step + 1) * cfg.dt
         energy = elastic_energy(positions, loaded.fixture, cfg)
         if peak_energy > 0.0 and energy <= 0.01 * peak_energy:
-            resolved = True
-            break
+            current_foi = fibre_orientation_index(positions, loaded.fixture, loaded.cell.center)
+            current_kappa = nam_plasticity_index(foi_pre, current_foi, reference=foi_initial)
+            if signal < 1.0e-4 or (np.isfinite(current_kappa) and current_kappa < 0.1):
+                resolved = True
+                break
     foi_post = fibre_orientation_index(positions, loaded.fixture, loaded.cell.center)
+    kappa = nam_plasticity_index(foi_pre, foi_post, reference=foi_initial)
+    if signal < 1.0e-4:
+        status = "insufficient_foi_signal"
+    else:
+        status = "complete" if resolved else "unresolved_recovery"
     return {
+        "foi_initial_measured": foi_initial,
         "foi_pre_unload": foi_pre,
         "foi_post_recovery": foi_post,
-        "kappa": nam_plasticity_index(foi_pre, foi_post),
+        "foi_pull_signal": signal,
+        "kappa": kappa,
+        "kappa_reference": "measured initial FOI (equals Nam's random baseline only for an ideal random start)",
         "peak_elastic_energy_J": peak_energy,
         "final_elastic_energy_J": elastic_energy(positions, loaded.fixture, cfg),
         "recovery_time_s": recovery_time,
         "recovery_resolved": resolved,
-        "status": "complete" if resolved else "unresolved_recovery",
+        "status": status,
     }

@@ -31,14 +31,16 @@ def _single_bound_clutch(cfg, fixture, alpha=0.37):
 def test_closest_point_returns_segment_material_coordinate():
     cfg = G3Config()
     fixture = build_fixture("single_fibre", cfg, np.random.default_rng(0))
-    anchor = fixture.initial_positions[0] + np.array([0.25e-6, 0.7e-6])
+    direction = (fixture.initial_positions[1] - fixture.initial_positions[0]) / cfg.bead_spacing
+    normal = np.array([-direction[1], direction[0]])
+    anchor = fixture.initial_positions[0] + 0.25e-6 * direction + 0.7e-6 * normal
     segment, fibre, alpha, point, distance = closest_material_point(
         anchor, fixture.initial_positions, fixture.network.fiber_bonds,
         fixture.segment_fiber_id)
     assert segment == 0
     assert fibre == 0
     assert alpha == pytest.approx(0.25)
-    assert point[0] == pytest.approx(fixture.initial_positions[0, 0] + 0.25e-6)
+    assert np.allclose(point, fixture.initial_positions[0] + 0.25e-6 * direction)
     assert distance == pytest.approx(0.7e-6)
 
 

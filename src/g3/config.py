@@ -50,12 +50,13 @@ class G3Config:
 
     # Overdamped integration and calibrated rigid-cell drag.
     dt: float = 0.005
+    ecm_substeps: int = 2
     cell_drag: float = 0.3  # 300 nN s / um == 0.3 N s / m
     rotational_drag_factor: float = 1.0
     overlap_tolerance: float = 0.1e-6
 
     # Recording defaults. Long preregistered runs override duration at the CLI.
-    duration_g3a: float = 120.0
+    duration_g3a: float = 15.0
     duration_g3b: float = 600.0
     duration_g3c: float = 600.0
     metrics_interval: float = 0.1
@@ -84,8 +85,12 @@ class G3Config:
             raise ValueError("G3 supports one or two active protrusions and >=2 sectors")
         if self.n_active_protrusions > self.n_sectors:
             raise ValueError("active protrusions cannot exceed candidate sectors")
-        if self.dt >= 2.0 * self.bead_drag / self.kappa_s_f:
-            raise ValueError("dt violates the explicit overdamped spring stability bound")
+        if self.ecm_substeps < 1:
+            raise ValueError("ecm_substeps must be a positive integer")
+        # A chain bead couples to two neighbours; its largest extensional eigenvalue tends to
+        # 4*kappa. Forward Euler therefore requires dt_ecm < zeta/(2*kappa).
+        if self.dt / self.ecm_substeps >= self.bead_drag / (2.0 * self.kappa_s_f):
+            raise ValueError("ECM substep violates the explicit bead-chain stability bound")
 
     def to_dict(self) -> dict[str, Any]:
         out = asdict(self)

@@ -28,10 +28,11 @@ g3:
   feedback_time: 30.0
   geometry_update_interval: 0.1
   dt: 0.005
+  ecm_substeps: 2
   cell_drag: 0.3
   rotational_drag_factor: 1.0
   overlap_tolerance: 1.0e-7
-  duration_g3a: 120.0
+  duration_g3a: 15.0
   duration_g3b: 600.0
   duration_g3c: 600.0
   metrics_interval: 0.1

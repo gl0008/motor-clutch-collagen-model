@@ -14,22 +14,18 @@ FOI_RANDOM = 2.0 / np.pi
 
 
 def fibre_geometry(positions, fixture: G3Fixture):
-    """Return fibre centroids and normalized end-to-end orientations."""
-    centroids = []
-    directions = []
-    for fibre in range(fixture.network.n_fibers):
-        points = positions[fixture.network.fiber_id == fibre]
-        if points.shape[0] < 2:
-            continue
-        vector = points[-1] - points[0]
-        length = np.linalg.norm(vector)
-        if length == 0.0:
-            continue
-        centroids.append(points.mean(axis=0))
-        directions.append(vector / length)
-    if not centroids:
+    """Return segment midpoints and tangents for local, deformation-sensitive FOI."""
+    bonds = fixture.network.fiber_bonds
+    if bonds.size == 0:
         return np.empty((0, 2)), np.empty((0, 2))
-    return np.asarray(centroids), np.asarray(directions)
+    a = positions[bonds[:, 0]]
+    b = positions[bonds[:, 1]]
+    vector = b - a
+    length = np.linalg.norm(vector, axis=1)
+    valid = length > 0.0
+    centroids = 0.5 * (a[valid] + b[valid])
+    directions = vector[valid] / length[valid, None]
+    return centroids, directions
 
 
 def fibre_orientation_index(positions, fixture: G3Fixture, cell_center,

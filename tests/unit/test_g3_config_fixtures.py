@@ -13,7 +13,7 @@ def test_g3_defaults_are_si_and_explicitly_stable():
     assert cfg.clutch_stiffness == pytest.approx(5.0e-3)  # 5 pN/nm
     assert cfg.cell_drag == pytest.approx(0.3)            # 300 nN s/um
     assert cfg.rotational_drag == pytest.approx(cfg.cell_drag * cfg.cell_radius**2)
-    assert cfg.dt < 2.0 * cfg.bead_drag / cfg.kappa_s_f
+    assert cfg.dt / cfg.ecm_substeps < cfg.bead_drag / (2.0 * cfg.kappa_s_f)
 
 
 def test_invalid_explicit_timestep_is_rejected():
@@ -34,7 +34,7 @@ def test_minimal_fixture_shapes_and_far_end_anchors(name, n_fibres):
     cfg = G3Config()
     fixture = build_fixture(name, cfg, np.random.default_rng(3))
     assert fixture.network.n_fibers == n_fibres
-    assert fixture.fixed_mask.sum() == n_fibres
+    assert fixture.fixed_mask.sum() == 2 * n_fibres
     if n_fibres:
         assert fixture.network.n_beads == n_fibres * cfg.beads_per_fibre
         assert np.all(np.linalg.norm(fixture.initial_positions, axis=1) >= cfg.cell_radius)

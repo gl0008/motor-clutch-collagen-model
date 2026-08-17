@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 
@@ -82,6 +82,45 @@ def run_ensemble(stage: str, fixture: str, seeds, cfg: G3Config | None = None,
     cfg = cfg or G3Config()
     return [run_g3(stage, fixture, cfg, int(seed), duration, feedback_enabled)
             for seed in seeds]
+
+
+def validate_g3a(cfg: G3Config | None = None, seeds=CALIBRATION_SEEDS,
+                 duration: float = 120.0):
+    """No-pull and 0.5x/1x/2x motor-capacity controls for the oblique single fibre."""
+    cfg = cfg or G3Config()
+    conditions = {
+        "no_pull": replace(cfg, bind_rate=0.0),
+        "motor_0_5x": replace(cfg, motor_force=0.5 * cfg.motor_force),
+        "motor_1x": cfg,
+        "motor_2x": replace(cfg, motor_force=2.0 * cfg.motor_force),
+    }
+    output = {}
+    for label, condition in conditions.items():
+        runs = run_ensemble("g3a", "single_fibre", seeds, condition, duration)
+        delta_foi = np.asarray([
+            run.summary["final_foi"] - run.summary["initial_foi"] for run in runs])
+        max_displacement = np.asarray([
+            run.summary["bead_displacement"]["max"] for run in runs])
+        output[label] = {
+            "mean_delta_foi": float(delta_foi.mean()),
+            "std_delta_foi": float(delta_foi.std()),
+            "mean_max_displacement_m": float(max_displacement.mean()),
+            "max_force_error": float(max(run.summary["max_force_error"] for run in runs)),
+            "max_torque_error": float(max(run.summary["max_torque_error"] for run in runs)),
+        }
+    numerical_floor = max(abs(output["no_pull"]["mean_delta_foi"]), 1.0e-6)
+    output["gates"] = {
+        "foi_signal_gt_10x_no_pull": output["motor_1x"]["mean_delta_foi"] > 10.0 * numerical_floor,
+        "all_pulling_conditions_reorient_positive": all(
+            output[label]["mean_delta_foi"] > 0.0
+            for label in ("motor_0_5x", "motor_1x", "motor_2x")
+        ),
+        "force_conservation": max(
+            output[label]["max_force_error"] for label in conditions) < 1.0e-10,
+        "torque_conservation": max(
+            output[label]["max_torque_error"] for label in conditions) < 1.0e-8,
+    }
+    return output
 
 
 def validate_g3b(cfg: G3Config | None = None, seeds=VALIDATION_SEEDS,

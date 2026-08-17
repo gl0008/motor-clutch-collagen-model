@@ -255,9 +255,12 @@ def elastic_forces(positions, fixture: G3Fixture, cfg: G3Config):
 
 def advance_ecm(positions, active_forces, fixture: G3Fixture, cfg: G3Config,
                 rng: np.random.Generator):
-    total = elastic_forces(positions, fixture, cfg) + active_forces
-    updated = euler_maruyama_step(positions, total, cfg.bead_drag, 0.0, cfg.dt, rng)
-    updated[fixture.fixed_mask] = fixture.initial_positions[fixture.fixed_mask]
+    updated = positions
+    sub_dt = cfg.dt / cfg.ecm_substeps
+    for _ in range(cfg.ecm_substeps):
+        total = elastic_forces(updated, fixture, cfg) + active_forces
+        updated = euler_maruyama_step(updated, total, cfg.bead_drag, 0.0, sub_dt, rng)
+        updated[fixture.fixed_mask] = fixture.initial_positions[fixture.fixed_mask]
     return updated
 
 

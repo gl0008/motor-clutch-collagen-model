@@ -50,6 +50,7 @@ def _network_from_rays(starts, directions, cfg: G3Config, name: str, director=No
         first_bend = (base + bend).ravel()
         triples = np.column_stack((first_bend, first_bend + 1, first_bend + 2)).astype(int)
         fixed = np.zeros(positions.shape[0], dtype=bool)
+        fixed[np.arange(n_fibres) * n_beads] = True
         fixed[np.arange(n_fibres) * n_beads + (n_beads - 1)] = True
 
     network = ECMNetwork(
@@ -76,8 +77,9 @@ def _rotate(points, angle):
 def build_fixture(name: str, cfg: G3Config, rng: np.random.Generator) -> G3Fixture:
     """Build one of the preregistered few-fibre geometries.
 
-    Fibres begin 0.5 um outside the rigid cell and extend outward. Their far ends are fixed,
-    representing continuation into a much larger matrix without introducing an annular wall.
+    Fibres begin 0.5 um outside the rigid cell and extend outward. Both endpoints are fixed,
+    eliminating the rigid-rotation zero mode while representing continuation into a larger
+    matrix without introducing an annular wall.
     """
     contact_radius = cfg.cell_radius + 0.5e-6
 
@@ -85,8 +87,10 @@ def build_fixture(name: str, cfg: G3Config, rng: np.random.Generator) -> G3Fixtu
         return _network_from_rays([], [], cfg, name)
 
     if name == "single_fibre":
-        starts = np.array([[contact_radius, 0.0]])
-        directions = np.array([[1.0, 0.0]])
+        # A tangential fibre passes the cell at its midpoint. Pulling that midpoint inward
+        # produces a visible V-shaped radial recruitment while both far endpoints stay fixed.
+        starts = np.array([[contact_radius, -0.5 * cfg.fibre_length]])
+        directions = np.array([[0.0, 1.0]])
         return _network_from_rays(starts, directions, cfg, name, director=0.0)
 
     if name == "balanced_8":
