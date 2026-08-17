@@ -8,10 +8,12 @@ from g3.fixtures import build_fixture, rotated_fixture
 from g3.mechanics import (
     bell_off_rate,
     clutch_geometry,
+    clutch_geometry_numpy,
     closest_material_point,
     conservation_errors,
     force_velocity,
     project_clutch_forces,
+    project_clutch_forces_numpy,
     update_spatial_clutches,
 )
 from g3.state import ClutchState, ProtrusionState, RigidCellState
@@ -90,6 +92,28 @@ def test_gaussian_projection_preserves_force_and_first_moment():
         clutches, material, motor, bead_forces, fixture.initial_positions, cell)
     assert force_error < 1e-10
     assert torque_error < 1e-8
+
+
+def test_accelerated_clutch_geometry_and_projection_match_numpy_reference():
+    cfg = G3Config()
+    fixture = build_fixture("single_fibre", cfg, np.random.default_rng(0))
+    clutches = _single_bound_clutch(cfg, fixture, alpha=0.37)
+    cell = RigidCellState.at_origin(cfg.cell_radius)
+    accelerated = clutch_geometry(
+        clutches, cell, fixture.initial_positions, fixture.network.fiber_bonds
+    )
+    reference = clutch_geometry_numpy(
+        clutches, cell, fixture.initial_positions, fixture.network.fiber_bonds
+    )
+    for actual, expected in zip(accelerated, reference):
+        assert np.allclose(actual, expected, equal_nan=True, rtol=1.0e-14, atol=1.0e-25)
+    accelerated_force = project_clutch_forces(
+        clutches, accelerated[0], fixture.initial_positions, fixture, cfg
+    )
+    reference_force = project_clutch_forces_numpy(
+        clutches, reference[0], fixture.initial_positions, fixture, cfg
+    )
+    assert np.allclose(accelerated_force, reference_force, rtol=1.0e-13, atol=1.0e-25)
 
 
 def test_projection_rotates_covariantly():

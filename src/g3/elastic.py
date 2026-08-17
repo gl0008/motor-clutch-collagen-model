@@ -3,8 +3,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 
 import numpy as np
+
+try:
+    from numba import njit
+except ImportError:  # pragma: no cover - exercised only in minimal installations
+    njit = None
+
+
+NUMBA_ENABLED = njit is not None and os.environ.get("G3_DISABLE_NUMBA") != "1"
 
 
 @dataclass
@@ -36,7 +45,7 @@ def harmonic_bond_energy(positions, bonds, rest_length, stiffness) -> float:
     return float(0.5 * np.sum(stiffness * (length - rest_length) ** 2))
 
 
-def harmonic_bond_forces(positions, bonds, rest_length, stiffness):
+def harmonic_bond_forces_numpy(positions, bonds, rest_length, stiffness):
     """Equal-and-opposite Hookean forces for an arbitrary bond list."""
     n_beads = positions.shape[0]
     if bonds.size == 0:
@@ -57,6 +66,35 @@ def harmonic_bond_forces(positions, bonds, rest_length, stiffness):
     fy = (np.bincount(first, vector[:, 1], minlength=n_beads)
           - np.bincount(second, vector[:, 1], minlength=n_beads))
     return np.column_stack((fx, fy))
+
+
+if njit is not None:
+    @njit(cache=True)
+    def _harmonic_bond_forces_numba(positions, bonds, rest_length, stiffness):
+        forces = np.zeros_like(positions)
+        for bond_id in range(bonds.shape[0]):
+            first = bonds[bond_id, 0]
+            second = bonds[bond_id, 1]
+            dx = positions[second, 0] - positions[first, 0]
+            dy = positions[second, 1] - positions[first, 1]
+            length = np.sqrt(dx * dx + dy * dy)
+            if length <= 0.0:
+                continue
+            magnitude = stiffness * (length - rest_length) / length
+            fx = magnitude * dx
+            fy = magnitude * dy
+            forces[first, 0] += fx
+            forces[first, 1] += fy
+            forces[second, 0] -= fx
+            forces[second, 1] -= fy
+        return forces
+
+
+def harmonic_bond_forces(positions, bonds, rest_length, stiffness):
+    """Equal-and-opposite Hookean forces, optionally using the verified Numba kernel."""
+    if NUMBA_ENABLED:
+        return _harmonic_bond_forces_numba(positions, bonds, rest_length, stiffness)
+    return harmonic_bond_forces_numpy(positions, bonds, rest_length, stiffness)
 
 
 def extensional_energy(positions, bonds, rest_length, stiffness) -> float:
@@ -93,7 +131,7 @@ def bending_energy(positions, triples, theta0, stiffness) -> float:
     return float(0.5 * np.sum(stiffness * (theta - theta0) ** 2))
 
 
-def bending_forces(positions, triples, theta0, stiffness):
+def bending_forces_numpy(positions, triples, theta0, stiffness):
     """Analytical negative gradient of the harmonic angle energy."""
     n_beads = positions.shape[0]
     if triples.size == 0:
@@ -130,6 +168,59 @@ def bending_forces(positions, triples, theta0, stiffness):
         + np.bincount(last, force_last[:, 1], minlength=n_beads)
     )
     return np.column_stack((fx, fy))
+
+
+if njit is not None:
+    @njit(cache=True)
+    def _bending_forces_numba(positions, triples, theta0, stiffness):
+        forces = np.zeros_like(positions)
+        for triple_id in range(triples.shape[0]):
+            first = triples[triple_id, 0]
+            middle = triples[triple_id, 1]
+            last = triples[triple_id, 2]
+            ux = positions[middle, 0] - positions[first, 0]
+            uy = positions[middle, 1] - positions[first, 1]
+            vx = positions[last, 0] - positions[middle, 0]
+            vy = positions[last, 1] - positions[middle, 1]
+            lu2 = ux * ux + uy * uy
+            lv2 = vx * vx + vy * vy
+            if lu2 <= 0.0 or lv2 <= 0.0:
+                continue
+            lu = np.sqrt(lu2)
+            lv = np.sqrt(lv2)
+            uv = ux * vx + uy * vy
+            cosine = uv / (lu * lv)
+            cosine = min(1.0, max(-1.0, cosine))
+            sine = np.sqrt(max(1.0 - cosine * cosine, 0.0))
+            if sine <= 1.0e-12:
+                continue
+            theta = np.arccos(cosine)
+            prefactor = stiffness * (theta - theta0) / sine
+            inverse_lengths = 1.0 / (lu * lv)
+            v_perp_ux = vx - (uv / lu2) * ux
+            v_perp_uy = vy - (uv / lu2) * uy
+            u_perp_vx = ux - (uv / lv2) * vx
+            u_perp_vy = uy - (uv / lv2) * vy
+            first_x = -prefactor * inverse_lengths * v_perp_ux
+            first_y = -prefactor * inverse_lengths * v_perp_uy
+            last_x = prefactor * inverse_lengths * u_perp_vx
+            last_y = prefactor * inverse_lengths * u_perp_vy
+            middle_x = -(first_x + last_x)
+            middle_y = -(first_y + last_y)
+            forces[first, 0] += first_x
+            forces[first, 1] += first_y
+            forces[middle, 0] += middle_x
+            forces[middle, 1] += middle_y
+            forces[last, 0] += last_x
+            forces[last, 1] += last_y
+        return forces
+
+
+def bending_forces(positions, triples, theta0, stiffness):
+    """Analytical bending forces, optionally using the verified Numba kernel."""
+    if NUMBA_ENABLED:
+        return _bending_forces_numba(positions, triples, theta0, stiffness)
+    return bending_forces_numpy(positions, triples, theta0, stiffness)
 
 
 def overdamped_step(positions, forces, drag, dt):

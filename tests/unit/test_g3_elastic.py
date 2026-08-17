@@ -3,8 +3,10 @@ import numpy as np
 from g3.elastic import (
     bending_energy,
     bending_forces,
+    bending_forces_numpy,
     extensional_energy,
     extensional_forces,
+    harmonic_bond_forces_numpy,
     overdamped_step,
 )
 
@@ -42,3 +44,22 @@ def test_overdamped_step_uses_force_over_drag_and_has_no_hidden_noise():
     forces = np.array([[4.0, -2.0]])
     updated = overdamped_step(positions, forces, drag=2.0, dt=0.5)
     assert np.array_equal(updated, np.array([[2.0, 1.5]]))
+
+
+def test_accelerated_elastic_kernels_match_numpy_reference():
+    rng = np.random.default_rng(18)
+    positions = np.column_stack((np.arange(7) * 1.0e-6, rng.normal(0.0, 0.08e-6, 7)))
+    bonds = np.column_stack((np.arange(6), np.arange(1, 7))).astype(int)
+    triples = np.column_stack((np.arange(5), np.arange(1, 6), np.arange(2, 7))).astype(int)
+    assert np.allclose(
+        extensional_forces(positions, bonds, 1.0e-6, 4.0e-3),
+        harmonic_bond_forces_numpy(positions, bonds, 1.0e-6, 4.0e-3),
+        rtol=1.0e-13,
+        atol=1.0e-25,
+    )
+    assert np.allclose(
+        bending_forces(positions, triples, 0.0, 8.27e-20),
+        bending_forces_numpy(positions, triples, 0.0, 8.27e-20),
+        rtol=1.0e-12,
+        atol=1.0e-25,
+    )
