@@ -4,6 +4,7 @@ from g3.campaign import (
     ALL_CONDITIONS,
     G3B_CONDITIONS,
     G3C_CONDITIONS,
+    _checkpoint_is_terminal,
     campaign_fingerprint,
     evaluate_gates,
     selected_conditions,
@@ -56,6 +57,18 @@ def test_summary_uses_independent_run_vectors_and_reports_invalid_overlap():
     assert summary["n_invalid_overlap"] == 1
     assert summary["mean_nematic_alignment"] == 1.0
     assert summary["positive_fraction"] == 1.0
+
+
+def test_checkpoint_resume_retries_worker_errors_but_preserves_negative_results(tmp_path):
+    worker_error = tmp_path / "worker.json"
+    worker_error.write_text('{"status": "worker_error"}', encoding="utf-8")
+    overlap = tmp_path / "overlap.json"
+    overlap.write_text('{"status": "invalid_geometry_overlap"}', encoding="utf-8")
+    malformed = tmp_path / "malformed.json"
+    malformed.write_text("not-json", encoding="utf-8")
+    assert not _checkpoint_is_terminal(worker_error)
+    assert _checkpoint_is_terminal(overlap)
+    assert not _checkpoint_is_terminal(malformed)
 
 
 def test_gate_evaluator_handles_partial_campaign_without_inventing_missing_gates():

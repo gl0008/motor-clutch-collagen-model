@@ -199,6 +199,17 @@ def _record_path(root: Path, phase: str, condition: CampaignCondition, seed: int
     return root / phase / "records" / condition.stage / condition.name / f"seed_{seed}.json"
 
 
+def _checkpoint_is_terminal(path: Path) -> bool:
+    """Return true for a completed or scientific-negative run, but retry infrastructure errors."""
+    if not path.exists():
+        return False
+    try:
+        status = json.loads(path.read_text(encoding="utf-8")).get("status")
+    except (OSError, json.JSONDecodeError):
+        return False
+    return status not in (None, "worker_error")
+
+
 def selected_conditions(stages: set[str], names: set[str] | None = None):
     return [condition for condition in ALL_CONDITIONS
             if condition.stage in stages and (not names or condition.name in names)]
@@ -233,7 +244,7 @@ def run_campaign(root: Path, phase: str, cfg: G3Config, duration: float, workers
     for condition in conditions:
         for seed in seeds:
             path = _record_path(root, phase, condition, seed)
-            if not path.exists():
+            if not _checkpoint_is_terminal(path):
                 pending.append((condition, int(seed), path))
     print(f"phase={phase} total={len(conditions) * len(seeds)} pending={len(pending)} workers={workers}",
           flush=True)
