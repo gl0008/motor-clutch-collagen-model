@@ -26,6 +26,36 @@ interactions, SLS, transient crosslinks, or irreversible plasticity.
 3. **G3C — rigid-body motion.** The cell translates and rotates only from equal-and-opposite
    clutch reactions. No prescribed self-propulsion velocity is present.
 
+## Current validation state (2026-08-18)
+
+G3B calibration has been completed for all six preregistered conditions using seeds 0--19
+and 600 s per run (120 runs total). The configuration is **not frozen** and validation seeds
+1000--1099 have **not** been opened.
+
+The calibration supports the intended aligned-ECM mechanism:
+
+- `aligned_8`: mean nematic guidance 0.726 (bootstrap 95% CI 0.626--0.819), with a 55/45
+  split between the two directions of the collagen axis.
+- `aligned_8_rotated_30`: the inferred protrusion axis rotated with the fixture; covariance
+  error was 3.03 degrees.
+- `aligned_feedback_off`: mean nematic guidance was -0.033 (95% CI -0.195--0.127), so
+  removing geometry/traction feedback eliminated the aligned preference.
+- `no_fibre`: zero bound clutches, force, and torque in all 20 runs.
+
+G3B nevertheless **fails its calibration gate** because 7 of 20 `isotropic_random_8` runs
+entered `invalid_geometry_overlap`: collagen beads were actively pulled more than 0.1 um
+inside the rigid cell. The valid-run subset must not be treated as an unbiased isotropic
+ensemble. At 20 seeds, the balanced and valid-isotropic residual polar ratios (0.182 and
+0.276) also cannot establish the preregistered <0.1 final-ensemble criterion.
+
+A concurrently launched `--stage both` job produced 169 partial G3C calibration records
+before this G3B failure was summarized. Those records are retained for audit only and are
+excluded from formal evidence. The job was stopped; G3C calibration/final validation must
+not resume until the G3B geometry-overlap mechanism is resolved and G3B calibration passes.
+
+See `docs/results/g3b_calibration_2026-08-18.md` and
+`results/g3_validation/calibration/` for the complete summary and per-seed records.
+
 ## Relationship to Generation 2
 
 The existing `generations/g2_corrected/` implementation remains frozen and unchanged.
