@@ -12,6 +12,7 @@ from g3.campaign import (
     evaluate_gates,
     run_campaign,
     selected_conditions,
+    selected_seeds,
     summarize_condition,
 )
 from g3.config import G3Config
@@ -41,6 +42,13 @@ def test_campaign_fingerprint_changes_if_locked_physics_changes():
 def test_condition_selection_respects_stage_and_name():
     selected = selected_conditions({"g3b"}, {"aligned"})
     assert [(condition.stage, condition.name) for condition in selected] == [("g3b", "aligned")]
+
+
+def test_seed_selection_is_phase_locked_and_deduplicated():
+    assert selected_seeds("calibration", [3, 1, 3]) == (1, 3)
+    assert selected_seeds("validation", [1001, 1000]) == (1000, 1001)
+    with pytest.raises(ValueError, match="outside the calibration preregistered range"):
+        selected_seeds("calibration", [1000])
 
 
 def test_summary_uses_independent_run_vectors_and_reports_invalid_overlap():

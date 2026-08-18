@@ -218,8 +218,19 @@ def selected_conditions(stages: set[str], names: set[str] | None = None):
             if condition.stage in stages and (not names or condition.name in names)]
 
 
+def selected_seeds(phase: str, requested=None):
+    """Return a validated, deterministic subset of a preregistered phase."""
+    campaign_seeds = CALIBRATION_SEEDS if phase == "calibration" else VALIDATION_SEEDS
+    if not requested:
+        return campaign_seeds
+    unknown = sorted(set(requested) - set(campaign_seeds))
+    if unknown:
+        raise ValueError(f"seeds outside the {phase} preregistered range: {unknown}")
+    return tuple(sorted(set(requested)))
+
+
 def run_campaign(root: Path, phase: str, cfg: G3Config, duration: float, workers: int,
-                 conditions):
+                 conditions, requested_seeds=None):
     halt_path = root / "HALT.json"
     if halt_path.exists():
         try:
@@ -229,7 +240,8 @@ def run_campaign(root: Path, phase: str, cfg: G3Config, duration: float, workers
             reason = "campaign halted (HALT.json is unreadable)"
         raise RuntimeError(f"{reason}; remove {halt_path} only after the documented gate is cleared")
 
-    seeds = CALIBRATION_SEEDS if phase == "calibration" else VALIDATION_SEEDS
+    campaign_seeds = CALIBRATION_SEEDS if phase == "calibration" else VALIDATION_SEEDS
+    seeds = selected_seeds(phase, requested_seeds)
     fingerprint = campaign_fingerprint(cfg, duration)
     if phase == "validation":
         lock_path = root / "config_lock.json"
@@ -241,7 +253,8 @@ def run_campaign(root: Path, phase: str, cfg: G3Config, duration: float, workers
 
     manifest = {
         "phase": phase,
-        "seeds": list(seeds),
+        "seeds": list(campaign_seeds),
+        "selected_seeds_at_launch": list(seeds),
         "duration_s": duration,
         "workers": workers,
         "git_commit_at_launch": _git_commit(),
@@ -550,6 +563,10 @@ def main(argv=None):
         sub.add_argument("--duration", type=float, default=600.0)
         if command == "run":
             sub.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) // 2))
+            sub.add_argument(
+                "--seed", action="append", type=int, default=[],
+                help="run only this preregistered seed; repeat for short checkpointed batches",
+            )
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--output", type=Path, required=True)
     freeze.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH)
@@ -565,7 +582,10 @@ def main(argv=None):
     if not conditions:
         raise ValueError("no campaign conditions selected")
     if args.command == "run":
-        run_campaign(args.output, args.phase, cfg, args.duration, args.workers, conditions)
+        run_campaign(
+            args.output, args.phase, cfg, args.duration, args.workers, conditions,
+            requested_seeds=args.seed,
+        )
     else:
         summarize_campaign(args.output, args.phase, conditions)
     return 0
