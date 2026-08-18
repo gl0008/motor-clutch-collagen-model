@@ -1,0 +1,11 @@
+{
+  "output": "C:\\Users\\minni\\Desktop\\motor-clutch-collagen-model\\docs\\g3-web-data.js",
+  "bytes": 10031528,
+  "runs": {
+    "g3a": 41,
+    "g3b_off": 41,
+    "g3b_on": 41,
+    "g3c_fixed": 41,
+    "g3c_released": 41
+  }
+}

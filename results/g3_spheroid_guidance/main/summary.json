@@ -1,0 +1,17 @@
+{
+  "fibers": 150,
+  "beads": 10567,
+  "crosslinks": 786,
+  "connected_fraction": 1.0,
+  "duration_s": 3600.0,
+  "frames": 121,
+  "final_engaged": 10,
+  "peak_traction_nN": 35.90111026328697,
+  "path_length_um": 18.9490174765899,
+  "net_displacement_um": 18.837621836025942,
+  "speed_um_per_min": 0.315816957943165,
+  "order_near_start": -0.6161424043773576,
+  "order_near_end": -0.31023595745108584,
+  "max_bead_disp_um": 5.058386890172027,
+  "polarity_angle_end": -81.80105288943714
+}

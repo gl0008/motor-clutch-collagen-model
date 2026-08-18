@@ -1,0 +1,46 @@
+{
+  "purpose": "G2-scale controlled-loading G3ABC-R visual demonstrations",
+  "duration_s": 20.0,
+  "g3abc_total_traction_target_nN": 5.0,
+  "traction_ramp_after_first_attachment_s": 3.0,
+  "spheroid": {
+    "kind": "traction-only coarse surface shell; no interior or cell-cell mechanics",
+    "surface_patches": 8,
+    "nominal_clutches_per_patch": 200,
+    "total_traction_target_nN": 20.0,
+    "nominal_target_per_patch_nN": 2.5,
+    "radius_um": 35.0
+  },
+  "runs": {
+    "g3a_5nN": {
+      "first_attachment_s_at_frame_resolution": 1.5,
+      "max_applied_clutch_load_nN": 5.000000000000001,
+      "max_bead_displacement_um_across_saved_frames": 0.0329043767651608
+    },
+    "g3b_feedback_off_5nN": {
+      "first_attachment_s_at_frame_resolution": 1.5,
+      "max_applied_clutch_load_nN": 5.000000000000001,
+      "max_bead_displacement_um_across_saved_frames": 0.038274160338505704
+    },
+    "g3b_feedback_on_5nN": {
+      "first_attachment_s_at_frame_resolution": 1.5,
+      "max_applied_clutch_load_nN": 5.000000000000001,
+      "max_bead_displacement_um_across_saved_frames": 0.038274160338505704
+    },
+    "g3c_fixed_5nN": {
+      "first_attachment_s_at_frame_resolution": 1.5,
+      "max_applied_clutch_load_nN": 5.000000000000001,
+      "max_bead_displacement_um_across_saved_frames": 0.03969846386115187
+    },
+    "g3c_released_5nN": {
+      "first_attachment_s_at_frame_resolution": 1.5,
+      "max_applied_clutch_load_nN": 5.000000000000001,
+      "max_bead_displacement_um_across_saved_frames": 0.02852867874753139
+    },
+    "g3s_surface_shell_20nN": {
+      "first_attachment_s_at_frame_resolution": 1.5,
+      "max_applied_clutch_load_nN": 20.000000000000007,
+      "max_bead_displacement_um_across_saved_frames": 0.06253227185563437
+    }
+  }
+}
