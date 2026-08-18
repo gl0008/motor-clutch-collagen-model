@@ -7,6 +7,8 @@ from g3.config import G3Config
 from g3.fixtures import build_fixture, rotated_fixture
 from g3.mechanics import (
     bell_off_rate,
+    cell_contact_forces,
+    cell_contact_forces_numpy,
     clutch_geometry,
     clutch_geometry_numpy,
     closest_material_point,
@@ -69,6 +71,70 @@ def test_bell_rate_and_force_velocity_have_expected_limits():
     assert rates[1] == pytest.approx(np.e * cfg.unbind_rate)
     assert force_velocity(0.0, cfg.n_motors, cfg) == pytest.approx(cfg.unloaded_actin_speed)
     assert force_velocity(cfg.n_motors * cfg.motor_force, cfg.n_motors, cfg) == 0.0
+
+
+def test_conservative_cell_contact_is_outward_and_equal_opposite():
+    cfg = G3Config()
+    cell = RigidCellState.at_origin(cfg.cell_radius)
+    penetration = 0.2e-6
+    positions = np.array([
+        [cfg.cell_radius - penetration, 0.0],
+        [0.0, cfg.cell_radius + 0.3e-6],
+    ])
+    bead, reaction, torque, maximum, count, energy = cell_contact_forces_numpy(
+        positions, cell, cfg)
+    expected_force = cfg.contact_stiffness * penetration
+    assert bead[0] == pytest.approx([expected_force, 0.0])
+    assert bead[1] == pytest.approx([0.0, 0.0])
+    assert bead.sum(axis=0) + reaction == pytest.approx([0.0, 0.0], abs=1e-25)
+    assert torque == pytest.approx(0.0, abs=1e-25)
+    assert maximum == pytest.approx(penetration)
+    assert count == 1
+    assert energy == pytest.approx(0.5 * cfg.contact_stiffness * penetration**2)
+
+    # The force is the negative spatial gradient of the one-sided contact energy.
+    step = 1.0e-10
+    shifted_plus = positions.copy()
+    shifted_minus = positions.copy()
+    shifted_plus[0, 0] += step
+    shifted_minus[0, 0] -= step
+    energy_plus = cell_contact_forces_numpy(shifted_plus, cell, cfg)[-1]
+    energy_minus = cell_contact_forces_numpy(shifted_minus, cell, cfg)[-1]
+    numerical_force = -(energy_plus - energy_minus) / (2.0 * step)
+    assert numerical_force == pytest.approx(expected_force, rel=1e-10)
+
+
+def test_accelerated_contact_matches_numpy_and_conserves_global_moment():
+    cfg = G3Config()
+    cell = RigidCellState.at_origin(cfg.cell_radius)
+    positions = np.array([
+        [0.6 * (cfg.cell_radius - 0.1e-6), 0.8 * (cfg.cell_radius - 0.1e-6)],
+        [-cfg.cell_radius - 0.1e-6, 0.0],
+    ])
+    accelerated = cell_contact_forces(positions, cell, cfg)
+    reference = cell_contact_forces_numpy(positions, cell, cfg)
+    for actual, expected in zip(accelerated, reference):
+        assert actual == pytest.approx(expected, rel=1e-13, abs=1e-25)
+
+    clutches = ClutchState.empty(0)
+    zero = np.zeros_like(positions)
+    force_error, torque_error = conservation_errors(
+        clutches, np.empty((0, 2)), np.empty((0, 2)), zero, positions, cell,
+        contact_bead_forces=accelerated[0],
+        contact_cell_force=accelerated[1],
+        contact_cell_torque=accelerated[2],
+    )
+    assert force_error < 1e-12
+    assert torque_error < 1e-12
+
+
+def test_contact_can_be_disabled_for_ablation():
+    cfg = replace(G3Config(), contact_enabled=False)
+    cell = RigidCellState.at_origin(cfg.cell_radius)
+    result = cell_contact_forces(np.array([[0.5 * cfg.cell_radius, 0.0]]), cell, cfg)
+    assert np.allclose(result[0], 0.0)
+    assert np.allclose(result[1], 0.0)
+    assert result[3:] == (0.0, 0, 0.0)
 
 
 def test_gaussian_projection_preserves_force_and_first_moment():

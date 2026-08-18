@@ -20,6 +20,90 @@ def cross2(a, b):
     return a[..., 0] * b[..., 1] - a[..., 1] * b[..., 0]
 
 
+def cell_contact_forces_numpy(positions, cell: RigidCellState, cfg: G3Config):
+    """One-sided conservative bead--circle contact and equal cell reaction.
+
+    The repulsive signed-distance branch follows the linear elastic contact form in
+    Runser, Vetter & Iber 2024, Methods Eq. 2. G3 uses zero-radius ECM material nodes,
+    no adhesive branch, and no tangential friction.
+    """
+    bead_forces = np.zeros_like(positions)
+    if not cfg.contact_enabled or positions.size == 0:
+        return bead_forces, np.zeros(2), 0.0, 0.0, 0, 0.0
+
+    offset = positions - cell.center[None, :]
+    distance = np.linalg.norm(offset, axis=1)
+    penetration = np.maximum(cell.radius - distance, 0.0)
+    active = penetration > 0.0
+    count = int(active.sum())
+    if count == 0:
+        return bead_forces, np.zeros(2), 0.0, 0.0, 0, 0.0
+
+    normals = np.divide(
+        offset[active], distance[active, None],
+        out=np.zeros((count, 2), dtype=float), where=distance[active, None] > 0.0,
+    )
+    at_center = distance[active] == 0.0
+    if np.any(at_center):
+        normals[at_center] = np.array([np.cos(cell.body_angle), np.sin(cell.body_angle)])
+    bead_forces[active] = (cfg.contact_stiffness * penetration[active])[:, None] * normals
+    cell_force = -bead_forces.sum(axis=0)
+    cell_torque = -float(np.sum(cross2(offset, bead_forces)))
+    energy = 0.5 * cfg.contact_stiffness * float(np.dot(penetration, penetration))
+    return (
+        bead_forces, cell_force, cell_torque,
+        float(penetration.max(initial=0.0)), count, energy,
+    )
+
+
+if njit is not None:
+    @njit(cache=True)
+    def _cell_contact_forces_numba(positions, center, body_angle, radius, stiffness):
+        bead_forces = np.zeros_like(positions)
+        cell_force = np.zeros(2, dtype=np.float64)
+        cell_torque = 0.0
+        max_penetration = 0.0
+        count = 0
+        energy = 0.0
+        fallback_x = np.cos(body_angle)
+        fallback_y = np.sin(body_angle)
+        for bead_id in range(positions.shape[0]):
+            dx = positions[bead_id, 0] - center[0]
+            dy = positions[bead_id, 1] - center[1]
+            distance = np.sqrt(dx * dx + dy * dy)
+            penetration = radius - distance
+            if penetration <= 0.0:
+                continue
+            count += 1
+            max_penetration = max(max_penetration, penetration)
+            energy += 0.5 * stiffness * penetration * penetration
+            if distance > 0.0:
+                normal_x = dx / distance
+                normal_y = dy / distance
+            else:
+                normal_x = fallback_x
+                normal_y = fallback_y
+            force_x = stiffness * penetration * normal_x
+            force_y = stiffness * penetration * normal_y
+            bead_forces[bead_id, 0] = force_x
+            bead_forces[bead_id, 1] = force_y
+            cell_force[0] -= force_x
+            cell_force[1] -= force_y
+            cell_torque -= dx * force_y - dy * force_x
+        return bead_forces, cell_force, cell_torque, max_penetration, count, energy
+
+
+def cell_contact_forces(positions, cell: RigidCellState, cfg: G3Config):
+    """Return bead force, cell reaction, torque, penetration, count, and energy."""
+    if not cfg.contact_enabled:
+        return np.zeros_like(positions), np.zeros(2), 0.0, 0.0, 0, 0.0
+    if NUMBA_ENABLED:
+        return _cell_contact_forces_numba(
+            positions, cell.center, cell.body_angle, cell.radius, cfg.contact_stiffness,
+        )
+    return cell_contact_forces_numpy(positions, cell, cfg)
+
+
 def bell_off_rate(force_magnitude, cfg: G3Config):
     """Bell slip-bond rate, Adebowale et al. 2021 SI Eq. 2."""
     argument = np.clip(np.asarray(force_magnitude) / cfg.bell_force,
@@ -433,16 +517,30 @@ def advance_cell(cell: RigidCellState, force, torque: float, cfg: G3Config) -> N
                             % (2.0 * np.pi) - np.pi)
 
 
-def conservation_errors(clutches, material_points, motor_points, bead_forces, positions, cell):
+def conservation_errors(
+    clutches, material_points, motor_points, bead_forces, positions, cell,
+    contact_bead_forces=None, contact_cell_force=None, contact_cell_torque=0.0,
+):
     """Relative internal force and torque residuals for diagnostics/tests."""
     point_force = clutches.force_vector.sum(axis=0)
     reaction_force, reaction_torque = reaction_force_and_torque(clutches, motor_points, cell)
-    force_residual = bead_forces.sum(axis=0) + reaction_force
-    force_scale = max(float(np.linalg.norm(point_force)), np.finfo(float).eps)
+    if contact_bead_forces is None:
+        contact_bead_forces = np.zeros_like(bead_forces)
+    if contact_cell_force is None:
+        contact_cell_force = np.zeros(2)
+    total_reaction = reaction_force + contact_cell_force
+    force_residual = bead_forces.sum(axis=0) + contact_bead_forces.sum(axis=0) + total_reaction
+    force_scale = max(
+        float(np.linalg.norm(point_force))
+        + float(np.linalg.norm(contact_bead_forces, axis=1).sum()),
+        np.finfo(float).eps,
+    )
     force_error = float(np.linalg.norm(force_residual) / force_scale)
 
-    ecm_moment = float(np.sum(cross2(positions, bead_forces)))
-    cell_moment = float(cross2(cell.center, reaction_force) + reaction_torque)
+    ecm_moment = float(np.sum(cross2(positions, bead_forces + contact_bead_forces)))
+    cell_moment = float(
+        cross2(cell.center, total_reaction) + reaction_torque + contact_cell_torque
+    )
     bound = clutches.bound
     if np.any(bound):
         point_scale = float(np.sum(
@@ -451,5 +549,9 @@ def conservation_errors(clutches, material_points, motor_points, bead_forces, po
         ))
     else:
         point_scale = 0.0
+    point_scale += float(np.sum(
+        np.linalg.norm(contact_bead_forces, axis=1)
+        * np.maximum(np.linalg.norm(positions - cell.center[None, :], axis=1), cell.radius)
+    ))
     torque_error = abs(ecm_moment + cell_moment) / max(point_scale, np.finfo(float).eps)
     return force_error, float(torque_error)

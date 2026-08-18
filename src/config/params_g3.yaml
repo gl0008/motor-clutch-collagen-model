@@ -11,6 +11,8 @@ g3:
   gaussian_sigma: 2.0e-6
   gaussian_support_sigma: 3.0
   capture_distance: 2.0e-6
+  contact_enabled: true
+  contact_stiffness: 4.0e-3
   n_clutches: 200
   n_motors: 200
   motor_force: 2.0e-12

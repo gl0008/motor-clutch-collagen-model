@@ -12,6 +12,7 @@ from .fixtures import G3Fixture, build_fixture
 from .mechanics import (
     advance_cell,
     advance_ecm,
+    cell_contact_forces,
     conservation_errors,
     project_clutch_forces,
     reaction_force_and_torque,
@@ -99,7 +100,8 @@ def run_g3(
     trace = {name: [] for name in (
         "time", "cell_x", "cell_y", "cell_angle", "bound_count", "foi", "cell_force_x",
         "cell_force_y", "cell_torque", "force_error", "torque_error", "elastic_energy",
-        "protrusion_x", "protrusion_y",
+        "contact_count", "contact_penetration", "contact_energy", "protrusion_x",
+        "protrusion_y",
     )}
     snapshots = []
     status = "complete"
@@ -109,6 +111,9 @@ def run_g3(
     cell_torque = 0.0
     force_error = 0.0
     torque_error = 0.0
+    contact_count = 0
+    contact_penetration = 0.0
+    contact_energy = 0.0
 
     geometry_scores(protrusions, cell, positions, fixture, cfg)
 
@@ -125,14 +130,25 @@ def run_g3(
         material, _, motor, _ = update_spatial_clutches(
             clutches, protrusions, cell, positions, fixture, cfg, time, rng)
         bead_traction = project_clutch_forces(clutches, material, positions, fixture, cfg)
+        (
+            bead_contact, contact_cell_force, contact_cell_torque,
+            contact_penetration, contact_count, contact_energy,
+        ) = cell_contact_forces(positions, cell, cfg)
         # Reaction drives G3C every step. Fixed-cell stages need it only when a diagnostic is
         # recorded. Conservation is an identity checked by unit tests and sampled here at the
         # registered metrics cadence; recomputing it on every unrecorded step changes no state.
         if stage == "g3c" or diagnostic_step:
-            cell_force, cell_torque = reaction_force_and_torque(clutches, motor, cell)
+            clutch_cell_force, clutch_cell_torque = reaction_force_and_torque(
+                clutches, motor, cell)
+            cell_force = clutch_cell_force + contact_cell_force
+            cell_torque = clutch_cell_torque + contact_cell_torque
         if diagnostic_step:
             force_error, torque_error = conservation_errors(
-                clutches, material, motor, bead_traction, positions, cell)
+                clutches, material, motor, bead_traction, positions, cell,
+                contact_bead_forces=bead_contact,
+                contact_cell_force=contact_cell_force,
+                contact_cell_torque=contact_cell_torque,
+            )
 
         if diagnostic_step:
             foi = fibre_orientation_index(positions, fixture, cell.center)
@@ -143,7 +159,8 @@ def run_g3(
             values = (
                 time, cell.center[0], cell.center[1], cell.body_angle, int(clutches.bound.sum()),
                 foi, cell_force[0], cell_force[1], cell_torque, force_error, torque_error,
-                elastic_energy(positions, fixture, cfg), pvec[0], pvec[1],
+                elastic_energy(positions, fixture, cfg), contact_count,
+                contact_penetration, contact_energy, pvec[0], pvec[1],
             )
             for key, value in zip(trace, values):
                 trace[key].append(value)
@@ -156,7 +173,7 @@ def run_g3(
         if step == n_steps:
             break
 
-        positions = advance_ecm(positions, bead_traction, fixture, cfg, rng)
+        positions = advance_ecm(positions, bead_traction + bead_contact, fixture, cfg, rng)
         if stage == "g3c":
             advance_cell(cell, cell_force, cell_torque, cfg)
 
@@ -185,6 +202,11 @@ def run_g3(
         "final_foi": float(traces["foi"][-1]) if traces["foi"].size else float("nan"),
         "max_force_error": float(traces["force_error"].max(initial=0.0)),
         "max_torque_error": float(traces["torque_error"].max(initial=0.0)),
+        "max_contact_count": int(traces["contact_count"].max(initial=0)),
+        "max_contact_penetration_m": float(
+            traces["contact_penetration"].max(initial=0.0)
+        ),
+        "max_contact_energy_J": float(traces["contact_energy"].max(initial=0.0)),
         "cell_net_displacement_m": net_displacement,
         "cell_path_length_m": path_length,
         "cell_final_angle_rad": float(cell.body_angle),
@@ -212,16 +234,21 @@ def run_load_unload(
     foi_initial = fibre_orientation_index(
         loaded.initial_positions, loaded.fixture, loaded.cell.center)
     foi_pre = fibre_orientation_index(positions, loaded.fixture, loaded.cell.center)
-    peak_energy = elastic_energy(positions, loaded.fixture, cfg)
+    contact_force, _, _, _, _, peak_contact_energy = cell_contact_forces(
+        positions, loaded.cell, cfg)
+    peak_elastic_energy = elastic_energy(positions, loaded.fixture, cfg)
+    peak_energy = peak_elastic_energy + peak_contact_energy
     signal = abs(foi_pre - foi_initial)
     rng = np.random.default_rng(seed + 1_000_000)
     max_steps = int(round(recovery_duration / cfg.dt))
     recovery_time = 0.0
     resolved = peak_energy <= np.finfo(float).tiny
     for step in range(max_steps):
-        positions = advance_ecm(positions, np.zeros_like(positions), loaded.fixture, cfg, rng)
+        contact_force, _, _, _, _, _ = cell_contact_forces(positions, loaded.cell, cfg)
+        positions = advance_ecm(positions, contact_force, loaded.fixture, cfg, rng)
         recovery_time = (step + 1) * cfg.dt
-        energy = elastic_energy(positions, loaded.fixture, cfg)
+        _, _, _, _, _, contact_energy = cell_contact_forces(positions, loaded.cell, cfg)
+        energy = elastic_energy(positions, loaded.fixture, cfg) + contact_energy
         if peak_energy > 0.0 and energy <= 0.01 * peak_energy:
             current_foi = fibre_orientation_index(positions, loaded.fixture, loaded.cell.center)
             current_kappa = nam_plasticity_index(foi_pre, current_foi, reference=foi_initial)
@@ -241,8 +268,13 @@ def run_load_unload(
         "foi_pull_signal": signal,
         "kappa": kappa,
         "kappa_reference": "measured initial FOI (equals Nam's random baseline only for an ideal random start)",
-        "peak_elastic_energy_J": peak_energy,
+        "peak_elastic_energy_J": peak_elastic_energy,
+        "peak_contact_energy_J": peak_contact_energy,
+        "peak_recoverable_energy_J": peak_energy,
         "final_elastic_energy_J": elastic_energy(positions, loaded.fixture, cfg),
+        "final_contact_energy_J": cell_contact_forces(
+            positions, loaded.cell, cfg
+        )[-1],
         "recovery_time_s": recovery_time,
         "recovery_resolved": resolved,
         "status": status,

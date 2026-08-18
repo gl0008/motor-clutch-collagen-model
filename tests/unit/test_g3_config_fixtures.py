@@ -21,6 +21,13 @@ def test_invalid_explicit_timestep_is_rejected():
         replace(G3Config(), dt=1.0).validate()
 
 
+def test_contact_stiffness_is_positive_and_included_in_stability_bound():
+    with pytest.raises(ValueError, match="contact_stiffness"):
+        replace(G3Config(), contact_stiffness=0.0).validate()
+    with pytest.raises(ValueError, match="stability"):
+        replace(G3Config(), contact_stiffness=0.1).validate()
+
+
 @pytest.mark.parametrize("name,n_fibres", [
     ("empty", 0),
     ("single_fibre", 1),

@@ -9,6 +9,11 @@ surface sectors provide unbiased probes; local collagen availability/alignment a
 formation, while bound fraction and traction affect persistence. G3C releases the rigid cell
 and applies only equal-and-opposite clutch reactions.
 
+A one-sided harmonic contact potential now prevents collagen material nodes from crossing the
+rigid circular boundary. Contact is conservative, frictionless, and non-adhesive; its exact
+opposite reaction is included in G3C cell motion. The contact-enabled ensemble has not yet
+passed calibration.
+
 ## Stage boundaries
 
 - **G3A:** prescribed test protrusion, fixed cell, material-point and conservation gates.

@@ -52,7 +52,9 @@ def test_summary_uses_independent_run_vectors_and_reports_invalid_overlap():
             "final_cell_angle_rad": 0.1, "cell_x_m": 1.0, "cell_y_m": 0.0,
             "max_bound_clutches": 2, "max_cell_force_N": 3.0,
             "max_abs_cell_torque_N_m": 4.0, "max_force_error": 1e-15,
-            "max_torque_error": 1e-15, "wall_time_s": 1.0,
+            "max_torque_error": 1e-15, "max_contact_count": 2,
+            "max_contact_penetration_m": 3e-9, "max_contact_energy_J": 4e-20,
+            "wall_time_s": 1.0,
         },
         {"status": "invalid_geometry_overlap"},
     ]
@@ -61,6 +63,9 @@ def test_summary_uses_independent_run_vectors_and_reports_invalid_overlap():
     assert summary["n_invalid_overlap"] == 1
     assert summary["mean_nematic_alignment"] == 1.0
     assert summary["positive_fraction"] == 1.0
+    assert summary["max_contact_count"] == 2
+    assert summary["max_contact_penetration_m"] == 3e-9
+    assert summary["max_contact_energy_J"] == 4e-20
 
 
 def test_checkpoint_resume_retries_worker_errors_but_preserves_negative_results(tmp_path):

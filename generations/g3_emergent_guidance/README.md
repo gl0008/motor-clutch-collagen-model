@@ -19,6 +19,11 @@ left/right bias used in G2 V3.
 3. **G3C — rigid-body motion.** Equal-and-opposite clutch reactions translate and rotate the
    cell. There is no prescribed velocity, fixed `+x` force, or `polarity_probability=0.65`.
 
+All stages now include a one-sided conservative bead--cell contact potential. It prevents
+collagen material nodes from crossing the rigid circular boundary and applies the exact
+opposite contact reaction to a mobile G3C cell. The contact is frictionless and non-adhesive;
+it is distinct from motor-clutch attachment.
+
 The implementation lives in [`../../src/g3/`](../../src/g3/). Parameters are in
 [`../../src/config/params_g3.yaml`](../../src/config/params_g3.yaml). Equations, provenance,
 and gates are recorded in [`../../equations_talking_points.md`](../../equations_talking_points.md),

@@ -183,6 +183,9 @@ def _run_one(condition_data, seed: int, config_data, duration: float):
         "final_foi": float(result.summary["final_foi"]),
         "max_force_error": float(result.summary["max_force_error"]),
         "max_torque_error": float(result.summary["max_torque_error"]),
+        "max_contact_count": int(result.summary["max_contact_count"]),
+        "max_contact_penetration_m": float(result.summary["max_contact_penetration_m"]),
+        "max_contact_energy_J": float(result.summary["max_contact_energy_J"]),
         "wall_time_s": float(time.perf_counter() - started),
     }
     return record
@@ -366,6 +369,15 @@ def summarize_condition(records, director):
         ),
         "max_force_error": max((record["max_force_error"] for record in valid), default=None),
         "max_torque_error": max((record["max_torque_error"] for record in valid), default=None),
+        "max_contact_count": max(
+            (record.get("max_contact_count", 0) for record in valid), default=None
+        ),
+        "max_contact_penetration_m": max(
+            (record.get("max_contact_penetration_m", 0.0) for record in valid), default=None
+        ),
+        "max_contact_energy_J": max(
+            (record.get("max_contact_energy_J", 0.0) for record in valid), default=None
+        ),
         "mean_wall_time_s": float(np.mean([record["wall_time_s"] for record in valid]))
         if valid else None,
     }
@@ -441,6 +453,12 @@ def evaluate_gates(summaries, expected_records=None):
         no_fibre = summaries["g3b/no_fibre"]
         gates["g3b_no_fibre_has_zero_traction"] = (
             no_fibre["max_bound_clutches"] == 0 and no_fibre["max_cell_force_N"] == 0.0
+        )
+    g3b_names = [f"g3b/{condition.name}" for condition in G3B_CONDITIONS]
+    if available(*g3b_names):
+        gates["g3b_contact_penetration_below_0_1um"] = all(
+            summaries[name].get("max_contact_penetration_m", 0.0) < 0.1e-6
+            for name in g3b_names
         )
 
     if available("g3c/no_fibre"):

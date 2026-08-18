@@ -28,6 +28,11 @@ class G3Config:
     gaussian_support_sigma: float = 3.0
     capture_distance: float = 2.0e-6
 
+    # Conservative one-sided cell--collagen contact (Runser et al. 2024 Eq. 2,
+    # repulsive signed-distance branch). Beads are zero-radius material nodes.
+    contact_enabled: bool = True
+    contact_stiffness: float = 4.0e-3
+
     # Adebowale et al. 2021 SI Table 4, converted once to SI.
     n_clutches: int = 200
     n_motors: int = 200
@@ -87,9 +92,14 @@ class G3Config:
             raise ValueError("active protrusions cannot exceed candidate sectors")
         if self.ecm_substeps < 1:
             raise ValueError("ecm_substeps must be a positive integer")
-        # A chain bead couples to two neighbours; its largest extensional eigenvalue tends to
-        # 4*kappa. Forward Euler therefore requires dt_ecm < zeta/(2*kappa).
-        if self.dt / self.ecm_substeps >= self.bead_drag / (2.0 * self.kappa_s_f):
+        if self.contact_enabled and self.contact_stiffness <= 0.0:
+            raise ValueError("contact_stiffness must be positive when contact is enabled")
+        # A chain bead's largest extensional eigenvalue tends to 4*kappa_s. The active
+        # one-sided contact adds at most k_contact locally. Forward Euler therefore uses
+        # dt_ecm < 2*zeta/(4*kappa_s + k_contact).
+        contact = self.contact_stiffness if self.contact_enabled else 0.0
+        stability_limit = 2.0 * self.bead_drag / (4.0 * self.kappa_s_f + contact)
+        if self.dt / self.ecm_substeps >= stability_limit:
             raise ValueError("ECM substep violates the explicit bead-chain stability bound")
 
     def to_dict(self) -> dict[str, Any]:

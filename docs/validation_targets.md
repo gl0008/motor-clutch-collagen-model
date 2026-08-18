@@ -20,6 +20,9 @@ untouched final-validation set.
 
 | Control | Gate |
 |---|---|
+| Contact exclusion | Maximum bead penetration remains below `0.1 um` in every run |
+| Contact action--reaction | Bead contact force plus cell reaction is numerical zero |
+| Contact ablation | Disabling contact reproduces the preserved overlap failure |
 | Balanced fixture | No fixed `+x` peak |
 | Isotropic ensemble | Ensemble polar resultant / mean individual resultant below 0.1 |
 | Aligned ECM | Protrusion axis follows the collagen director |

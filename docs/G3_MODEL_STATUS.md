@@ -28,9 +28,9 @@ interactions, SLS, transient crosslinks, or irreversible plasticity.
 
 ## Current validation state (2026-08-18)
 
-G3B calibration has been completed for all six preregistered conditions using seeds 0--19
-and 600 s per run (120 runs total). The configuration is **not frozen** and validation seeds
-1000--1099 have **not** been opened.
+The original contact-free G3B calibration was completed for all six preregistered conditions
+using seeds 0--19 and 600 s per run (120 runs total). It remains a preserved negative result.
+The configuration is **not frozen** and validation seeds 1000--1099 have **not** been opened.
 
 The calibration supports the intended aligned-ECM mechanism:
 
@@ -54,6 +54,14 @@ excluded from formal evidence. The job was stopped; G3C calibration/final valida
 not resume until the G3B geometry-overlap mechanism is resolved and G3B calibration passes.
 `results/g3_validation/HALT.json` enforces this boundary in the campaign runner so stale
 resume commands cannot silently continue the campaign.
+
+The active development configuration now contains an explicit conservative cell--collagen
+contact law. A bead that penetrates the rigid circle receives a radial force derived from
+`0.5 * contact_stiffness * penetration^2`, and the cell receives the exact opposite reaction.
+The previously failing isotropic seed 2 reproduces its 48.1 s overlap when contact is disabled;
+with contact enabled it completes a 60 s diagnostic with 0.00375 um maximum penetration.
+This is an implementation diagnostic only. All six G3B calibration conditions must be rerun
+in a new version-preserving output directory before the stage can be cleared.
 
 See `docs/results/g3b_calibration_2026-08-18.md` and
 `results/g3_validation/calibration/` for the complete summary and per-seed records.

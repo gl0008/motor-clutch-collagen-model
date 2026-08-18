@@ -15,6 +15,31 @@ prescribed global polarity.
 
 Stretching and bending are purely elastic. There is no SLS or plasticity in G3.
 
+## Conservative cell--collagen contact
+
+For a zero-radius collagen bead at distance
+
+\[
+d_i=\|\mathbf r_i-\mathbf r_c\|,
+\qquad
+\delta_i=\max(0,R-d_i),
+\]
+
+the one-sided penalty potential and bead force are
+
+\[
+U_i^{\rm contact}=\frac12 k_{\rm contact}\delta_i^2,
+\qquad
+\mathbf F_i^{\rm contact}
+=k_{\rm contact}\delta_i
+\frac{\mathbf r_i-\mathbf r_c}{d_i}.
+\]
+
+The cell receives the exact opposite reaction. The force is central, so ideal circular contact
+adds no torque about the cell center. This is the repulsive signed-distance branch of the
+linear elastic contact approach in Runser, Vetter & Iber 2024, Methods Eq. 2, specialized to
+a rigid 2D circle and point-like ECM beads. G3 includes no contact adhesion or friction.
+
 ## Persistent material-point attachment
 
 For clutch \(j\) bound to segment \((a,b)\),
@@ -73,6 +98,10 @@ chosen coarse-grained rate constants.
 A clutch engages along the surface normal, then follows its evolving full vector. If every
 force were constrained to remain radial on a circular cell, the torque would be identically
 zero. No independent self-propulsion velocity is present.
+
+With contact active, the translational force also includes
+\(-\sum_i\mathbf F_i^{\rm contact}\). This preserves action--reaction balance and prevents
+the rigid cell and collagen nodes from occupying the same space.
 
 ## FOI and κ
 
