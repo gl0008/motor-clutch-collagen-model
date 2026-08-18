@@ -129,3 +129,11 @@ coarse-grained defaults into a fit; assumptions remain explicit in
     - Provides G3's bead spacing, elastic stiffness and bending coefficient scales.
     - Its annular spheroid geometry and full-density network are later validation/scale-up
       targets, not features of the current eight-fibre fixtures.
+
+18. **Runser, Vetter & Iber (2024), “SimuCell3D: Three-dimensional simulation
+    of tissue mechanics with cell polarization.”** Nature Computational Science 4:299–309.
+    [doi:10.1038/s43588-024-00620-9](https://doi.org/10.1038/s43588-024-00620-9)
+    - Supports the repulsive signed-distance branch used for G3's one-sided
+      conservative bead–cell contact potential.
+    - Does not establish the provisional contact stiffness, zero bead radius,
+      frictionless interface or rigid-cell assumption.

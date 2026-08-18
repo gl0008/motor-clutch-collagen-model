@@ -22,7 +22,7 @@ should only be copied into the repository when redistribution rights are clear.
 | G2 V2 | R1–R4, R10 | physical fibre scale, connected transmission, compression softening and spatial response metrics |
 | G2 V3 | R5–R9 | clutch law, motor feedback, polarity, migration speed and future force calibration |
 | G2 V4 | R1, R2, R11, R12 | new-contact weak-link hypothesis, load–unload control and alternative sliding/merging mechanism |
-| G3 A–C | R1, R5, R13, R15–R17 | bead fibres, Bell kinetics, motor-clutch scales, protrusion feedback, FOI/κ diagnostics and elastic parameter scales |
+| G3 A–C | R1, R5, R13, R15–R18 | bead fibres, Bell kinetics, motor-clutch scales, protrusion feedback, FOI/κ diagnostics, elastic parameter scales and conservative cell contact |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography
@@ -86,6 +86,10 @@ should only be copied into the repository when redistribution rights are clear.
 - **R17 — Saraswathibhatla et al. (2025).** “Swirling motion of breast cancer
   cells radially aligns collagen fibers to enable collective invasion.” *bioRxiv* preprint.
   [doi:10.1101/2025.01.31.635980](https://doi.org/10.1101/2025.01.31.635980)
+- **R18 — Runser, Vetter & Iber (2024).** “SimuCell3D: Three-dimensional
+  simulation of tissue mechanics with cell polarization.” *Nature Computational Science*
+  4:299–309.
+  [doi:10.1038/s43588-024-00620-9](https://doi.org/10.1038/s43588-024-00620-9)
 
 ## Evidence boundary
 

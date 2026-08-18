@@ -4,6 +4,11 @@ These files are smoke demonstrations of the implemented mechanisms. They are not
 preregistered 100-seed biological validation and must not be presented as realistic 3D tumor
 migration.
 
+The G3A, G3B, G3C and direction-control assets were regenerated after the conservative
+cell--collagen contact law was enabled. These selected fixtures recorded zero active contact,
+so their mechanism metrics match the preserved pre-contact smoke values. Contact behavior is
+demonstrated and gated separately in `docs/design_decisions/D011_cell_collagen_contact.md`.
+
 ## G3A — material-point clutches
 
 - Fixture: one tangential 40 µm fibre, both endpoints fixed; cell fixed.

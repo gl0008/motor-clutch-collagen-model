@@ -39,6 +39,7 @@ Generation 2 baseline.
 | G3-A7 | G3C | Rigid circular cell, reaction-only translation/rotation | isolates mechanical guidance without hidden self-propulsion | deformable cell, nucleus and pore confinement are deferred |
 | G3-A8 | G3C | 300 nN·s/µm translational drag and dimensional rotational drag | calibrated timescale closure, not an independent prediction | report direction/symmetry before speed; sweep drag |
 | G3-A9 | all | Permanent elastic ECM; no SLS or irreversible remodeling | isolates guidance before material memory | report unresolved recovery as unresolved, not plasticity |
+| G3-A10 | G3A–C | One-sided conservative bead–cell contact with `k_contact=4×10⁻³ N/m` | Runser et al. 2024 supports the signed-distance repulsive form; required after the preserved overlap failure | complete 2/4/8×10⁻³ N/m sensitivity and all-condition recalibration; add cortex/fibre geometry later |
 
 Full values and provenance are in [`docs/parameter_provenance.md`](docs/parameter_provenance.md).
 

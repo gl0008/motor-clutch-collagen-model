@@ -71,9 +71,11 @@ py -3 -m unittest discover -s generations/g2_corrected/v4_contact_plasticity/tes
 Current saved outputs demonstrate implementation mechanisms, not final emergent-guidance
 validation. The 20-seed, 600-s G3B calibration has been run: aligned guidance, nematic sign
 symmetry, 30-degree rotation covariance, feedback ablation and the no-fibre control support the
-intended mechanism. The overall stage gate nevertheless fails because 7/20 isotropic-random
-runs crossed the rigid-cell overlap guard. The untouched 100-seed final ensemble has not been
-opened, and formal G3C validation is halted until G3B is corrected and recalibrated.
+intended mechanism. The preserved contact-free stage gate nevertheless fails because 7/20
+isotropic-random runs crossed the rigid-cell overlap guard. Conservative contact is now
+implemented and passes the targeted 60 s failing-seed diagnostic, but the full six-condition
+calibration must be rerun from clean checkpoints. The untouched 100-seed final ensemble has
+not been opened, and formal G3C validation remains halted until contact-enabled G3B passes.
 
 The website keeps the stages separate so their causal roles are not confused:
 

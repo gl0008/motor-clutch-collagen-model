@@ -122,8 +122,11 @@ G3 removes G2 V3's `polarity_probability=0.65`. It does not claim realistic 3D t
 migration: pores, nucleus, deformable cortex, MMP, collagen-concentration calibration, SLS,
 plasticity, EMT, and cell-cell interactions remain outside its scope. G3A mechanism gates pass.
 The 20-seed G3B calibration supports aligned collagen guidance and rotation covariance, but the
-stage remains blocked because 7/20 isotropic runs crossed the rigid-cell overlap guard. The
-untouched 100-seed final ensemble and formal G3C validation have therefore not been opened.
+preserved contact-free stage remains blocked because 7/20 isotropic runs crossed the rigid-cell
+overlap guard. The active development configuration now includes an equal-and-opposite
+conservative cell–collagen contact law; the targeted failing seed completes 60 s with 0.00375 µm
+maximum penetration. All six contact-enabled calibration conditions still need a clean rerun.
+The untouched 100-seed final ensemble and formal G3C validation have therefore not been opened.
 
 The public notebook now includes separate G3A, G3B and G3C pages with precomputed animations,
 all implemented equations, paper support, assumptions, results and stage-specific limitations:

@@ -7,9 +7,9 @@
       label:'Fixed-cell single-fibre attachment test',
       watch:'A collagen fibre is a connected bead chain. Red spokes end at bound material points; the attachment follows the same segment coordinate as beads deform.',
       cell:'Fixed center and fixed angle. The single active sector is prescribed only to isolate clutch mechanics.',
-      evidence:'Material identity, local force projection, force/torque conservation and rotation-covariance gates pass.',
+      evidence:'Material identity, local force projection, force/torque conservation and rotation-covariance gates pass. The active engine also includes conservative cell contact.',
       metrics:'15 s · FOI 0.6046 → 0.6239 · maximum bead displacement 0.395 µm · maximum 173/200 bound clutches.',
-      boundary:'This does not test emergent direction selection or migration. Extending the pull eventually reaches the no-overlap guard.'
+      boundary:'This does not test emergent direction selection or migration. Contact is frictionless, non-adhesive and provisionally stiff; the saved GIF is a short attachment-mechanism run.'
     },
     g3b:{
       title:'G3B · collagen-guided protrusions',
@@ -18,9 +18,9 @@
       label:'Fixed-cell aligned-collagen guidance test',
       watch:'The two red active-sector rings turn over among 24 initially unbiased probes. Larger/brighter sector points mean more nearby collagen aligned with that outward direction.',
       cell:'Fixed center and fixed angle so protrusion direction is not confused with cell translation.',
-      evidence:'Aligned guidance, ± director symmetry, 30° rotation covariance, feedback ablation and no-fibre controls pass. The overall calibration gate remains blocked.',
+      evidence:'The preserved contact-free run supports aligned guidance, ± director symmetry, 30° rotation covariance, feedback ablation and no-fibre controls. Active code now adds conservative contact, but the full fresh calibration is pending.',
       metrics:'Aligned 20-seed mean nematic guidance 0.726 (95% CI 0.626–0.819) · 55/45 axis-sign split · 3.03° rotation error.',
-      boundary:'Seven of twenty random-isotropic runs pulled collagen inside the rigid cell. Until an explicit contact law is added and all controls are rerun, G3B is not formally validated.'
+      boundary:'Seven of twenty old contact-free random-isotropic runs pulled collagen inside the rigid cell. A conservative contact law now fixes the targeted 60 s seed-2 diagnostic, but all six 600 s conditions must be rerun before G3B is cleared.'
     },
     g3c:{
       title:'G3C · reaction-driven translation and rotation',
@@ -30,7 +30,7 @@
       label:'Released rigid-cell force/torque smoke test',
       watch:'Spatial clutch vectors create an equal-and-opposite blue reaction arrow and torque. The blue trajectory is the resulting cell path, not a prescribed velocity.',
       cell:'Both x/y translation and body rotation are released under linear overdamped drag.',
-      evidence:'The reaction mechanism and hidden-drive audit exist, but the formal G3C campaign is halted behind the failed upstream G3B geometry gate.',
+      evidence:'The reaction mechanism, conservative contact reaction and hidden-drive audit exist, but formal G3C remains halted until the contact-enabled G3B recalibration passes.',
       metrics:'30 s asymmetric fixture · net displacement 0.00187 µm · final rotation 6.68×10⁻⁵ rad. Values are not display-amplified.',
       boundary:'This tiny motion is a mechanism demonstration, not realistic tumor migration. The partial 173-run calibration data are retained for audit and excluded from evidence.'
     }

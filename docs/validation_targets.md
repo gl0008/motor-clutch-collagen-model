@@ -54,5 +54,5 @@ as `unresolved_recovery`, not plasticity.
 The 20-seed, 600-s G3B calibration has been run. Its aligned, rotated, feedback-off and
 no-fibre controls support the intended collagen-guidance mechanism, but 7/20 isotropic runs
 failed the rigid-cell overlap guard. The complete 100-seed G3B/G3C final ensemble has not been
-opened, and G3C formal validation is halted until the G3B geometry/contact decision is made and
-all G3B calibration gates pass.
+opened, and G3C formal validation is halted until the contact-enabled G3B campaign is rerun from
+clean checkpoints and all calibration gates pass.
