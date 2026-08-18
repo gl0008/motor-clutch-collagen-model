@@ -23,6 +23,7 @@ should only be copied into the repository when redistribution rights are clear.
 | G2 V3 | R5–R9 | clutch law, motor feedback, polarity, migration speed and future force calibration |
 | G2 V4 | R1, R2, R11, R12 | new-contact weak-link hypothesis, load–unload control and alternative sliding/merging mechanism |
 | G3 A–C | R1, R5, R13, R15–R18 | bead fibres, Bell kinetics, motor-clutch scales, protrusion feedback, FOI/κ diagnostics, elastic parameter scales and conservative cell contact |
+| Proposed G3-R | R1–R3, R5–R6, R8–R9, R15, R19–R25 | cell-intrinsic polarity, explicit protrusion/adhesion feedback, crosslinked scale-up, nonlinear/relaxing collagen and later pore/nucleus gates; proposal only |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography
@@ -90,6 +91,35 @@ should only be copied into the repository when redistribution rights are clear.
   simulation of tissue mechanics with cell polarization.” *Nature Computational Science*
   4:299–309.
   [doi:10.1038/s43588-024-00620-9](https://doi.org/10.1038/s43588-024-00620-9)
+- **R19 — Mori, Jilkine & Edelstein-Keshet (2008).** “Wave-Pinning and Cell
+  Polarity from a Bistable Reaction-Diffusion System.” *Biophysical Journal*
+  94:3684–3697.
+  [PMCID: PMC2292363](https://pmc.ncbi.nlm.nih.gov/articles/PMC2292363/)
+- **R20 — Fraley et al. (2010).** “A distinctive role for focal adhesion
+  proteins in three-dimensional cell motility.” *Nature Cell Biology* 12:598–604.
+  [doi:10.1038/ncb2062](https://doi.org/10.1038/ncb2062)
+- **R21 — Fraley et al. (2015).** “Three-dimensional matrix fiber alignment
+  modulates cell migration and MT1-MMP utility by spatially and temporally
+  directing protrusions.” *Scientific Reports* 5:14580.
+  [doi:10.1038/srep14580](https://doi.org/10.1038/srep14580)
+- **R22 — Wolf et al. (2013).** “Physical limits of cell migration: Control by
+  ECM space and nuclear deformation and tuning by proteolysis and traction
+  force.” *Journal of Cell Biology* 201:1069–1084.
+  [PMCID: PMC3691458](https://pmc.ncbi.nlm.nih.gov/articles/PMC3691458/)
+- **R23 — Licup et al. (2015).** “Stress controls the mechanics of collagen
+  networks.” *PNAS* 112:9573–9578.
+  [doi:10.1073/pnas.1504258112](https://doi.org/10.1073/pnas.1504258112)
+- **R24 — Nam et al. (2016).** “Strain-enhanced stress relaxation impacts
+  nonlinear elasticity in collagen gels.” *PNAS* 113:5492–5497.
+  [doi:10.1073/pnas.1523906113](https://doi.org/10.1073/pnas.1523906113)
+- **R25 — Krause et al. (2019).** “Fiber stiffness, pore size and adhesion
+  control migratory phenotype of MDA-MB-231 cells in collagen gels.” *PLOS ONE*.
+  [PMCID: PMC6853323](https://pmc.ncbi.nlm.nih.gov/articles/PMC6853323/)
+
+The candidate-by-candidate decision table for G3-R is in
+[`../docs/G3_REVISION_PLAN.md`](../docs/G3_REVISION_PLAN.md). Sources R19–R25
+motivate that proposal; they are not evidence that those mechanisms are already
+implemented or validated.
 
 ## Evidence boundary
 

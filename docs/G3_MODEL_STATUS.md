@@ -2,7 +2,7 @@
 
 ## Scientific claim
 
-G3 is a **2D minimal mechanism model of emergent cell–collagen guidance**. It tests whether
+G3 is a **2D minimal mechanism model testing cell–collagen guidance**. It tests whether
 spatial motor-clutch attachments, local collagen geometry, and traction-dependent protrusion
 persistence can generate a migration axis without a prescribed global polarity.
 
@@ -12,27 +12,46 @@ interactions, SLS, transient crosslinks, or irreversible plasticity.
 
 ## Active stages
 
-1. **G3A — material-point clutches.** A fixed rigid cell pulls a few elastic fibres. Each
+1. **G3A-R — protrusion-tip material-point clutches.** A fixed rigid cell grows a visible
+   protrusion into a crosslinked 99-fibre network. Each
    clutch stores `(fiber_id, segment_id, alpha)` and remains attached to that material point
    until Bell-law unbinding. A local Gaussian projects the point force to nearby beads on the
    same fibre while preserving net force and first moment.
-   The single-fibre gate uses a tangential fibre with both endpoints fixed; the default run is
-   15 s because a longer prescribed pull reaches the explicitly monitored no-steric-overlap
-   boundary of this minimal model.
-2. **G3B — emergent protrusions.** Twenty-four candidate surface sectors probe the matrix.
-   Formation depends on local collagen availability/alignment; persistence is reinforced by
-   bound-clutch fraction and traction success. Initial sector selection is uniform and contains
-   no `+x` preference.
+   The displayed and freshly validated condition uses the shared crosslinked 99-fibre fixture,
+   with boundary-only anchors and eight controlled near-cell contact fibres. The diagnostic
+   protrusion is prescribed only in G3A so growth, capture and network loading can be isolated.
+2. **G3B-R — cell-intrinsic polarity.** A conserved noisy activity field on 24 membrane
+   sectors breaks symmetry without collagen-direction input. Physical attachment and traction
+   can stabilize activity after contact; there is no `+x` preference.
 3. **G3C — rigid-body motion.** The cell translates and rotates only from equal-and-opposite
    clutch reactions. No prescribed self-propulsion velocity is present.
 
 ## Current validation state (2026-08-18)
 
-The original contact-free G3B calibration was completed for all six preregistered conditions
-using seeds 0--19 and 600 s per run (120 runs total). It remains a preserved negative result.
-The configuration is **not frozen** and validation seeds 1000--1099 have **not** been opened.
+### G3-R 99-fibre revision
 
-The calibration supports the intended aligned-ECM mechanism:
+A fresh short mechanism suite has now been run for the explicit-protrusion, cell-intrinsic
+polarity revision. All displayed G3A/B/C conditions use a crosslinked 99-fibre network rather
+than the old few-fibre fixtures. All nine mechanism/execution gates passed, including matched
+motor-off, fixed-cell and empty-network controls. The full result table and interpretation are
+in `docs/results/g3_revision_validation_2026-08-18.md`.
+
+This revision does not erase the preserved result below and does not yet clear a guidance
+claim. Its four-seed aligned ensemble has nematic order 0.0142, whereas the four-seed isotropic
+ensemble has 0.0160. A matched 20 s feedback OFF/ON pair also follows the same sector sequence
+and finishes at 30.02 degrees. The new model therefore needs a larger preregistered aligned-versus-
+isotropic calibration, rotated-axis covariance and parameter sensitivity before final
+validation seeds are opened.
+
+### Superseded original contact-free calibration — audit only
+
+The original contact-free G3B calibration was completed for all six preregistered conditions
+using seeds 0--19 and 600 s per run (120 runs total). It is preserved for audit but is not
+current evidence because one comparison condition failed its geometry-validity gate. The
+configuration is **not frozen** and validation seeds 1000--1099 have **not** been opened.
+
+The valid subsets produced the following historical signals, which motivated the revision but
+must not be reported as a successful guidance result:
 
 - `aligned_8`: mean nematic guidance 0.726 (bootstrap 95% CI 0.626--0.819), with a 55/45
   split between the two directions of the collagen axis.
@@ -50,18 +69,20 @@ ensemble. At 20 seeds, the balanced and valid-isotropic residual polar ratios (0
 
 A concurrently launched `--stage both` job produced 173 partial G3C calibration records
 before this G3B failure was summarized. Those records are retained for audit only and are
-excluded from formal evidence. The job was stopped; G3C calibration/final validation must
-not resume until the G3B geometry-overlap mechanism is resolved and G3B calibration passes.
+excluded from formal evidence. The old campaign was stopped. The fresh G3C-R short mechanism
+run is a separate control-based execution test; predictive migration validation must not
+resume until the revised G3B guidance gate passes.
 `results/g3_validation/HALT.json` enforces this boundary in the campaign runner so stale
 resume commands cannot silently continue the campaign.
 
-The active development configuration now contains an explicit conservative cell--collagen
+The active configuration now contains an explicit conservative cell--collagen
 contact law. A bead that penetrates the rigid circle receives a radial force derived from
 `0.5 * contact_stiffness * penetration^2`, and the cell receives the exact opposite reaction.
 The previously failing isotropic seed 2 reproduces its 48.1 s overlap when contact is disabled;
 with contact enabled it completes a 60 s diagnostic with 0.00375 um maximum penetration.
-This is an implementation diagnostic only. All six G3B calibration conditions must be rerun
-in a new version-preserving output directory before the stage can be cleared.
+This was an implementation diagnostic only. The new 99-fibre short suite has since been run,
+but its aligned/isotropic results remain negative. A larger preregistered rerun in a new
+version-preserving output directory is required before the guidance stage can be cleared.
 
 See `docs/results/g3b_calibration_2026-08-18.md` and
 `results/g3_validation/calibration/` for the complete summary and per-seed records.

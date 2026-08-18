@@ -3,39 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>G3 mechanism animation</title>
-<link rel="stylesheet" href="g3-demo.css">
-<script defer src="g3-demo.js"></script>
+<title>G3 physical simulation</title>
+<link rel="stylesheet" href="g3-gloria.css?v=2">
 </head>
 <body>
-<header>
-  <div><span class="eyebrow">precomputed Python simulation · no browser physics</span><h1 id="title"></h1></div>
-  <nav aria-label="G3 stages">
-    <a href="g3-demo.html?stage=g3a" data-stage="g3a">G3A</a>
-    <a href="g3-demo.html?stage=g3b" data-stage="g3b">G3B</a>
-    <a href="g3-demo.html?stage=g3c" data-stage="g3c">G3C</a>
-  </nav>
-</header>
-<main>
-  <section class="explain">
-    <div><b>What to watch</b><p id="watch"></p></div>
-    <div><b>Cell state</b><p id="cellState"></p></div>
-    <div><b>Evidence status</b><p id="evidence"></p></div>
+<header><h1 id="title"></h1><p id="subtitle"></p></header>
+<main class="layout">
+  <section class="panel"><h2 id="leftTitle"></h2><svg class="scene" id="left" aria-label="Left synchronized G3 condition"></svg><div class="metrics" id="leftMetrics"></div></section>
+  <section class="panel"><h2 id="rightTitle"></h2><svg class="scene" id="right" aria-label="Right synchronized G3 condition"></svg><div class="metrics" id="rightMetrics"></div></section>
+  <section class="controls">
+    <button class="primary" id="play">Pause</button><button id="step">Step</button><a class="gifLink" id="gifLink" href="#" target="_blank" rel="noopener">Open updated GIF</a>
+    <label>View <select id="view"><option value="full">full 180 µm field</option><option value="near">near-cell zoom</option></select></label>
+    <label class="check"><input type="checkbox" id="vectors"> displacement vectors</label>
+    <label>vector scale <select id="vectorScale"><option value="1">1×</option><option value="5">5×</option><option value="1000" selected>1000×</option></select></label>
+    <input id="scrub" type="range" min="0" max="100" value="0"><span class="readout" id="time">0.0 s</span>
   </section>
-  <section class="viewer">
-    <div class="viewerHead"><div><span class="statusDot"></span><b id="animationLabel"></b></div><button id="restart" type="button">Restart animation</button></div>
-    <img id="animation" alt="Animated G3 simulation">
-    <p class="legend"><span class="bead"></span> collagen beads + connected springs <span class="clutch"></span> bound clutch material points/spokes <span class="sector"></span> sector geometry score <span class="active"></span> active protrusions <span class="path"></span> cell path</p>
-  </section>
-  <section class="secondary" id="secondary" hidden>
-    <div class="viewerHead"><b>Direction controls: random, aligned, aligned rotated 30°</b><button id="restartSecondary" type="button">Restart controls</button></div>
-    <img id="secondaryAnimation" alt="G3C direction-control animation">
-  </section>
-  <section class="summary">
-    <div><h2>Recorded outputs</h2><p id="metrics"></p><p class="boundary" id="boundary"></p></div>
-    <img id="summaryImage" alt="Summary plots for this G3 stage">
-  </section>
+  <div class="legend"><span class="key" style="--c:#48636f">bond + bead</span><span class="key" style="--c:#247c75">declared contact fibre</span><span class="key" style="--c:#b17d28">crosslink diamond</span><span class="key" style="--c:#2e7c61">protrusion</span><span class="key" style="--c:#b93a35">bound material point</span><span class="key" style="--c:#d45f32">clutch force</span><span class="key" style="--c:#17232b">outer anchor</span></div>
+  <section class="explain"><div><b>What should move?</b><p class="small" id="what"></p></div><div class="equation"><span id="equation"></span><br><span class="small">Every frame is a precomputed Python solver snapshot. Browser JavaScript decodes and renders positions; it does not prescribe cell, protrusion or collagen motion. Geometry is true 1× unless the optional green displacement vectors are selected.</span></div></section>
 </main>
-<footer>Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction.</footer>
+<script src="g3-web-data.js?v=99f-r2"></script>
+<script src="g3-gloria.js?v=2"></script>
 </body>
 </html>

@@ -6,16 +6,21 @@ Generation 3 tests whether spatial motor-clutch attachments, local collagen geom
 traction-dependent protrusion persistence can produce a migration axis without the prescribed
 left/right bias used in G2 V3.
 
+The G3-R revision now implements explicit protrusion growth, cell-intrinsic polarity,
+post-attachment feedback, 99-fibre crosslinked-network scale-up and G1/G2-style synchronized
+GIFs. Its design is in [`../../docs/G3_REVISION_PLAN.md`](../../docs/G3_REVISION_PLAN.md), and
+fresh mechanism results are in
+[`../../docs/results/g3_revision_validation_2026-08-18.md`](../../docs/results/g3_revision_validation_2026-08-18.md).
+
 ## Stage sequence
 
-1. **G3A — spatial material-point clutches.** A fixed cell uses a prescribed test protrusion.
+1. **G3A-R — explicit protrusion and spatial material-point clutches.** A fixed cell uses a prescribed diagnostic activity patch; the protrusion grows to a finite tip before capture.
    Each clutch binds `(fiber_id, segment_id, alpha)` and remains on that material point until
    Bell-law unbinding. The local same-fibre Gaussian projection conserves total force and first
    moment.
-2. **G3B — protrusion feedback.** Twenty-four initially unbiased sectors probe the ECM. Local
-   collagen abundance/alignment affects sector selection, and successful traction increases
-   protrusion persistence. The cell remains fixed so guidance can be debugged separately from
-   motion.
+2. **G3B-R — cell-intrinsic polarity and adhesion feedback.** A conserved noisy activity field
+   on 24 sectors breaks symmetry without reading collagen direction. Only physical attachment
+   and transmitted traction can reinforce a sector. The cell remains fixed.
 3. **G3C — rigid-body motion.** Equal-and-opposite clutch reactions translate and rotate the
    cell. There is no prescribed velocity, fixed `+x` force, or `polarity_probability=0.65`.
 
@@ -46,6 +51,9 @@ py -3 -m g3.run --stage g3b --fixture aligned_8 `
 
 py -3 -m g3.run --stage g3c --fixture asymmetric_torque `
   --seed 3 --duration 30 --output results/g3/g3c-demo
+
+# Fresh 99-fibre G3-R suite and synchronized Gloria-style GIFs
+py -3 run_g3_revision_experiments.py --ensemble-seeds 4 --ensemble-duration 15
 ```
 
 Each run writes its resolved configuration, seed, Git commit, status, compact numerical traces,

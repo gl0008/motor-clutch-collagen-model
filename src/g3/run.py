@@ -11,7 +11,9 @@ import numpy as np
 import yaml
 
 from .config import DEFAULT_CONFIG_PATH, G3Config
-from .simulation import run_g3, run_load_unload
+from .fixtures import build_fixture
+from .simulation import G3RunResult, run_g3, run_load_unload
+from .state import ClutchState, G3Snapshot, ProtrusionState, RigidCellState
 from .visualization import make_stage_animation, make_summary_figure
 
 
@@ -55,6 +57,22 @@ def save_run(result, output: Path, make_gif=True, make_mp4=False):
     with open(output / "manifest.json", "w", encoding="utf-8") as handle:
         json.dump(manifest, handle, indent=2, ensure_ascii=False)
     np.savez_compressed(output / "traces.npz", **result.traces)
+    n_frames = len(result.snapshots)
+    n_clutches = result.config.n_clutches
+    bound_mask = np.zeros((n_frames, n_clutches), dtype=bool)
+    bound_points = np.full((n_frames, n_clutches, 2), np.nan)
+    motor_points = np.full((n_frames, n_clutches, 2), np.nan)
+    clutch_forces = np.zeros((n_frames, n_clutches, 2))
+    bound_fibre_ids = np.full((n_frames, n_clutches), -1, dtype=int)
+    bound_sector_ids = np.full((n_frames, n_clutches), -1, dtype=int)
+    for frame, snapshot in enumerate(result.snapshots):
+        count = snapshot.bound_points.shape[0]
+        bound_mask[frame, :count] = True
+        bound_points[frame, :count] = snapshot.bound_points
+        motor_points[frame, :count] = snapshot.motor_points
+        clutch_forces[frame, :count] = snapshot.clutch_forces
+        bound_fibre_ids[frame, :count] = snapshot.bound_fibre_ids
+        bound_sector_ids[frame, :count] = snapshot.bound_sector_ids
     np.savez_compressed(
         output / "frames.npz",
         time=np.asarray([snapshot.time for snapshot in result.snapshots]),
@@ -65,12 +83,102 @@ def save_run(result, output: Path, make_gif=True, make_mp4=False):
             np.isin(np.arange(result.config.n_sectors), snapshot.active_sectors)
             for snapshot in result.snapshots
         ]),
+        active_sector_age=np.asarray([
+            snapshot.active_sector_age for snapshot in result.snapshots
+        ]),
+        protrusion_tips=np.asarray([snapshot.protrusion_tips for snapshot in result.snapshots]),
+        protrusion_lengths=np.asarray([
+            snapshot.protrusion_lengths for snapshot in result.snapshots
+        ]),
+        polarity_activity=np.asarray([
+            snapshot.polarity_activity for snapshot in result.snapshots
+        ]),
+        bound_mask=bound_mask,
+        bound_points=bound_points,
+        motor_points=motor_points,
+        clutch_forces=clutch_forces,
+        bound_fibre_ids=bound_fibre_ids,
+        bound_sector_ids=bound_sector_ids,
     )
     make_summary_figure(result, output / f"{result.stage}_summary.png")
     if make_gif:
         make_stage_animation(result, output / f"{result.stage}_{result.fixture_name}.gif")
     if make_mp4:
         make_stage_animation(result, output / f"{result.stage}_{result.fixture_name}.mp4")
+
+
+def load_saved_run(output: str | Path) -> G3RunResult:
+    """Reconstruct a renderable run from saved numerical frames without rerunning physics."""
+    output = Path(output)
+    with open(output / "resolved_config.yaml", encoding="utf-8") as handle:
+        config_values = (yaml.safe_load(handle) or {}).get("g3", {})
+    # ``to_dict`` records these useful derived values for provenance, but they
+    # are properties rather than constructor inputs.
+    config_values.pop("rotational_drag", None)
+    config_values.pop("beads_per_fibre", None)
+    cfg = G3Config.from_dict(config_values)
+    with open(output / "manifest.json", encoding="utf-8") as handle:
+        manifest = json.load(handle)
+    with open(output / "metrics.json", encoding="utf-8") as handle:
+        summary = json.load(handle)
+    seed = int(manifest["seed"])
+    fixture = build_fixture(manifest["fixture"], cfg, np.random.default_rng(seed))
+    frames = np.load(output / "frames.npz")
+    traces_npz = np.load(output / "traces.npz")
+    traces = {name: traces_npz[name] for name in traces_npz.files}
+    n_active = 1 if manifest["stage"] == "g3a" else cfg.n_active_protrusions
+    protrusions = ProtrusionState.initialize(
+        cfg.n_sectors, n_active, np.random.default_rng(seed),
+        prescribed=[0] if manifest["stage"] == "g3a" else None,
+    )
+
+    snapshots = []
+    trace_time = traces["time"]
+    for frame, time in enumerate(frames["time"]):
+        bound = frames["bound_mask"][frame]
+        trace_index = int(np.argmin(np.abs(trace_time - time)))
+        active = np.flatnonzero(frames["active_sectors"][frame])
+        snapshots.append(G3Snapshot(
+            time=float(time),
+            positions=frames["positions"][frame].copy(),
+            cell_center=frames["cell_center"][frame].copy(),
+            cell_angle=float(frames["cell_angle"][frame]),
+            bound_points=frames["bound_points"][frame, bound].copy(),
+            bound_fibre_ids=frames["bound_fibre_ids"][frame, bound].copy(),
+            bound_sector_ids=frames["bound_sector_ids"][frame, bound].copy(),
+            motor_points=frames["motor_points"][frame, bound].copy(),
+            clutch_forces=frames["clutch_forces"][frame, bound].copy(),
+            active_sectors=active,
+            active_sector_age=frames["active_sector_age"][frame].copy(),
+            protrusion_tips=frames["protrusion_tips"][frame].copy(),
+            protrusion_lengths=frames["protrusion_lengths"][frame].copy(),
+            polarity_activity=frames["polarity_activity"][frame].copy(),
+            geometry_scores=np.zeros(cfg.n_sectors),
+            traction_scores=np.zeros(cfg.n_sectors),
+            foi=float(traces["foi"][trace_index]),
+            cell_force=np.array([
+                traces["cell_force_x"][trace_index], traces["cell_force_y"][trace_index]
+            ]),
+            cell_torque=float(traces["cell_torque"][trace_index]),
+        ))
+
+    final = snapshots[-1]
+    protrusions.active[:] = False
+    protrusions.active[final.active_sectors] = True
+    protrusions.active_age[:] = final.active_sector_age
+    protrusions.length[:] = final.protrusion_lengths
+    protrusions.activity[:] = final.polarity_activity
+    cell = RigidCellState.at_origin(cfg.cell_radius)
+    cell.center[:] = final.cell_center
+    cell.body_angle = final.cell_angle
+    return G3RunResult(
+        stage=manifest["stage"], fixture_name=manifest["fixture"], seed=seed,
+        status=manifest["status"], config=cfg, fixture=fixture,
+        initial_positions=fixture.initial_positions.copy(),
+        final_positions=final.positions.copy(), cell=cell,
+        clutches=ClutchState.empty(cfg.n_clutches), protrusions=protrusions,
+        traces=traces, snapshots=snapshots, summary=summary,
+    )
 
 
 def main(argv=None):

@@ -74,6 +74,9 @@ class ProtrusionState:
     active: np.ndarray
     geometry_score: np.ndarray
     traction_score: np.ndarray
+    activity: np.ndarray
+    length: np.ndarray
+    active_age: np.ndarray
 
     @classmethod
     def initialize(
@@ -81,12 +84,26 @@ class ProtrusionState:
     ) -> "ProtrusionState":
         angles = 2.0 * np.pi * np.arange(n_sectors) / n_sectors
         active = np.zeros(n_sectors, dtype=bool)
+        activity = np.full(n_sectors, 1.0 / n_sectors, dtype=float)
         if prescribed is None:
-            chosen = rng.choice(n_sectors, size=n_active, replace=False)
+            activity += rng.normal(0.0, 1.0e-3 / n_sectors, size=n_sectors)
+            activity = np.maximum(activity, 0.0)
+            activity /= activity.sum()
+            chosen = np.argpartition(activity, -n_active)[-n_active:]
         else:
             chosen = np.atleast_1d(prescribed).astype(int)
+            activity[:] = 0.0
+            activity[chosen] = 1.0 / max(chosen.size, 1)
         active[chosen] = True
-        return cls(angles, active, np.zeros(n_sectors), np.zeros(n_sectors))
+        return cls(
+            angles,
+            active,
+            np.zeros(n_sectors),
+            np.zeros(n_sectors),
+            activity,
+            np.zeros(n_sectors),
+            np.zeros(n_sectors),
+        )
 
 
 @dataclass
@@ -96,9 +113,15 @@ class G3Snapshot:
     cell_center: np.ndarray
     cell_angle: float
     bound_points: np.ndarray
+    bound_fibre_ids: np.ndarray
+    bound_sector_ids: np.ndarray
     motor_points: np.ndarray
     clutch_forces: np.ndarray
     active_sectors: np.ndarray
+    active_sector_age: np.ndarray
+    protrusion_tips: np.ndarray
+    protrusion_lengths: np.ndarray
+    polarity_activity: np.ndarray
     geometry_scores: np.ndarray
     traction_scores: np.ndarray
     foi: float

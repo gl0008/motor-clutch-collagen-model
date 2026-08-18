@@ -9,6 +9,115 @@ from .fixtures import G3Fixture
 from .state import ClutchState, ProtrusionState, RigidCellState
 
 
+def protrusion_tips(protrusions: ProtrusionState, cell: RigidCellState):
+    """Return explicit protrusion bases and tips in the laboratory frame."""
+    angles = cell.body_angle + protrusions.sector_angles
+    normal = np.column_stack((np.cos(angles), np.sin(angles)))
+    base = cell.center[None, :] + cell.radius * normal
+    tip = base + protrusions.length[:, None] * normal
+    return base, tip
+
+
+def step_protrusion_lengths(
+    protrusions: ProtrusionState,
+    cfg: G3Config,
+    dt: float | None = None,
+    clutches: ClutchState | None = None,
+):
+    """Grow active protrusions and retract inactive probes at a finite speed."""
+    dt = cfg.dt if dt is None else float(dt)
+    maximum = max(float(protrusions.activity.max(initial=0.0)), np.finfo(float).eps)
+    activity = protrusions.activity / maximum
+    activity = np.where(protrusions.active, np.maximum(activity, 0.35), activity)
+    growth = cfg.protrusion_growth_speed * activity * (
+        1.0 - protrusions.length / cfg.protrusion_max_length
+    )
+    retraction = cfg.protrusion_retraction_speed * (~protrusions.active)
+    if clutches is not None and np.any(clutches.bound):
+        attached = np.unique(clutches.sector_id[clutches.bound & (clutches.sector_id >= 0)])
+        growth[attached] = 0.0
+        retraction[attached] = 0.0
+    protrusions.length += dt * (growth - retraction)
+    protrusions.length[:] = np.clip(protrusions.length, 0.0, cfg.protrusion_max_length)
+
+
+def step_intrinsic_polarity(
+    protrusions: ProtrusionState,
+    cfg: G3Config,
+    rng: np.random.Generator,
+    dt: float,
+    feedback_enabled: bool = True,
+):
+    """Mass-conserving stochastic cell polarity with adhesion reinforcement.
+
+    Collagen geometry is deliberately absent from this update. Matrix structure
+    affects polarity only after a protrusion physically encounters a fibre and
+    develops a nonzero traction-success signal.
+    """
+    activity = protrusions.activity
+    adhesion = protrusions.traction_score if feedback_enabled else np.zeros_like(activity)
+    laplacian = np.roll(activity, 1) + np.roll(activity, -1) - 2.0 * activity
+    logits = (
+        cfg.polarity_self_gain * activity
+        + cfg.polarity_adhesion_gain * adhesion
+        + cfg.polarity_diffusion * laplacian
+    )
+    failed_probe = (
+        (protrusions.length >= 0.80 * cfg.protrusion_max_length)
+        & (protrusions.traction_score < 0.02)
+    )
+    logits -= cfg.polarity_failed_probe_penalty * failed_probe
+    logits -= float(logits.max(initial=0.0))
+    target = np.exp(np.clip(logits, -40.0, 0.0))
+    target *= cfg.polarity_total_activity / max(float(target.sum()), np.finfo(float).eps)
+    alpha = min(float(dt) / cfg.polarity_time, 1.0)
+    noise = cfg.polarity_noise * np.sqrt(max(alpha, 0.0)) * rng.normal(size=activity.size)
+    activity += alpha * (target - activity) + noise / activity.size
+    activity[:] = np.maximum(activity, 0.0)
+    total = float(activity.sum())
+    if total <= np.finfo(float).eps:
+        activity[:] = cfg.polarity_total_activity / activity.size
+    else:
+        activity *= cfg.polarity_total_activity / total
+    # Activity determines where a protrusion is *eligible* to form, but a
+    # protrusion is a physical object and must not teleport whenever two noisy
+    # sector values cross. Keep expressed sectors for a minimum lifetime and
+    # require both a relative and absolute activity advantage before replacing
+    # the weakest mature protrusion.
+    n_active = min(cfg.n_active_protrusions, activity.size)
+    protrusions.active_age[protrusions.active] += dt
+    protrusions.active_age[~protrusions.active] = 0.0
+    active = np.flatnonzero(protrusions.active)
+    if active.size < n_active:
+        candidates = np.flatnonzero(~protrusions.active)
+        add = candidates[np.argsort(activity[candidates])[-(n_active - active.size):]]
+        protrusions.active[add] = True
+        protrusions.active_age[add] = 0.0
+        active = np.flatnonzero(protrusions.active)
+    elif active.size > n_active:
+        keep = active[np.argsort(activity[active])[-n_active:]]
+        protrusions.active[:] = False
+        protrusions.active[keep] = True
+        protrusions.active_age[:] = 0.0
+        active = keep
+
+    inactive = np.flatnonzero(~protrusions.active)
+    mature = active[protrusions.active_age[active] >= cfg.protrusion_min_lifetime]
+    if mature.size and inactive.size:
+        weakest = int(mature[np.argmin(activity[mature])])
+        challenger = int(inactive[np.argmax(activity[inactive])])
+        threshold = max(
+            cfg.protrusion_switch_ratio * activity[weakest],
+            activity[weakest] + cfg.protrusion_switch_margin,
+        )
+        if activity[challenger] > threshold:
+            protrusions.active[weakest] = False
+            protrusions.active[challenger] = True
+            protrusions.active_age[weakest] = 0.0
+            protrusions.active_age[challenger] = 0.0
+    return np.flatnonzero(protrusions.active)
+
+
 def geometry_scores(protrusions: ProtrusionState, cell: RigidCellState,
                     positions: np.ndarray, fixture: G3Fixture, cfg: G3Config):
     """Compute collagen availability, local nematic alignment, and their combined score."""
@@ -57,9 +166,12 @@ def update_traction_scores(protrusions: ProtrusionState, clutches: ClutchState,
         if n_assigned == 0:
             continue
         bound = assigned & clutches.bound
-        bound_fraction = float(bound.sum() / n_assigned)
+        n_bound = int(bound.sum())
         traction = float(np.linalg.norm(clutches.force_vector[bound], axis=1).sum())
-        instant[sector] = bound_fraction * min(traction / max(stall, np.finfo(float).eps), 1.0)
+        engagement = 1.0 - np.exp(-n_bound / cfg.adhesion_clutch_scale)
+        force_scale = cfg.adhesion_force_fraction * stall
+        load_success = min(traction / max(force_scale, np.finfo(float).eps), 1.0)
+        instant[sector] = engagement * load_success
     protrusions.traction_score += alpha * (instant - protrusions.traction_score)
     protrusions.traction_score[~protrusions.active] = 0.0
     return instant

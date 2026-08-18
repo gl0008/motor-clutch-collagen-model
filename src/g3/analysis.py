@@ -91,9 +91,23 @@ def displacement_statistics(initial, current):
 
 def elastic_energy(positions, fixture: G3Fixture, cfg: G3Config):
     network = fixture.network
+    if network.external_network is not None:
+        external = network.external_network
+        external.r[:] = np.asarray(positions) * 1.0e6
+        _, _, _, energy, _, _ = external.elastic_forces(include_crosslinks=True)
+        # nN um -> J
+        return float(sum(energy.values()) * 1.0e-15)
+    link_energy = (
+        extensional_energy(
+            positions, network.xl_bonds, network.xl_rest_length, cfg.kappa_s_f
+        )
+        if network.xl_bonds.size
+        else 0.0
+    )
     return float(
         extensional_energy(positions, network.fiber_bonds, cfg.bead_spacing, cfg.kappa_s_f)
         + bending_energy(positions, network.bending_triples, cfg.theta0_f, cfg.kappa_b_f)
+        + link_energy
     )
 
 

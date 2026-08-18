@@ -137,3 +137,66 @@ coarse-grained defaults into a fit; assumptions remain explicit in
       conservative bead–cell contact potential.
     - Does not establish the provisional contact stiffness, zero bead radius,
       frictionless interface or rigid-cell assumption.
+
+19. **Mori, Jilkine & Edelstein-Keshet (2008), “Wave-Pinning and Cell
+    Polarity from a Bistable Reaction-Diffusion System.”** Biophysical Journal
+    94:3684–3697.
+    [PMCID: PMC2292363](https://pmc.ncbi.nlm.nih.gov/articles/PMC2292363/)
+    - Supports mass conservation, unequal active/inactive diffusivity and
+      bistable local kinetics as one minimal route to spontaneous cell polarity.
+    - Motivates the proposed G3-R cell-intrinsic activity field, not an
+      MDA-MB-231 parameter fit or the claim that wave-pinning is the unique
+      polarity mechanism.
+
+20. **Fraley et al. (2010), “A distinctive role for focal adhesion proteins in
+    three-dimensional cell motility.”** Nature Cell Biology 12:598–604.
+    [doi:10.1038/ncb2062](https://doi.org/10.1038/ncb2062)
+    - Supports treating protrusion activity and matrix deformation as a coupled
+      three-dimensional motility/traction module.
+    - Warns against requiring large, visually discrete 2D-style focal-adhesion
+      plaques in an embedded-cell model.
+
+21. **Fraley et al. (2015), “Three-dimensional matrix fiber alignment modulates
+    cell migration and MT1-MMP utility by spatially and temporally directing
+    protrusions.”** Scientific Reports 5:14580.
+    [doi:10.1038/srep14580](https://doi.org/10.1038/srep14580)
+    - Supports protrusion orientation/rate and fibre alignment as validation
+      observables across collagen conditions.
+    - Does not allow collagen concentration, pore size, alignment, crosslinking
+      and stiffness to be collapsed into one interchangeable model parameter.
+
+22. **Wolf et al. (2013), “Physical limits of cell migration: Control by ECM
+    space and nuclear deformation and tuning by proteolysis and traction
+    force.”** Journal of Cell Biology 201:1069–1084.
+    [PMCID: PMC3691458](https://pmc.ncbi.nlm.nih.gov/articles/PMC3691458/)
+    - Supports pore/nucleus geometry, traction and proteolysis as coupled limits
+      on three-dimensional cell passage and arrest.
+    - Motivates a later deformable-cell/nucleus generation; it does not justify
+      adding an uncalibrated nucleus to the G3-R attachment gate.
+
+23. **Licup et al. (2015), “Stress controls the mechanics of collagen
+    networks.”** PNAS 112:9573–9578.
+    [doi:10.1073/pnas.1504258112](https://doi.org/10.1073/pnas.1504258112)
+    - Supports stress-dependent nonlinear stiffening and the role of network
+      geometry/connectivity in its onset.
+    - Motivates an independently calibrated nonlinear network branch; it does
+      not provide one universal strain threshold for the current synthetic
+      network.
+
+24. **Nam et al. (2016), “Strain-enhanced stress relaxation impacts nonlinear
+    elasticity in collagen gels.”** PNAS 113:5492–5497.
+    [doi:10.1073/pnas.1523906113](https://doi.org/10.1073/pnas.1523906113)
+    - Shows faster collagen stress relaxation at larger strain and supports
+      force-dependent weak interfibre bond unbinding/rebinding as a candidate
+      reversible mechanism.
+    - Does not establish that every fibre bond is an SLS element or that
+      reversible stress relaxation is permanent remodeling.
+
+25. **Krause et al. (2019), “Fiber stiffness, pore size and adhesion control
+    migratory phenotype of MDA-MB-231 cells in collagen gels.”** PLOS ONE.
+    [PMCID: PMC6853323](https://pmc.ncbi.nlm.nih.gov/articles/PMC6853323/)
+    - Supports treating fibre stiffness, pore size and adhesion as distinct
+      controls of MDA-MB-231 migration phenotype.
+    - Motivates later local-pore and phenotype validation; it does not map the
+      current eight-fibre fixture or 99-fibre planar network to a collagen
+      concentration.

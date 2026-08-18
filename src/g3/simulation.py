@@ -18,7 +18,13 @@ from .mechanics import (
     reaction_force_and_torque,
     update_spatial_clutches,
 )
-from .protrusions import geometry_scores, step_protrusion_turnover, update_traction_scores
+from .protrusions import (
+    geometry_scores,
+    protrusion_tips,
+    step_intrinsic_polarity,
+    step_protrusion_lengths,
+    update_traction_scores,
+)
 from .state import ClutchState, G3Snapshot, ProtrusionState, RigidCellState
 
 
@@ -48,15 +54,22 @@ def _duration_for_stage(stage: str, cfg: G3Config) -> float:
 def _snapshot(time, positions, cell, clutches, protrusions, material, motor,
               force, torque, foi):
     bound = clutches.bound
+    _, tips = protrusion_tips(protrusions, cell)
     return G3Snapshot(
         time=float(time),
         positions=positions.copy(),
         cell_center=cell.center.copy(),
         cell_angle=float(cell.body_angle),
         bound_points=material[bound].copy(),
+        bound_fibre_ids=clutches.fiber_id[bound].copy(),
+        bound_sector_ids=clutches.sector_id[bound].copy(),
         motor_points=motor[bound].copy(),
         clutch_forces=clutches.force_vector[bound].copy(),
         active_sectors=np.flatnonzero(protrusions.active).copy(),
+        active_sector_age=protrusions.active_age.copy(),
+        protrusion_tips=tips.copy(),
+        protrusion_lengths=protrusions.length.copy(),
+        polarity_activity=protrusions.activity.copy(),
         geometry_scores=protrusions.geometry_score.copy(),
         traction_scores=protrusions.traction_score.copy(),
         foi=float(foi),
@@ -94,6 +107,7 @@ def run_g3(
         raise ValueError("duration must be positive")
     n_steps = int(round(duration / cfg.dt))
     geometry_every = max(1, int(round(cfg.geometry_update_interval / cfg.dt)))
+    polarity_every = max(1, int(round(cfg.polarity_update_interval / cfg.dt)))
     metrics_every = max(1, int(round(cfg.metrics_interval / cfg.dt)))
     frame_every = max(1, int(round(cfg.frame_interval / cfg.dt)))
 
@@ -101,7 +115,8 @@ def run_g3(
         "time", "cell_x", "cell_y", "cell_angle", "bound_count", "foi", "cell_force_x",
         "cell_force_y", "cell_torque", "force_error", "torque_error", "elastic_energy",
         "contact_count", "contact_penetration", "contact_energy", "protrusion_x",
-        "protrusion_y",
+        "protrusion_y", "polarity_magnitude", "max_protrusion_length",
+        "attached_protrusions",
     )}
     snapshots = []
     status = "complete"
@@ -125,7 +140,16 @@ def run_g3(
 
         if stage in ("g3b", "g3c"):
             update_traction_scores(protrusions, clutches, cfg)
-            step_protrusion_turnover(protrusions, cfg, rng, feedback_enabled)
+            if step % polarity_every == 0:
+                step_intrinsic_polarity(
+                    protrusions,
+                    cfg,
+                    rng,
+                    dt=polarity_every * cfg.dt,
+                    feedback_enabled=feedback_enabled,
+                )
+
+        step_protrusion_lengths(protrusions, cfg, clutches=clutches)
 
         material, _, motor, _ = update_spatial_clutches(
             clutches, protrusions, cell, positions, fixture, cfg, time, rng)
@@ -156,11 +180,20 @@ def run_g3(
             angles = cell.body_angle + protrusions.sector_angles[active]
             weights = 1.0 + protrusions.traction_score[active]
             pvec = (weights[:, None] * np.column_stack((np.cos(angles), np.sin(angles)))).sum(axis=0)
+            activity_angles = cell.body_angle + protrusions.sector_angles
+            activity_vector = np.sum(
+                protrusions.activity[:, None]
+                * np.column_stack((np.cos(activity_angles), np.sin(activity_angles))),
+                axis=0,
+            )
+            attached = np.unique(clutches.sector_id[clutches.bound & (clutches.sector_id >= 0)])
             values = (
                 time, cell.center[0], cell.center[1], cell.body_angle, int(clutches.bound.sum()),
                 foi, cell_force[0], cell_force[1], cell_torque, force_error, torque_error,
                 elastic_energy(positions, fixture, cfg), contact_count,
-                contact_penetration, contact_energy, pvec[0], pvec[1],
+                contact_penetration, contact_energy, activity_vector[0], activity_vector[1],
+                np.linalg.norm(activity_vector), protrusions.length.max(initial=0.0),
+                attached.size,
             )
             for key, value in zip(trace, values):
                 trace[key].append(value)

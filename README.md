@@ -112,25 +112,32 @@ Generation 3 is intentionally separate from the frozen G2 folders. Its active en
 [`src/g3/`](src/g3/), and its version entry is
 [`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/).
 
+The G3-R revision now adds visible protrusion growth, cell-intrinsic polarity, post-attachment
+adhesion feedback, 99-fibre crosslinked-network scale-up and the same precomputed-data/SVG
+visualization architecture used by Gloria's G2 pages. Downloadable synchronized GIFs are also
+generated from the same saved solver frames. The
+design and priorities are in [`docs/G3_REVISION_PLAN.md`](docs/G3_REVISION_PLAN.md); fresh
+mechanism results and their evidence boundary are in
+[`docs/results/g3_revision_validation_2026-08-18.md`](docs/results/g3_revision_validation_2026-08-18.md).
+
 | Stage | Question | Cell state |
 |---|---|---|
-| G3A | Does each clutch remain attached to one collagen segment material point and conserve force/torque under local projection? | fixed |
-| G3B | Can unbiased protrusions be stabilized by local collagen geometry and traction success? | fixed |
+| G3A-R | Can a visible protrusion grow, reach a collagen material point and load a crosslinked 99-fibre network? | fixed |
+| G3B-R | Can cell-intrinsic membrane activity break symmetry, with only post-attachment traction stabilizing the front? | fixed |
 | G3C | Can clutch reactions translate and rotate a rigid cell in 2D without hidden self-propulsion? | mobile rigid body |
 
-G3 removes G2 V3's `polarity_probability=0.65`. It does not claim realistic 3D tumor
-migration: pores, nucleus, deformable cortex, MMP, collagen-concentration calibration, SLS,
-plasticity, EMT, and cell-cell interactions remain outside its scope. G3A mechanism gates pass.
-The 20-seed G3B calibration supports aligned collagen guidance and rotation covariance, but the
-preserved contact-free stage remains blocked because 7/20 isotropic runs crossed the rigid-cell
-overlap guard. The active development configuration now includes an equal-and-opposite
-conservative cell–collagen contact law; the targeted failing seed completes 60 s with 0.00375 µm
-maximum penetration. All six contact-enabled calibration conditions still need a clean rerun.
-The untouched 100-seed final ensemble and formal G3C validation have therefore not been opened.
+G3 removes G2 V3's `polarity_probability=0.65`. The fresh G3-R suite passes nine short
+mechanism/execution gates on 99 fibres, including motor-off, fixed-cell and empty-network
+controls. It does not claim realistic 3D tumor migration: pores, nucleus, deformable cortex,
+MMP, collagen-concentration calibration, SLS, plasticity, EMT and cell-cell interactions remain
+outside scope. At four seeds the revised isotropic nematic order exceeds the aligned value, so
+the new guidance law still requires preregistered large ensembles and sensitivity analysis.
 
-The public notebook now includes separate G3A, G3B and G3C pages with precomputed animations,
+The public notebook now includes separate G3A, G3B and G3C pages with interactive precomputed
+SVG playback,
 all implemented equations, paper support, assumptions, results and stage-specific limitations:
 
+- [G3 professor briefing: storyline, formulas, paper map, current results and speaking script](docs/g3-professor-brief.html)
 - [G3A website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-a)
 - [G3B website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-b)
 - [G3C website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-c)

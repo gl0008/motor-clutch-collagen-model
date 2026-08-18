@@ -45,7 +45,7 @@ def test_feedback_biases_replacement_but_ablation_is_uniform():
     assert count_target(False) < 40
 
 
-def test_traction_success_is_bound_fraction_times_stall_normalized_load():
+def test_traction_success_saturates_with_engaged_clutches_and_load():
     cfg = replace(G3Config(), n_clutches=10, n_motors=10, n_active_protrusions=1,
                   feedback_time=0.005)
     # feedback_time == dt makes the exponential moving average equal the instant score.
@@ -57,5 +57,6 @@ def test_traction_success_is_bound_fraction_times_stall_normalized_load():
     stall = cfg.n_motors * cfg.motor_force
     clutches.force_vector[:5, 0] = stall / 10.0
     instant = update_traction_scores(state, clutches, cfg)
-    assert instant[3] == pytest.approx(0.25)  # 0.5 bound * 0.5 stall load
-    assert state.traction_score[3] == pytest.approx(0.25)
+    expected = 1.0 - np.exp(-5.0 / cfg.adhesion_clutch_scale)
+    assert instant[3] == pytest.approx(expected)
+    assert state.traction_score[3] == pytest.approx(expected)

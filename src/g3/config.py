@@ -23,6 +23,15 @@ class G3Config:
     theta0_f: float = 0.0
     bead_drag: float = 3.73e-5
 
+    # G3-R scale-up. The legacy 1/8-fibre fixtures remain available only as
+    # unit-level controls; revised stage experiments use the 99-fibre network.
+    scaled_fibre_count: int = 99
+    scaled_domain_size: float = 180.0e-6
+    scaled_min_fibre_length: float = 20.0e-6
+    scaled_max_fibre_length: float = 80.0e-6
+    scaled_bead_spacing: float = 0.75e-6
+    scaled_required_connected_fraction: float = 0.85
+
     # Local representation of a point clutch force (D010).
     gaussian_sigma: float = 2.0e-6
     gaussian_support_sigma: float = 3.0
@@ -50,8 +59,27 @@ class G3Config:
     beta_geometry: float = 2.0
     beta_traction: float = 2.0
     sensing_sigma: float = 3.0e-6
-    feedback_time: float = 30.0
+    feedback_time: float = 10.0
     geometry_update_interval: float = 0.1
+
+    # G3-R explicit protrusion and cell-intrinsic polarity field. These values
+    # are provisional calibration parameters, not measured MDA-MB-231 constants.
+    protrusion_max_length: float = 6.0e-6
+    protrusion_growth_speed: float = 0.50e-6
+    protrusion_retraction_speed: float = 0.25e-6
+    polarity_update_interval: float = 0.1
+    polarity_time: float = 5.0
+    polarity_self_gain: float = 80.0
+    polarity_adhesion_gain: float = 160.0
+    polarity_failed_probe_penalty: float = 35.0
+    polarity_diffusion: float = 0.15
+    polarity_noise: float = 0.15
+    polarity_total_activity: float = 1.0
+    protrusion_min_lifetime: float = 4.0
+    protrusion_switch_ratio: float = 1.25
+    protrusion_switch_margin: float = 0.03
+    adhesion_clutch_scale: float = 3.0
+    adhesion_force_fraction: float = 0.10
 
     # Overdamped integration and calibrated rigid-cell drag.
     dt: float = 0.005
@@ -80,16 +108,29 @@ class G3Config:
             "cell_radius", "fibre_length", "bead_spacing", "kappa_s_f", "bead_drag",
             "gaussian_sigma", "capture_distance", "bell_force", "clutch_stiffness",
             "dt", "cell_drag", "protrusion_lifetime", "feedback_time",
+            "protrusion_max_length", "protrusion_growth_speed",
+            "protrusion_retraction_speed", "polarity_update_interval",
+            "polarity_time", "polarity_total_activity",
+            "protrusion_min_lifetime", "protrusion_switch_ratio",
+            "adhesion_clutch_scale", "adhesion_force_fraction",
         )
         for name in positive:
             if getattr(self, name) <= 0.0:
                 raise ValueError(f"{name} must be positive")
         if self.n_clutches < 1 or self.n_motors < 1:
             raise ValueError("n_clutches and n_motors must be positive")
+        if self.scaled_fibre_count < 16:
+            raise ValueError("scaled_fibre_count must be at least 16")
+        if not 0.0 < self.scaled_required_connected_fraction <= 1.0:
+            raise ValueError("scaled_required_connected_fraction must be in (0, 1]")
         if self.n_sectors < 2 or self.n_active_protrusions not in (1, 2):
             raise ValueError("G3 supports one or two active protrusions and >=2 sectors")
         if self.n_active_protrusions > self.n_sectors:
             raise ValueError("active protrusions cannot exceed candidate sectors")
+        if self.protrusion_switch_ratio <= 1.0:
+            raise ValueError("protrusion_switch_ratio must exceed one")
+        if self.protrusion_switch_margin < 0.0:
+            raise ValueError("protrusion_switch_margin cannot be negative")
         if self.ecm_substeps < 1:
             raise ValueError("ecm_substeps must be a positive integer")
         if self.contact_enabled and self.contact_stiffness <= 0.0:

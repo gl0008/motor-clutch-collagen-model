@@ -1,0 +1,8 @@
+{
+  "stage": "g3c",
+  "fixture": "scaled_aligned_99",
+  "seed": 6,
+  "git_commit": "8ea09dc69a3a07ee251cbfe3d479d877c8c3dcd5",
+  "status": "complete",
+  "interpretation": "Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction."
+}

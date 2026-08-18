@@ -26,6 +26,15 @@ class ECMNetwork:
     xl_bonds: np.ndarray
     xl_rest_length: np.ndarray
     fiber_id: np.ndarray
+    # Optional bridge to the validated G2 network mechanics. Revised 99-fibre
+    # fixtures use its variable bond lengths, reference curvature, compression
+    # softening and material-point crosslinks, converted to SI at the boundary.
+    external_network: object | None = None
+    effective_bead_drag: float | None = None
+    xl_edge_a: np.ndarray | None = None
+    xl_alpha_a: np.ndarray | None = None
+    xl_edge_b: np.ndarray | None = None
+    xl_alpha_b: np.ndarray | None = None
 
     @property
     def n_beads(self) -> int:

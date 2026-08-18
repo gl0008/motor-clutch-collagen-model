@@ -1,0 +1,46 @@
+g3:
+  scaled_fibre_count: 99
+  scaled_domain_size: 1.80e-4
+  scaled_min_fibre_length: 2.0e-5
+  scaled_max_fibre_length: 8.0e-5
+  scaled_bead_spacing: 7.5e-7
+  scaled_required_connected_fraction: 0.85
+
+  # A protrusion tip must come within 0.5 um of a collagen material point.
+  # The old 2 um capture radius let a ~0.5 um protrusion bind across the
+  # declared 2.5 um gap, obscuring the intended grow -> encounter sequence.
+  capture_distance: 5.0e-7
+
+  # Tenfold coarse-grained force scale for a whole-cell multi-fibre experiment.
+  # The Bell/motor/clutch triplet is scaled together so the microscopic extension
+  # and force-dependent rupture ratios remain unchanged. This is a calibration
+  # assumption and is reported as such, not a direct molecular measurement.
+  motor_force: 2.0e-11
+  bell_force: 2.0e-11
+  clutch_stiffness: 5.0e-2
+
+  feedback_time: 10.0
+  protrusion_max_length: 6.0e-6
+  protrusion_growth_speed: 5.0e-7
+  protrusion_retraction_speed: 2.5e-7
+  polarity_update_interval: 0.1
+  polarity_time: 5.0
+  polarity_self_gain: 80.0
+  polarity_adhesion_gain: 160.0
+  polarity_failed_probe_penalty: 35.0
+  polarity_diffusion: 0.15
+  polarity_noise: 0.15
+  polarity_total_activity: 1.0
+  # Physical protrusions persist; sector activity crossings alone cannot make
+  # the displayed protrusion teleport around the membrane.
+  protrusion_min_lifetime: 4.0
+  protrusion_switch_ratio: 1.25
+  protrusion_switch_margin: 0.03
+  adhesion_clutch_scale: 3.0
+  adhesion_force_fraction: 0.10
+
+  duration_g3a: 15.0
+  duration_g3b: 20.0
+  duration_g3c: 20.0
+  metrics_interval: 0.1
+  frame_interval: 0.5

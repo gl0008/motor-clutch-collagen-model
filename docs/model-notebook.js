@@ -24,14 +24,15 @@
   const chain=model.chain.map((x,i)=>`${i?'<i>→</i>':''}<span>${x}</span>`).join('');
   let html=`
   <section class="section">
-    <h2>Your purpose in this version · 你當時想做什麼</h2>
+    <h2>Purpose of this version</h2>
     <p class="lead">${model.purpose}</p>
     <div class="brief ${model.generation==='G2'?'g2-accent':model.generation==='G3'?'g3-accent':''}"><div class="label">Your brief · condensed from our conversation</div><ul>${brief}</ul></div>
     <h3>Causal chain you wanted to isolate</h3><div class="causal-chain">${chain}</div>
+    ${model.generation==='G3'?'<div class="professor-brief-link"><b>Presenting G3 tomorrow?</b><span>Open the one-page storyline with the model chain, key equations, paper map, current numbers and wording boundaries.</span><a class="button" href="g3-professor-brief.html">Open G3 professor briefing</a></div>':''}
   </section>`;
 
   if(model.simulation){
-    html+=`<section class="section"><h2>Simulation</h2><p>${model.simulation.note}</p><div class="simulation-shell"><iframe title="${esc(model.title)} interactive simulation" src="${model.simulation.src}" loading="lazy"></iframe></div><div class="simulation-links">${button(model.simulation.src,'Open simulation full screen')}${button(model.source,'View model source',true)}</div></section>`;
+    html+=`<section class="section"><h2>Simulation</h2><p>${model.simulation.note}</p><div class="simulation-shell"><iframe title="${esc(model.title)} interactive simulation" src="${model.simulation.src}" loading="lazy"></iframe></div><div class="simulation-links">${button(model.simulation.src,'Open simulation full screen')}${model.simulation.gif?button(model.simulation.gif,'Open updated GIF',true):''}${button(model.source,'View model source',true)}</div></section>`;
   }else{
     html+=`<section class="section"><h2>Archived prototype artifacts</h2><div class="empty-sim"><h3>No standalone browser animation was published for V0</h3><p>The equations and code are preserved below. This is intentional: V0 is the question-forming prototype, not the accepted collagen-network baseline.</p></div><div class="archive-grid" style="margin-top:12px">${model.artifacts.map(x=>`<article class="archive-card"><b>${x.title}</b><p>${x.note}</p>${button(x.href,'Open source',true)}</article>`).join('')}</div></section>`;
   }

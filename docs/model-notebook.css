@@ -78,10 +78,13 @@ a{color:var(--teal)}
 .talk{border-left:7px solid var(--teal);background:var(--soft-teal)}
 .talk-script{font:19px/1.58 Georgia,serif;margin:0}
 .talk ul{padding-left:20px}
+.professor-brief-link{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;margin-top:20px;padding:14px 15px;border:1px solid #b9c8ee;border-radius:10px;background:#edf2ff}
+.professor-brief-link span{color:#526067}
+.professor-brief-link .button{white-space:nowrap}
 .footer-nav{display:flex;justify-content:space-between;gap:12px;margin-top:25px}
 .footer-nav a{padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:white;text-decoration:none;font-weight:700}
 .empty-sim{padding:24px;border:1px dashed #a99f91;border-radius:10px;background:#f8f5ef}
 .empty-sim h3{margin-top:0}
 footer{text-align:center;color:var(--muted);padding:0 20px 35px}
-@media(max-width:820px){.hero-grid{grid-template-columns:1fr}.hero-meta{max-width:640px}.equation-list,.archive-grid,.paper-grid,.result-grid{grid-template-columns:1fr}.simulation-shell iframe{height:760px}.topbar-inner{align-items:flex-start;flex-direction:column}.version-nav{width:100%}}
+@media(max-width:820px){.hero-grid{grid-template-columns:1fr}.hero-meta{max-width:640px}.equation-list,.archive-grid,.paper-grid,.result-grid{grid-template-columns:1fr}.simulation-shell iframe{height:760px}.topbar-inner{align-items:flex-start;flex-direction:column}.version-nav{width:100%}.professor-brief-link{grid-template-columns:1fr}.professor-brief-link .button{width:max-content}}
 @media(max-width:520px){.hero{padding-top:36px}.wrap{padding-inline:12px}.section{border-radius:11px;padding:17px}.simulation-shell iframe{height:720px;min-height:520px}.math{font-size:16px}.footer-nav{flex-direction:column}}

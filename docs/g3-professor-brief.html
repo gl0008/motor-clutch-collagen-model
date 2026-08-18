@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G3 professor briefing · protrusion–clutch–collagen model</title>
+<link rel="stylesheet" href="model-notebook.css?v=g3-professor-1">
+<style>
+.brief-hero{background:#152832;color:white;padding:52px max(20px,calc((100vw - 1180px)/2))}.brief-hero h1{font:750 clamp(38px,6vw,68px)/1 Georgia,serif;margin:9px 0 15px;max-width:980px}.brief-hero p{max-width:900px;color:#d3dee1;font-size:18px}.brief-hero .status{display:inline-block;border:1px solid #7893df;border-radius:99px;padding:6px 11px;color:#dce5ff;font-weight:700;font-size:13px}.brief-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.brief-nav a{color:white;text-decoration:none;border:1px solid #617780;border-radius:7px;padding:7px 10px}.stage-grid,.number-grid,.qa-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stage,.number,.qa{border:1px solid var(--line);border-radius:11px;padding:16px;background:#fbfaf7}.stage h3,.qa h3{margin:0 0 8px}.stage .letter{font:750 35px Georgia,serif;color:#5875c5}.stage .say{border-left:4px solid var(--teal);padding-left:10px;color:#405159}.number b{display:block;font:750 24px Georgia,serif;color:#3f5da9}.number span{color:#59676e}.formula-table,.claim-table{width:100%;border-collapse:collapse}.formula-table th,.formula-table td,.claim-table th,.claim-table td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:12px 10px}.formula-table th,.claim-table th{background:#ece8df}.formula{font-family:Georgia,serif;font-size:17px}.can{color:#176c60;font-weight:800}.cannot{color:#a04b32;font-weight:800}.script{font:19px/1.62 Georgia,serif;background:#e7f1ee;border-left:6px solid var(--teal);padding:18px 20px;border-radius:0 10px 10px 0}.callout{background:#edf2ff;border-left:6px solid #627fd1;padding:16px 18px;border-radius:0 10px 10px 0}.priority{counter-reset:p;list-style:none;padding:0;display:grid;gap:9px}.priority li{counter-increment:p;border:1px solid var(--line);border-radius:9px;padding:12px 14px 12px 51px;position:relative}.priority li:before{content:counter(p);position:absolute;left:13px;top:11px;background:#152832;color:white;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;font-weight:800}.small{font-size:14px;color:#617078}@media(max-width:850px){.stage-grid,.number-grid,.qa-grid{grid-template-columns:1fr}.formula-table,.formula-table tbody,.formula-table tr,.formula-table td,.claim-table,.claim-table tbody,.claim-table tr,.claim-table td{display:block}.formula-table thead,.claim-table thead{display:none}.formula-table tr,.claim-table tr{border:1px solid var(--line);border-radius:9px;margin-bottom:10px;padding:8px}.formula-table td,.claim-table td{border:0;padding:6px}}
+</style>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+<header class="brief-hero">
+  <div class="status">Fresh rerun · 18 Aug 2026 · mechanism demonstration</div>
+  <h1>G3: protrusion → attachment → traction → collagen response</h1>
+  <p>Professor-facing explanation of what the three stages test, which physics is implemented, which papers motivate each choice, what the fresh 99-fibre runs actually show, and where the evidence stops.</p>
+  <nav class="brief-nav"><a href="index.html">Model generations</a><a href="model-notebook.html?model=g3-a">G3A equations</a><a href="model-notebook.html?model=g3-b">G3B equations</a><a href="model-notebook.html?model=g3-c">G3C equations</a><a href="g3-demo.html?stage=g3a">Open animation</a></nav>
+</header>
+<main class="wrap">
+<section class="section">
+  <h2>The 30-second answer</h2>
+  <p class="script">G3 is not an attempt to make migration merely look more realistic. It removes the prescribed 0.65 polarity from G2 and replaces it with a testable causal chain. G3A lets a protrusion grow to collagen, capture a material point that moves with the fibre, and load a crosslinked 99-fibre network through motor–clutch forces. G3B lets polarity emerge from conserved intracellular activity; collagen can feed back only after attachment and load transmission. G3C then releases cell x/y translation and rotation through equal-and-opposite clutch reactions. The fresh rerun verifies that attachment, force transfer and reaction bookkeeping execute, but it does not yet show that aligned collagen stabilizes polarity and it is not realistic tumor migration.</p>
+</section>
+
+<section class="section">
+  <h2>How to read the three animations</h2>
+  <div class="stage-grid">
+    <article class="stage"><div class="letter">G3A</div><h3>Can one protrusion grab and pull?</h3><p>The cell is intentionally fixed and one diagnostic protrusion is prescribed. Watch the green shaft grow, the tip encounter collagen, red clutch spokes appear, and the contacted fibre plus its crosslinked neighbors respond.</p><p class="say"><b>Say:</b> this isolates attachment and force transmission. <b>Do not call it polarity or migration.</b></p></article>
+    <article class="stage"><div class="letter">G3B</div><h3>Can the cell make its own front?</h3><p>The cell remains fixed. Membrane color is the cell-intrinsic activity pool; green shafts are expressed protrusions. Feedback OFF/ON use the same network and stochastic seed. Four-second persistence and hysteresis stop the active protrusion from teleporting between nearly tied sectors.</p><p class="say"><b>Say:</b> symmetry breaking executes without 0.65. <b>The current pair does not show collagen stabilization.</b></p></article>
+    <article class="stage"><div class="letter">G3C</div><h3>Can clutch reactions move the cell?</h3><p>Fixed and released cells share the same network. Only the released cell integrates the opposite clutch force and torque. The trajectory is true scale; the tiny motion is not visually amplified.</p><p class="say"><b>Say:</b> reaction-driven motion is nonzero and hidden-drive controls are zero. <b>Do not call the speed predictive.</b></p></article>
+  </div>
+  <p class="callout"><b>Why the fibres look dense:</b> every G3 panel uses the scaled 99-fibre network, not a single-fibre cartoon. Both comparison panels keep the same SVG viewBox, so the left and right plots do not drift toward the middle. There are no x/y axes or grid; the 10 µm scale bar follows Gloria’s G1/G2 visualization architecture.</p>
+</section>
+
+<section class="section">
+  <h2>The physical and biological theory</h2>
+  <table class="formula-table"><thead><tr><th>Model layer</th><th>Implemented equation</th><th>Meaning and literature role</th></tr></thead><tbody>
+    <tr><td><b>Collagen elasticity</b></td><td class="formula">\(U_s=\tfrac12\kappa_s\sum(\ell-\ell_0)^2\),<br>\(U_b=\tfrac12\kappa_b\sum(\theta-\theta_0)^2\)</td><td>Stretching and bending energies make each visible line a bead-connected fibre. Crosslinks transmit local loading into the larger network. <a href="https://doi.org/10.1371/journal.pone.0111896">Lee et al. (2014)</a> supports this modeling class; it does not validate our synthetic geometry.</td></tr>
+    <tr><td><b>Overdamped ECM</b></td><td class="formula">\(\zeta_b\dot{\mathbf r}_i=\mathbf F_i^{stretch}+\mathbf F_i^{bend}+\mathbf F_i^{xlink}+\mathbf F_i^{clutch}+\mathbf F_i^{contact}\)</td><td>At cellular time scales, force balance is represented without bead inertia. Motion is the net mechanical force divided by effective drag.</td></tr>
+    <tr><td><b>Spatial attachment</b></td><td class="formula">\(\mathbf p_c=(1-\alpha_c)\mathbf r_i+\alpha_c\mathbf r_j\)</td><td>A clutch stores fibre ID, segment ID and continuous coordinate \(\alpha_c\). When collagen deforms, the attachment follows the same material point instead of jumping to another bead.</td></tr>
+    <tr><td><b>Motor–clutch traction</b></td><td class="formula">\(\mathbf f_c=k_c[\|\mathbf m_c-\mathbf p_c\|-\ell_c^0]_+\hat{\mathbf e}_c\),<br>\(v_a=v_0[1-\Sigma|f_c|/(N_m f_m)]_{0}^{1}\)</td><td>Clutches pull only in tension; force slows actin retrograde motion toward stall. <a href="https://doi.org/10.1007/s12195-013-0296-5">Bangasser &amp; Odde (2013)</a> supports the motor–clutch load-and-fail framework. <a href="https://doi.org/10.1038/s41563-021-00981-w">Adebowale et al. (2021)</a> supplies filopodial clutch-scale parameters, not a tumor/collagen fit.</td></tr>
+    <tr><td><b>Force-dependent rupture</b></td><td class="formula">\(k_{off}=k_{off}^0e^{|f_c|/F_b}\), \(P_{off}=1-e^{-k_{off}\Delta t}\)</td><td>This is a Bell slip bond: greater load gives a larger rupture hazard. <a href="https://doi.org/10.1126/science.347575">Bell (1978)</a> motivates the exponential law; real integrins can require richer catch/slip behavior.</td></tr>
+    <tr><td><b>Cell-intrinsic polarity</b></td><td class="formula">\(\sum_s a_s=1\),<br>\(a_s^{n+1}=\mathcal N_+[a_s+\Delta t(A\pi_s-a_s)/\tau_a+\eta_s]\)</td><td>A finite intracellular activity pool redistributes over 24 membrane sectors and breaks symmetry without a +x preference or 0.65 input. This is a coarse-grained, discrete analogue motivated by mass-conserved polarity models such as <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2292363/">Mori et al. (2008)</a>; it is not their exact reaction–diffusion equation.</td></tr>
+    <tr><td><b>Post-attachment feedback</b></td><td class="formula">\(q_s=(1-e^{-N_{bound,s}/N_0})\min(\Sigma|f_c|/(\chi N_mf_m),1)\)</td><td>Collagen cannot choose a sector before contact. Only bound clutches carrying load reinforce local cell activity. <a href="https://doi.org/10.1039/C6IB00030D">Carey et al. (2016)</a> experimentally motivates alignment-dependent protrusion frequency, persistence and length through FAK/Rac1; our feedback coefficients remain provisional.</td></tr>
+    <tr><td><b>Whole-cell reaction</b></td><td class="formula">\(\mathbf F_{cell}=-\sum_c\mathbf f_c\), \(\tau_{cell}=\sum_c(\mathbf m_c-\mathbf r_c)\times(-\mathbf f_c)\),<br>\(\dot{\mathbf r}_c=\mathbf F_{cell}/\zeta_c\)</td><td>The cell receives the exact opposite of every clutch force. There is no added migration velocity or hidden +x force. Rotation follows the spatial moment of the reactions.</td></tr>
+  </tbody></table>
+</section>
+
+<section class="section">
+  <h2>Fresh rerun: the numbers that matter</h2>
+  <div class="number-grid">
+    <article class="number"><b>99 fibres</b><span>7,089 beads, 334 crosslinks; 98/99 fibres connected to the anchored boundary.</span></article>
+    <article class="number"><b>5.0 s</b><span>G3A first attachment; capture range 0.5 µm.</span></article>
+    <article class="number"><b>2.418 µm</b><span>Maximum G3A protrusion length; at most 9 of 200 clutches bound.</span></article>
+    <article class="number"><b>0.001171 µm</b><span>Maximum G3A bead displacement with motors; motor-off control is approximately 1.38×10⁻¹⁴ µm.</span></article>
+    <article class="number"><b>0.199°</b><span>Maximum true change in contacted-fibre angle. The effect is real but small; displacement arrows alone are magnified ×1000.</span></article>
+    <article class="number"><b>ON = OFF</b><span>G3B matched feedback pair both ends at 30.02° with the same one-switch sequence.</span></article>
+    <article class="number"><b>0.0142 vs 0.0160</b><span>Four-seed aligned versus isotropic nematic guidance. There is no resolved aligned advantage.</span></article>
+    <article class="number"><b>0.003122 µm</b><span>G3C released-cell displacement in 20 s; rotation 0.01675°.</span></article>
+    <article class="number"><b>0 exactly</b><span>G3C fixed-cell and released empty-network displacement controls.</span></article>
+  </div>
+</section>
+
+<section class="section">
+  <h2>What the results mean</h2>
+  <table class="claim-table"><thead><tr><th>Evidence level</th><th>What you can say tomorrow</th><th>What you should not say</th></tr></thead><tbody>
+    <tr><td class="can">Supported mechanism</td><td>An explicit protrusion can encounter collagen, bind a continuous material point, generate force through stochastic motor–clutch dynamics and produce nonzero network deformation above the motor-off control.</td><td>That the magnitude or time course has been quantitatively fitted to a tumor experiment.</td></tr>
+    <tr><td class="can">Supported implementation</td><td>Polarity is now a cell-state output from a conserved noisy activity field; there is no human-selected 0.65 direction.</td><td>That the current activity law is a validated molecular Rac/FAK model.</td></tr>
+    <tr><td class="cannot">Negative guidance result</td><td>The fresh G3B runs execute cleanly, but feedback ON does not separate from OFF and aligned collagen does not outperform isotropic collagen in the four-seed ensemble.</td><td>That collagen guidance has been demonstrated, or that a p-value can be interpreted from four seeds.</td></tr>
+    <tr><td class="can">Supported bookkeeping</td><td>Equal-and-opposite clutch reactions generate nonzero released-cell motion while fixed and empty controls remain zero.</td><td>That 0.003122 µm/20 s is a realistic migration speed; drag and force have not been jointly calibrated.</td></tr>
+    <tr><td class="cannot">Overall boundary</td><td>G3 is a scaled, physics-based mechanism demonstration and a falsifiable model architecture.</td><td>“Realistic tumor migration,” “validated contact guidance,” or “predictive 3D collagen remodeling.”</td></tr>
+  </tbody></table>
+</section>
+
+<section class="section">
+  <h2>Likely professor questions</h2>
+  <div class="qa-grid">
+    <article class="qa"><h3>Where does polarizability come from?</h3><p>From redistribution and competition of a conserved cell-intrinsic activity pool, not a fixed probability. Noise breaks symmetry; self-reinforcement and local diffusion shape the patch. Collagen enters only through successful loaded adhesion.</p></article>
+    <article class="qa"><h3>Why does the protrusion no longer jump?</h3><p>An incumbent is retained for at least 4 s. A challenger must exceed it by both a 1.25 ratio and a 0.03 absolute activity margin. Geometry is continuous: the old protrusion retracts while the new one grows.</p></article>
+    <article class="qa"><h3>Does fibre “mass” matter?</h3><p>This is an overdamped model, so inertial mass is intentionally absent. Size matters through cell radius, fibre diameter/segment length, elastic stiffness and effective drag. The unresolved comparison is therefore size–stiffness–drag, not a Newtonian cell/fibre mass ratio.</p></article>
+    <article class="qa"><h3>Why 99 fibres?</h3><p>It prevents the mechanism from depending on one hand-picked fibre and preserves a boundary-connected crosslinked network. It is still a synthetic 2D sample, not a measured collagen density distribution.</p></article>
+    <article class="qa"><h3>Why is the deformation so small?</h3><p>The current motor scale and stiff elastic network produce sub-resolution displacement. The motor-off difference shows it is not numerical drift, but its magnitude signals that force, fibre stiffness, drag and density need matched calibration.</p></article>
+    <article class="qa"><h3>What is the strongest negative result?</h3><p>G3B feedback ON and OFF are indistinguishable in the fresh pair, and the four-seed aligned ensemble is not better than isotropic. The architecture is working; the intended guidance effect is not yet established.</p></article>
+  </div>
+</section>
+
+<section class="section limitation">
+  <h2>Recommended revision priority after tomorrow</h2>
+  <ol class="priority">
+    <li><b>Validate G3B before tuning G3C.</b> Preregister a larger aligned/isotropic/rotated/feedback-off ensemble and outcome metrics; do not tune against held-out seeds.</li>
+    <li><b>Calibrate the upstream observables.</b> Fit protrusion lifetime, attachment probability, clutch force/traction and collagen displacement before asking the model to reproduce migration speed.</li>
+    <li><b>Run sensitivity and convergence.</b> Capture range, contact stiffness, activity gain/noise/timescale, bead spacing, Gaussian width, fibre density and crosslink density.</li>
+    <li><b>Replace synthetic geometry with measured statistics.</b> Use collagen orientation, pore size, fibre-length and density distributions from the target experimental system.</li>
+    <li><b>Only then calibrate cell motion.</b> Jointly fit whole-cell drag and active force to traction plus speed; after that consider deformable cell/nucleus, 3D pores, transient crosslinks, plasticity and proteolysis.</li>
+  </ol>
+</section>
+
+<section class="section talk">
+  <h2>A two-minute presentation script</h2>
+  <p class="talk-script">We begin with the limitation of G2: it demonstrates force transmission through crosslinked collagen, but its moving-cell direction still uses a human-selected polarization probability. G3 divides migration into three independently falsifiable stages. First, G3A fixes the cell and asks whether a protrusion can grow at finite speed, capture a material point after its tip reaches a continuous collagen segment, generate traction through tension-only clutches, a motor force–velocity law and Bell rupture, and transfer that load through bead–spring and crosslink mechanics to 99 fibres. The fresh control gives 0.001171 µm maximum motor-on bead displacement while the motor-off response is effectively zero, so the force path exists. Second, G3B removes 0.65 and uses conserved intracellular activity on 24 sectors. It can break symmetry internally; collagen feeds back through the adhesion score only after a clutch binds and carries load. Minimum lifetime and switching hysteresis prevent protrusions from teleporting. However, the fresh ON/OFF pair is identical and the aligned ensemble does not outperform the isotropic ensemble, so collagen guidance cannot yet be claimed. Third, G3C gives the cell an equal-and-opposite reaction and torque for every collagen force, with no added migration velocity. The released cell moves 0.003122 µm while fixed and empty controls remain zero. This verifies reaction bookkeeping, but upstream guidance and drag remain uncalibrated. The current conclusion is therefore a physics-based mechanism demonstration, not realistic tumor migration. The next priority is a larger preregistered G3B ensemble and calibration against protrusion, traction and collagen-displacement data before tuning migration speed or adding 3D complexity.</p>
+  <p class="small">Last updated from the fresh validation/experiment rerun on 18 Aug 2026. Links above open the complete implemented equation sets and synchronized Gloria-style animations.</p>
+</section>
+</main>
+<footer>G3 professor briefing · motor–clutch collagen model</footer>
+</body>
+</html>

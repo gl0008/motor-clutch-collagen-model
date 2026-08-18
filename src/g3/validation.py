@@ -43,7 +43,14 @@ def _g3b_angles(result: G3RunResult):
     snapshots = result.snapshots[len(result.snapshots) // 2:]
     angles = []
     for snapshot in snapshots:
-        angles.extend(snapshot.cell_angle + result.protrusions.sector_angles[snapshot.active_sectors])
+        lab = snapshot.cell_angle + result.protrusions.sector_angles
+        vector = np.sum(
+            snapshot.polarity_activity[:, None]
+            * np.column_stack((np.cos(lab), np.sin(lab))),
+            axis=0,
+        )
+        if np.linalg.norm(vector) > 1.0e-6:
+            angles.append(np.arctan2(vector[1], vector[0]))
     return np.asarray(angles, dtype=float)
 
 
