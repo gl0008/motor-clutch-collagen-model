@@ -2,114 +2,82 @@
 
 ## Scientific claim
 
-G3 is a **2D minimal mechanism model testing cell–collagen guidance**. It tests whether
-spatial motor-clutch attachments, local collagen geometry, and traction-dependent protrusion
-persistence can generate a migration axis without a prescribed global polarity.
+G3 is a **2D minimal mechanism model of emergent cell–collagen guidance**. It tests whether
+a cell **spheroid** can, *without any prescribed direction or polarity probability*, break
+symmetry, send protrusions out to grip collagen across an initially fibre-free gap, remodel
+the surrounding fibre network by motor–clutch traction, and migrate toward the side where it
+actually grips.
 
-It is not a realistic three-dimensional tumor-migration model. It does not contain calibrated
-collagen concentration/pore topology, a deformable cell or nucleus, proteolysis, EMT, cell-cell
-interactions, SLS, transient crosslinks, or irreversible plasticity.
+It is **not** a realistic three-dimensional tumour-migration model. It does not contain a
+calibrated collagen concentration/pore topology, a deformable cell or nucleus, proteolysis,
+EMT, cell–cell interactions, stress relaxation, or irreversible plasticity.
 
-## Active stages
+> Personal simulation / mechanism validation; not yet a realistic 3D tumour-migration prediction.
 
-1. **G3A-R — protrusion-tip material-point clutches.** A fixed rigid cell grows a visible
-   protrusion into a crosslinked 99-fibre network. Each
-   clutch stores `(fiber_id, segment_id, alpha)` and remains attached to that material point
-   until Bell-law unbinding. A local Gaussian projects the point force to nearby beads on the
-   same fibre while preserving net force and first moment.
-   The displayed and freshly validated condition uses the shared crosslinked 99-fibre fixture,
-   with boundary-only anchors and eight controlled near-cell contact fibres. The diagnostic
-   protrusion is prescribed only in G3A so growth, capture and network loading can be isolated.
-2. **G3B-R — cell-intrinsic polarity.** A conserved noisy activity field on 24 membrane
-   sectors breaks symmetry without collagen-direction input. Physical attachment and traction
-   can stabilize activity after contact; there is no `+x` preference.
-3. **G3C — rigid-body motion.** The cell translates and rotates only from equal-and-opposite
-   clutch reactions. No prescribed self-propulsion velocity is present.
+## Current implementation (2026-08-19 rebuild)
 
-## Current validation state (2026-08-18)
+The active implementation is **`generations/g3_spheroid_guidance/`**, a clean rebuild on top
+of Gloria's frozen, validated Generation-2 collagen engine
+(`generations/g2_corrected/common/model.py`). The engine — crosslinked, boundary-anchored
+bead–spring network with overdamped dynamics — is reused unchanged; G3 adds only:
 
-### G3-R 99-fibre revision
+1. **A spheroid with a fibre-free gap**, so `t = 0` has no cell–ECM contact.
+2. **Explicit protrusions** that probe outward and can bind a fibre only when their *tip*
+   reaches a material point (tip-first encounter), then load it with the G2 slip-bond
+   motor–clutch law.
+3. **Emergent polarity** — a mass-conserved replicator membrane-activity field with local
+   autocatalysis, diffusion, noise, and a FAK/Rac1-like adhesion-traction feedback. One
+   stable broad front emerges from a symmetric start; noise sets the direction; adhesion
+   feedback pulls the front toward wherever protrusions grip. **The old G2
+   `polarity_probability = 0.65` side-bias is removed** — the binding bias is now an emergent
+   consequence of the mechanics, not a parameter.
+4. **Reaction-driven migration** (as in G2 V3): spheroid velocity is the summed
+   equal-and-opposite clutch reaction over a cell drag.
 
-A fresh short mechanism suite has now been run for the explicit-protrusion, cell-intrinsic
-polarity revision. All displayed G3A/B/C conditions use a crosslinked 99-fibre network rather
-than the old few-fibre fixtures. All nine mechanism/execution gates passed, including matched
-motor-off, fixed-cell and empty-network controls. The full result table and interpretation are
-in `docs/results/g3_revision_validation_2026-08-18.md`.
+Design rationale, literature grounding, and run instructions are in
+`generations/g3_spheroid_guidance/README.md`.
 
-This revision does not erase the preserved result below and does not yet clear a guidance
-claim. Its four-seed aligned ensemble has nematic order 0.0142, whereas the four-seed isotropic
-ensemble has 0.0160. A matched 20 s feedback OFF/ON pair also follows the same sector sequence
-and finishes at 30.02 degrees. The new model therefore needs a larger preregistered aligned-versus-
-isotropic calibration, rotated-axis covariance and parameter sensitivity before final
-validation seeds are opened.
+## Result of the rebuilt reference run
 
-### Superseded original contact-free calibration — audit only
+150-fibre / 240 µm field / 22 µm spheroid / 12 µm gap / 60 min, seed 7
+(`results/g3_spheroid_guidance/main/`, GIFs in `figures/g3_spheroid_guidance/`):
 
-The original contact-free G3B calibration was completed for all six preregistered conditions
-using seeds 0--19 and 600 s per run (120 runs total). It is preserved for audit but is not
-current evidence because one comparison condition failed its geometry-validity gate. The
-configuration is **not frozen** and validation seeds 1000--1099 have **not** been opened.
+| Quantity | Value | Literature target |
+|---|---|---|
+| Peak collective traction | ~36 nN | tens of nN, ≤100 (Steinwachs 2016) |
+| Net migration in 60 min | ~19 µm (net ≈ path — directional) | — |
+| Migration speed | ~0.32 µm/min | 0.1–0.3 µm/min (Sapudom 2019) |
+| Engaged protrusions at end | ~10 | — |
+| Near-shell radial order | −0.62 → −0.31 (fibres pulled radially) | realignment over tens of min–h |
+| Max bead displacement | ~5 µm | — |
 
-The valid subsets produced the following historical signals, which motivated the revision but
-must not be reported as a successful guidance result:
+**Emergence check** (5 seeds, short runs): the migration direction is 84°, −84°, −8°, −99°,
+64° — spread ≈ 75°. The direction is genuinely stochastic and set per realisation, confirming
+there is no built-in directional bias.
 
-- `aligned_8`: mean nematic guidance 0.726 (bootstrap 95% CI 0.626--0.819), with a 55/45
-  split between the two directions of the collagen axis.
-- `aligned_8_rotated_30`: the inferred protrusion axis rotated with the fixture; covariance
-  error was 3.03 degrees.
-- `aligned_feedback_off`: mean nematic guidance was -0.033 (95% CI -0.195--0.127), so
-  removing geometry/traction feedback eliminated the aligned preference.
-- `no_fibre`: zero bound clutches, force, and torque in all 20 runs.
+Two GIF view modes are rendered, matching the G2-v3 notebook toggle: `*_full.gif` (full
+180 µm-style field) and `*_follow.gif` (follow-cell zoom).
 
-G3B nevertheless **fails its calibration gate** because 7 of 20 `isotropic_random_8` runs
-entered `invalid_geometry_overlap`: collagen beads were actively pulled more than 0.1 um
-inside the rigid cell. The valid-run subset must not be treated as an unbiased isotropic
-ensemble. At 20 seeds, the balanced and valid-isotropic residual polar ratios (0.182 and
-0.276) also cannot establish the preregistered <0.1 final-ensemble criterion.
+## Controls that make the mechanism falsifiable
 
-A concurrently launched `--stage both` job produced 173 partial G3C calibration records
-before this G3B failure was summarized. Those records are retained for audit only and are
-excluded from formal evidence. The old campaign was stopped. The fresh G3C-R short mechanism
-run is a separate control-based execution test; predictive migration validation must not
-resume until the revised G3B guidance gate passes.
-`results/g3_validation/HALT.json` enforces this boundary in the campaign runner so stale
-resume commands cannot silently continue the campaign.
-
-The active configuration now contains an explicit conservative cell--collagen
-contact law. A bead that penetrates the rigid circle receives a radial force derived from
-`0.5 * contact_stiffness * penetration^2`, and the cell receives the exact opposite reaction.
-The previously failing isotropic seed 2 reproduces its 48.1 s overlap when contact is disabled;
-with contact enabled it completes a 60 s diagnostic with 0.00375 um maximum penetration.
-This was an implementation diagnostic only. The new 99-fibre short suite has since been run,
-but its aligned/isotropic results remain negative. A larger preregistered rerun in a new
-version-preserving output directory is required before the guidance stage can be cleared.
-
-See `docs/results/g3b_calibration_2026-08-18.md` and
-`results/g3_validation/calibration/` for the complete summary and per-seed records.
+- `--fixed`: fibres still get pulled/realigned but the spheroid does not migrate.
+- Zero motor stall force: protrusions attach without deforming fibres.
+- No reachable fibre in the gap: zero engagement, zero traction, zero motion.
 
 ## Relationship to Generation 2
 
-The existing `generations/g2_corrected/` implementation remains frozen and unchanged.
+`generations/g2_corrected/` remains frozen and unchanged. G3 reuses its engine but does not
+rewrite G2 files or reinterpret G2 V2/V3 as realistic tumour migration.
 
-- V2 supports force transmission through permanent crosslinks in its specified 2D network.
-- V3 supports reaction-driven motion under a prescribed persistent clutch imbalance.
-- Neither result establishes emergent direction selection or realistic 3D migration.
+## Superseded G3 v1
 
-G3 is a new branch-level extension in the same repository. It does not rewrite G2 files or
-reinterpret G2 V2/V3 as realistic tumor migration.
-
-## Active/superseded map
-
-| Path | Status |
-|---|---|
-| `src/g3/` | Active G3 implementation |
-| `src/config/params_g3.yaml` | Active G3 configuration |
-| `generations/g3_emergent_guidance/` | G3 scientific-version entry and run instructions |
-| `generations/g2_corrected/` | Frozen G2 mechanism demonstrations |
-| `versions/` | Frozen Generation 1 archive |
+The earlier `src/g3/` package and all its outputs (mis-scaled, sub-minute runs, chaotic
+animations, a failed guidance test with aligned nematic order 0.0142 < isotropic 0.0160) have
+been archived under **`legacy/g3_v1_superseded/`**. They are kept for audit only and are not
+current evidence.
 
 ## Interpretation rule
 
-All generated figures must include:
+All generated figures carry:
 
-> Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction.
+> Mechanism demo — not a 3D tumour-migration prediction.

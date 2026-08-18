@@ -1,0 +1,29 @@
+{
+  "status": "complete",
+  "stage": "g3s",
+  "fixture": "scaled_isotropic_99",
+  "seed": 8,
+  "simulated_time_s": 20.0,
+  "n_fibres": 99,
+  "n_beads": 6519,
+  "final_bound_clutches": 16,
+  "max_bound_clutches": 28,
+  "initial_foi": 0.5031141085168581,
+  "final_foi": 0.503164868467331,
+  "max_force_error": 4.114486864288286e-15,
+  "max_torque_error": 3.008372728570426e-16,
+  "max_contact_count": 0,
+  "max_contact_penetration_m": 0.0,
+  "max_contact_energy_J": 0.0,
+  "cell_net_displacement_m": 0.0,
+  "cell_path_length_m": 0.0,
+  "cell_final_angle_rad": 0.0,
+  "bead_displacement": {
+    "median": 2.4119155665828373e-16,
+    "p95": 5.905666794967136e-10,
+    "p99": 1.4827252957978598e-08,
+    "max": 5.605123096534524e-07,
+    "participation_ratio": 0.00036724531647506467
+  },
+  "interpretation": "Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction."
+}

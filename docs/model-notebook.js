@@ -1,5 +1,5 @@
 (function(){
-  const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4','g3-a','g3-b','g3-c'];
+  const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4','g3'];
   const query=new URLSearchParams(location.search);
   const requested=(query.get('model')||'').replace(/;+$/,'');
   const id=NOTEBOOK_MODELS[requested]?requested:'g2-v2';
@@ -29,7 +29,6 @@
     <p class="lead">${model.purpose}</p>
     <div class="brief ${model.generation==='G2'?'g2-accent':model.generation==='G3'?'g3-accent':''}"><div class="label">Your brief · condensed from our conversation</div><ul>${brief}</ul></div>
     <h3>Causal chain you wanted to isolate</h3><div class="causal-chain">${chain}</div>
-    ${model.generation==='G3'?'<div class="professor-brief-link"><b>Presenting G3 tomorrow?</b><span>Open the one-page storyline with the model chain, key equations, paper map, current numbers and wording boundaries.</span><a class="button" href="g3-professor-brief.html">Open G3 professor briefing</a></div>':''}
   </section>`;
 
   if(model.simulation){

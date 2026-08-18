@@ -106,41 +106,35 @@ records the accepted gates and sensitivity runs.
   no resolved excess residual over the elastic control.  This is a negative
   baseline result, not evidence of permanent remodeling.
 
-## Generation 3 — emergent cell–collagen guidance
+## Generation 3 — emergent spheroid guidance
 
-Generation 3 is intentionally separate from the frozen G2 folders. Its active engine is
-[`src/g3/`](src/g3/), and its version entry is
-[`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/).
+Generation 3 is a **2D mechanism demonstration** built directly on the frozen Generation-2
+collagen engine. Its active implementation is
+[`generations/g3_spheroid_guidance/`](generations/g3_spheroid_guidance/) (rebuilt 2026-08-19).
+It asks whether a cell **spheroid** can, with **no prescribed direction and no polarity
+probability**, break symmetry, send protrusions out to grip collagen across an initially
+fibre-free gap, remodel the fibre network, and migrate toward the side where it grips.
 
-The G3-R revision now adds visible protrusion growth, cell-intrinsic polarity, post-attachment
-adhesion feedback, 99-fibre crosslinked-network scale-up and the same precomputed-data/SVG
-visualization architecture used by Gloria's G2 pages. Downloadable synchronized GIFs are also
-generated from the same saved solver frames. The
-design and priorities are in [`docs/G3_REVISION_PLAN.md`](docs/G3_REVISION_PLAN.md); fresh
-mechanism results and their evidence boundary are in
-[`docs/results/g3_revision_validation_2026-08-18.md`](docs/results/g3_revision_validation_2026-08-18.md).
+The rebuild reuses `generations/g2_corrected/common/model.py` unchanged and adds only: a
+spheroid with a fibre-free gap (no contact at `t = 0`); explicit protrusions that bind a fibre
+only when their *tip* reaches it; an **emergent, mass-conserved membrane-polarity field** with
+FAK/Rac1-like adhesion feedback (noise picks the direction, mechanics reinforce it); and
+reaction-driven migration exactly as in G2 V3. **G2 V3's `polarity_probability = 0.65` is
+removed** — the binding bias is now an emergent consequence of the mechanics, not a parameter.
+Design and literature grounding are in
+[`generations/g3_spheroid_guidance/README.md`](generations/g3_spheroid_guidance/README.md) and
+[`docs/G3_MODEL_STATUS.md`](docs/G3_MODEL_STATUS.md).
 
-| Stage | Question | Cell state |
-|---|---|---|
-| G3A-R | Can a visible protrusion grow, reach a collagen material point and load a crosslinked 99-fibre network? | fixed |
-| G3B-R | Can cell-intrinsic membrane activity break symmetry, with only post-attachment traction stabilizing the front? | fixed |
-| G3C | Can clutch reactions translate and rotate a rigid cell in 2D without hidden self-propulsion? | mobile rigid body |
+Reference run (150 fibres, 240 µm, 22 µm spheroid, 60 min): peak traction ~36 nN, ~19 µm
+directional migration at ~0.32 µm/min, near-shell radial order −0.62 → −0.31. A 5-seed
+emergence check gives migration directions spread over ~75°, confirming the direction is
+stochastic. Two GIF views are rendered (like the G2-v3 toggle): full 180 µm-style field and
+follow-cell zoom, in [`figures/g3_spheroid_guidance/`](figures/g3_spheroid_guidance/).
 
-G3 removes G2 V3's `polarity_probability=0.65`. The fresh G3-R suite passes nine short
-mechanism/execution gates on 99 fibres, including motor-off, fixed-cell and empty-network
-controls. It does not claim realistic 3D tumor migration: pores, nucleus, deformable cortex,
-MMP, collagen-concentration calibration, SLS, plasticity, EMT and cell-cell interactions remain
-outside scope. At four seeds the revised isotropic nematic order exceeds the aligned value, so
-the new guidance law still requires preregistered large ensembles and sensitivity analysis.
-
-The public notebook now includes separate G3A, G3B and G3C pages with interactive precomputed
-SVG playback,
-all implemented equations, paper support, assumptions, results and stage-specific limitations:
-
-- [G3 professor briefing: storyline, formulas, paper map, current results and speaking script](docs/g3-professor-brief.html)
-- [G3A website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-a)
-- [G3B website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-b)
-- [G3C website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-c)
+It does not claim realistic 3D tumour migration: pores, nucleus, deformable cortex, MMP,
+collagen-concentration calibration, stress relaxation, plasticity, EMT and cell–cell
+interactions remain outside scope. The earlier `src/g3/` implementation is archived under
+`legacy/g3_v1_superseded/`.
 
 ## Run and test
 
@@ -150,18 +144,17 @@ python3 -m unittest discover -s generations/g2_corrected/v3_two_sided_migration/
 python3 -m unittest discover -s generations/g2_corrected/v4_contact_plasticity/tests -v
 
 python3 generations/g2_corrected/validate.py
-python3 generations/g2_corrected/v2_crosslink_transmission/run.py
 python3 generations/g2_corrected/v3_two_sided_migration/run.py
-python3 generations/g2_corrected/v4_contact_plasticity/run.py
 
-# PowerShell
-$env:PYTHONPATH = "src"
-py -3 -m pytest tests/unit -q
-py -3 -m g3.run --stage g3a --fixture single_fibre --output results/g3/g3a-demo
+# Generation 3 spheroid guidance (rebuild)
+cd generations/g3_spheroid_guidance
+python run.py    --out ../../results/g3_spheroid_guidance/main --fibers 150 --domain 240 \
+                 --radius 22 --gap 12 --duration 3600 --dt 0.06 --seed 7
+python render.py --run ../../results/g3_spheroid_guidance/main --out ../../figures/g3_spheroid_guidance
 ```
 
-Python precomputes all physics into each `demo/data.js`.  The web pages only
-play saved frames; JavaScript does not implement a second hidden model.
+For G2, Python precomputes all physics into each `demo/data.js`; the web pages only play saved
+frames. The rebuilt G3 renders its GIFs directly with matplotlib in the same visual grammar.
 
 See [`ASSUMPTIONS.md`](ASSUMPTIONS.md), [`RESULTS.md`](RESULTS.md), and
 [`CITATIONS.md`](CITATIONS.md) for interpretation boundaries and sources.

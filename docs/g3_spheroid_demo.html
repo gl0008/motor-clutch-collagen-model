@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G3 · emergent spheroid guidance</title>
+<style>
+:root{--ink:#15242c;--muted:#617078;--paper:#edf1ed;--panel:#fffefa;--fiber:#5b6f79;--ghost:#c2cbc7;--gold:#b27b26;--orange:#ca6037;--green:#2e7c61;--red:#b53f38;--blue:#347bb0;--magenta:#b5379b;--border:#d3dbd4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}
+header{padding:20px max(18px,calc((100vw - 1200px)/2));background:#173039;color:#fff}
+h1{font:700 clamp(22px,3.6vw,32px)/1.05 Georgia,serif;margin:0}
+header p{color:#d2dcde;max-width:900px;margin:8px 0 0}
+main{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.panel,.controls,.note,.side{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:13px}
+.scene{display:block;width:100%;aspect-ratio:1;background:#f7f5ef;border:1px solid #dfe5df;border-radius:9px}
+.controls{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.controls button,.controls select{font:inherit;border:1px solid #b8c1bc;background:#fff;color:var(--ink);padding:7px 10px;border-radius:7px;cursor:pointer}
+.controls button.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.controls input[type=range]{flex:1;min-width:160px}
+.controls label{display:inline-flex;gap:5px;align-items:center;color:var(--muted)}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px}
+.metric{background:#edf1ed;border-radius:8px;padding:9px}
+.metric b{display:block;font:600 19px/1 ui-sans-serif;font-variant-numeric:tabular-nums}
+.metric small{color:var(--muted)}
+.side h2{font:700 18px Georgia,serif;margin:2px 0 8px}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;color:var(--muted);font-size:13px;margin-top:6px}
+.legend span:before{content:"";display:inline-block;width:13px;height:12px;border-radius:3px;background:var(--c);margin-right:6px;vertical-align:-2px}
+.note{grid-column:1/-1;border-left:5px solid var(--green)}.note p{margin:0}
+.boundary{font-size:12px;color:var(--muted);margin-top:8px}
+@media(max-width:880px){main{grid-template-columns:1fr}.controls{grid-column:1}}
+</style>
+</head>
+<body>
+<header>
+<h1>Generation 3 · emergent spheroid guidance</h1>
+<p>A cell spheroid starts with no collagen contact, sends protrusions out across the gap, grips fibres with motor–clutches, remodels the network, and migrates toward the side it grips — with no prescribed direction and no 0.65 polarity. Same overdamped bead–spring collagen engine as Gloria's G2.</p>
+</header>
+<main>
+<section class="panel">
+  <canvas class="scene" id="scene" width="760" height="760" aria-label="Emergent spheroid guidance animation"></canvas>
+  <div class="metrics" id="metrics"></div>
+</section>
+<section class="side">
+  <h2>What you are watching</h2>
+  <p>The <b>peach spheroid</b> grows <b style="color:var(--green)">green protrusions</b> in all directions. When a tip reaches a fibre it turns <b style="color:var(--orange)">orange</b> and a <b style="color:var(--red)">red clutch spoke</b> pulls that <b style="color:var(--magenta)">captured material point</b> inward. The <b>membrane heat-map</b> is the emergent polarity: bright at the front, dark at the rear. The direction is chosen by noise and reinforced by which protrusions actually grip — run a different seed and it points a different way.</p>
+  <div class="legend">
+    <span style="--c:var(--fiber)">collagen spring</span>
+    <span style="--c:var(--red)">tension / <span style="color:var(--blue)">compression</span></span>
+    <span style="--c:var(--gold)">permanent crosslink</span>
+    <span style="--c:var(--ink)">fixed boundary bead</span>
+    <span style="--c:var(--green)">protrusion (probing)</span>
+    <span style="--c:var(--orange)">protrusion (gripping)</span>
+    <span style="--c:var(--red)">clutch spoke</span>
+    <span style="--c:var(--magenta)">captured fibre point</span>
+  </div>
+  <p class="boundary">Mechanism demonstration in 2D. Geometry is true 1× scale; the scale bar is 20 µm. Not a realistic 3D tumour-migration prediction.</p>
+</section>
+<section class="controls">
+  <button class="primary" id="play">Pause</button>
+  <button id="step">Step</button>
+  <label>View <select id="view"><option value="full">full 180 µm field</option><option value="follow">follow-cell zoom</option></select></label>
+  <label><input type="checkbox" id="pol" checked> polarity</label>
+  <label><input type="checkbox" id="prot" checked> protrusions</label>
+  <input id="scrub" type="range" min="0" max="100" value="0">
+  <span id="time">0.0 min</span>
+</section>
+<section class="note"><p><b>How to read it:</b> the faint grey network is the initial geometry; springs turn red in tension and blue in compression as the spheroid pulls them. The blue curve is the cell path. Fibres near the front are drawn inward and reorient radially — that is the emergent collagen remodelling.</p></section>
+</main>
+
+<script src="g3_spheroid_demo_data.js"></script>
+<script>
+const D=window.G3_DATA, M=D.meta, S=M.n_sectors;
+const enc=D.encoding, F=enc.shape[0], NB=enc.shape[1], quantum=enc.quantum;
+// decode int16 position deltas
+const bin=atob(enc.base64), u8=new Uint8Array(bin.length);
+for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+const Q=new Int16Array(u8.buffer);
+const R0=M.initial_positions, EDG=M.edges, L0=M.l0, XL=M.crosslinks, FIXED=M.fixed;
+const anchors=[]; for(let i=0;i<FIXED.length;i++) if(FIXED[i]) anchors.push(i);
+function px(f,i){return R0[i][0]+quantum*Q[(f*NB+i)*2];}
+function py(f,i){return R0[i][1]+quantum*Q[(f*NB+i)*2+1];}
+function matx(f,e,a){const ij=EDG[e];return (1-a)*px(f,ij[0])+a*px(f,ij[1]);}
+function maty(f,e,a){const ij=EDG[e];return (1-a)*py(f,ij[0])+a*py(f,ij[1]);}
+
+// magma-ish colormap for the polarity heat-map
+const MAG=[[0,0,4],[40,11,84],[101,21,110],[159,42,99],[212,72,66],[245,125,21],[250,193,39],[252,253,191]];
+function magma(t){t=Math.max(0,Math.min(1,t));const x=t*(MAG.length-1),i=Math.floor(x),f=x-i,a=MAG[i],b=MAG[Math.min(i+1,MAG.length-1)];return `rgb(${a[0]+f*(b[0]-a[0])|0},${a[1]+f*(b[1]-a[1])|0},${a[2]+f*(b[2]-a[2])|0})`;}
+
+const cv=document.getElementById('scene'), ctx=cv.getContext('2d');
+const DPR=Math.min(2,window.devicePixelRatio||1); cv.width=760*DPR; cv.height=760*DPR;
+let frame=0, playing=true, last=0, speed=90;
+const half=M.domain_size/2, R=M.cell_radius;
+
+function transform(){
+  const c=D.center[frame];
+  let cx,cy,hw;
+  if(document.getElementById('view').value==='full'){cx=0;cy=0;hw=half;}
+  else{cx=c[0];cy=c[1];hw=2.6*R;}
+  const s=(760*DPR)/(2*hw);
+  return {X:wx=>(wx-cx)*s+380*DPR, Y:wy=>380*DPR-(wy-cy)*s, s, hw, cx, cy};
+}
+
+function draw(){
+  const t=transform(), f=frame;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#f7f5ef'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.lineCap='round';
+  // ghost initial network
+  ctx.strokeStyle='rgba(194,203,199,.5)'; ctx.lineWidth=0.7*DPR; ctx.beginPath();
+  for(let e=0;e<EDG.length;e++){const ij=EDG[e];ctx.moveTo(t.X(R0[ij[0]][0]),t.Y(R0[ij[0]][1]));ctx.lineTo(t.X(R0[ij[1]][0]),t.Y(R0[ij[1]][1]));}
+  ctx.stroke();
+  // current springs, bucketed by strain colour
+  const buckets={ '#5b6f79':[], '#b53f38':[], '#347bb0':[] };
+  for(let e=0;e<EDG.length;e++){
+    const ij=EDG[e], ax=px(f,ij[0]),ay=py(f,ij[0]),bx=px(f,ij[1]),by=py(f,ij[1]);
+    const len=Math.hypot(bx-ax,by-ay), st=(len-L0[e])/L0[e];
+    const col= st>6e-4?'#b53f38': st<-6e-4?'#347bb0':'#5b6f79';
+    buckets[col].push(ax,ay,bx,by);
+  }
+  ctx.lineWidth=1.05*DPR;
+  for(const col in buckets){const arr=buckets[col];if(!arr.length)continue;ctx.strokeStyle=col;ctx.beginPath();for(let k=0;k<arr.length;k+=4){ctx.moveTo(t.X(arr[k]),t.Y(arr[k+1]));ctx.lineTo(t.X(arr[k+2]),t.Y(arr[k+3]));}ctx.stroke();}
+  // crosslink gold diamonds
+  ctx.fillStyle='#b27b26';
+  for(let x=0;x<XL.length;x++){const l=XL[x],mx=(matx(f,l[0],l[1])+matx(f,l[2],l[3]))/2,my=(maty(f,l[0],l[1])+maty(f,l[2],l[3]))/2,X=t.X(mx),Y=t.Y(my),r=2.1*DPR;ctx.beginPath();ctx.moveTo(X,Y-r);ctx.lineTo(X+r,Y);ctx.lineTo(X,Y+r);ctx.lineTo(X-r,Y);ctx.closePath();ctx.fill();}
+  // fixed boundary anchors
+  ctx.fillStyle='#17232b';const a2=2.3*DPR;
+  for(const i of anchors){const X=t.X(px(f,i)),Y=t.Y(py(f,i));if(X<-10||X>cv.width+10||Y<-10||Y>cv.height+10)continue;ctx.fillRect(X-a2/2,Y-a2/2,a2,a2);}
+  // trajectory
+  ctx.strokeStyle='#347bb0';ctx.lineWidth=1.6*DPR;ctx.beginPath();
+  for(let k=0;k<=f;k++){const c=D.center[k];if(k===0)ctx.moveTo(t.X(c[0]),t.Y(c[1]));else ctx.lineTo(t.X(c[0]),t.Y(c[1]));}
+  ctx.stroke();
+  // spheroid body
+  const c=D.center[f];
+  ctx.beginPath();ctx.arc(t.X(c[0]),t.Y(c[1]),R*t.s,0,7);ctx.fillStyle='#f7e3d4';ctx.fill();ctx.strokeStyle='#ca6037';ctx.lineWidth=2*DPR;ctx.stroke();
+  // protrusions, spokes, captured points
+  const act=D.activity[f], len=D.length[f], eng=D.engaged[f], ep=D.engaged_points[f], vmax=D.act_vmax;
+  if(document.getElementById('prot').checked){
+    for(let k=0;k<S;k++){
+      const ang=2*Math.PI*k/S, nx=Math.cos(ang), ny=Math.sin(ang);
+      const bx=c[0]+R*nx, by=c[1]+R*ny, tx=c[0]+(R+len[k])*nx, ty=c[1]+(R+len[k])*ny;
+      ctx.strokeStyle=eng[k]?'#ca6037':'#2e7c61';ctx.lineWidth=(eng[k]?2.4:1.4)*DPR;
+      ctx.beginPath();ctx.moveTo(t.X(bx),t.Y(by));ctx.lineTo(t.X(tx),t.Y(ty));ctx.stroke();
+      ctx.fillStyle=eng[k]?'#ca6037':'#2e7c61';ctx.beginPath();ctx.arc(t.X(tx),t.Y(ty),(eng[k]?3.0:1.8)*DPR,0,7);ctx.fill();
+      if(eng[k]&&ep[k]){ctx.strokeStyle='#b53f38';ctx.lineWidth=1.3*DPR;ctx.beginPath();ctx.moveTo(t.X(tx),t.Y(ty));ctx.lineTo(t.X(ep[k][0]),t.Y(ep[k][1]));ctx.stroke();ctx.fillStyle='#b5379b';ctx.beginPath();ctx.arc(t.X(ep[k][0]),t.Y(ep[k][1]),2.6*DPR,0,7);ctx.fill();}
+    }
+  }
+  // emergent polarity membrane heat-map
+  if(document.getElementById('pol').checked){
+    for(let k=0;k<S;k++){const ang=2*Math.PI*k/S,hx=c[0]+1.09*R*Math.cos(ang),hy=c[1]+1.09*R*Math.sin(ang);ctx.fillStyle=magma(act[k]/vmax);ctx.beginPath();ctx.arc(t.X(hx),t.Y(hy),3.4*DPR,0,7);ctx.fill();}
+  }
+  // scale bar
+  const bx0=40*DPR, by0=cv.height-34*DPR, bar=20*t.s;
+  ctx.strokeStyle='#17232b';ctx.lineWidth=3*DPR;ctx.beginPath();ctx.moveTo(bx0,by0);ctx.lineTo(bx0+bar,by0);ctx.stroke();
+  ctx.fillStyle='#17232b';ctx.font=`${12*DPR}px ui-sans-serif`;ctx.textAlign='center';ctx.fillText('20 µm',bx0+bar/2,by0-6*DPR);
+  // metrics + time
+  document.getElementById('time').textContent=(D.time[f]/60).toFixed(1)+' min';
+  document.getElementById('scrub').value=100*f/(F-1);
+  const nEng=eng.reduce((s,v)=>s+v,0);
+  const px2=[c[0],c[1]], disp=Math.hypot(px2[0]-D.center[0][0],px2[1]-D.center[0][1]);
+  document.getElementById('metrics').innerHTML=
+    `<div class="metric"><b>${(D.time[f]/60).toFixed(1)} min</b><small>time</small></div>`+
+    `<div class="metric"><b>${nEng}</b><small>gripping protrusions</small></div>`+
+    `<div class="metric"><b>${D.traction[f].toFixed(1)} nN</b><small>collective traction</small></div>`+
+    `<div class="metric"><b>${disp.toFixed(1)} µm</b><small>spheroid displacement</small></div>`;
+}
+
+document.getElementById('play').onclick=e=>{playing=!playing;e.target.textContent=playing?'Pause':'Play';};
+document.getElementById('step').onclick=()=>{playing=false;document.getElementById('play').textContent='Play';frame=Math.min(frame+1,F-1);draw();};
+document.getElementById('scrub').oninput=e=>{playing=false;document.getElementById('play').textContent='Play';frame=Math.round(e.target.value/100*(F-1));draw();};
+document.getElementById('view').onchange=draw;
+document.getElementById('pol').onchange=draw;
+document.getElementById('prot').onchange=draw;
+function tick(ts){if(playing&&ts-last>speed){frame=(frame+1)%F;last=ts;draw();}requestAnimationFrame(tick);}
+draw();requestAnimationFrame(tick);
+</script>
+</body>
+</html>

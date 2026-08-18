@@ -1,0 +1,8 @@
+{
+  "stage": "g3s",
+  "fixture": "scaled_isotropic_99",
+  "seed": 8,
+  "git_commit": "702afbc0abf5118621765b1c778418de4e196c41",
+  "status": "complete",
+  "interpretation": "Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction."
+}
