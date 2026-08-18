@@ -2,3 +2,5 @@ __pycache__/
 *.py[cod]
 .DS_Store
 results_smoke/
+results/g3_validation/*.log
+results/g3_validation/pre_optimization_*/

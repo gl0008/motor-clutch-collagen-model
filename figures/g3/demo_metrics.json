@@ -1,0 +1,45 @@
+{
+  "interpretation": "Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction.",
+  "active_contact": {
+    "enabled": true,
+    "stiffness_N_per_m": 0.004,
+    "note": "These selected smoke fixtures had zero active contact; the regenerated trajectories therefore match the preserved mechanism values. Contact behavior is tested separately by D011."
+  },
+  "g3a": {
+    "fixture": "single_fibre",
+    "seed": 4,
+    "duration_s": 15.0,
+    "initial_foi": 0.6046143525556416,
+    "final_foi": 0.6239407485171414,
+    "maximum_bead_displacement_um": 0.3947673345357816,
+    "maximum_bound_clutches": 173,
+    "maximum_contact_count": 0,
+    "status": "complete"
+  },
+  "g3b": {
+    "fixture": "aligned_8",
+    "seed": 23,
+    "duration_s": 120.0,
+    "maximum_bound_clutches": 11,
+    "maximum_contact_count": 0,
+    "observed_turnover_times_s": [59.0, 70.0],
+    "status": "complete"
+  },
+  "g3c": {
+    "fixture": "asymmetric_torque",
+    "seed": 3,
+    "duration_s": 30.0,
+    "net_displacement_um": 0.0018699552726122955,
+    "final_rotation_rad": 0.00006678947228033749,
+    "maximum_bound_clutches": 11,
+    "maximum_contact_count": 0,
+    "status": "complete"
+  },
+  "load_unload": {
+    "pull_duration_s": 15.0,
+    "recovery_duration_s": 600.0,
+    "kappa": 0.48920993775040517,
+    "final_energy_fraction": 0.01265130065704806,
+    "status": "unresolved_recovery"
+  }
+}

@@ -1,20 +1,19 @@
 # Motor–clutch collagen model
 
-This repository now keeps **two complete model generations on one website**.
-The first generation is preserved exactly as the historical development path;
-the second generation corrects the boundary conditions, network coupling,
-physical units, migration comparison, and visualization without overwriting the
-older work.
+This repository preserves two completed model generations and develops a third.
+Generation 1 records the historical development path; Generation 2 corrects the
+boundary conditions, network coupling, physical units, migration comparison, and
+visualization; Generation 3 asks whether guidance can emerge without prescribing
+a persistent left/right polarity.
 
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
 
 ## How the repository is organized
 
-Generation 1 is the conceptual mainline; Generation 2 is the corrected branch
-from the frozen G1 archive. The default Git branch `main` is the published
-catalogue, so it intentionally contains both generations for side-by-side
-comparison.
+Generation 1 is the conceptual archive; Generation 2 is the corrected mechanism
+baseline; Generation 3 is the active minimal-guidance extension. The default Git
+branch `main` remains the reviewed catalogue.
 
 - [`VERSION_MAP.md`](VERSION_MAP.md) — branch/tag lineage, permanent folder map
   and the rule that prevents versions from overwriting one another;
@@ -107,6 +106,35 @@ records the accepted gates and sensitivity runs.
   no resolved excess residual over the elastic control.  This is a negative
   baseline result, not evidence of permanent remodeling.
 
+## Generation 3 — emergent cell–collagen guidance
+
+Generation 3 is intentionally separate from the frozen G2 folders. Its active engine is
+[`src/g3/`](src/g3/), and its version entry is
+[`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/).
+
+| Stage | Question | Cell state |
+|---|---|---|
+| G3A | Does each clutch remain attached to one collagen segment material point and conserve force/torque under local projection? | fixed |
+| G3B | Can unbiased protrusions be stabilized by local collagen geometry and traction success? | fixed |
+| G3C | Can clutch reactions translate and rotate a rigid cell in 2D without hidden self-propulsion? | mobile rigid body |
+
+G3 removes G2 V3's `polarity_probability=0.65`. It does not claim realistic 3D tumor
+migration: pores, nucleus, deformable cortex, MMP, collagen-concentration calibration, SLS,
+plasticity, EMT, and cell-cell interactions remain outside its scope. G3A mechanism gates pass.
+The 20-seed G3B calibration supports aligned collagen guidance and rotation covariance, but the
+preserved contact-free stage remains blocked because 7/20 isotropic runs crossed the rigid-cell
+overlap guard. The active development configuration now includes an equal-and-opposite
+conservative cell–collagen contact law; the targeted failing seed completes 60 s with 0.00375 µm
+maximum penetration. All six contact-enabled calibration conditions still need a clean rerun.
+The untouched 100-seed final ensemble and formal G3C validation have therefore not been opened.
+
+The public notebook now includes separate G3A, G3B and G3C pages with precomputed animations,
+all implemented equations, paper support, assumptions, results and stage-specific limitations:
+
+- [G3A website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-a)
+- [G3B website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-b)
+- [G3C website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-c)
+
 ## Run and test
 
 ```bash
@@ -118,6 +146,11 @@ python3 generations/g2_corrected/validate.py
 python3 generations/g2_corrected/v2_crosslink_transmission/run.py
 python3 generations/g2_corrected/v3_two_sided_migration/run.py
 python3 generations/g2_corrected/v4_contact_plasticity/run.py
+
+# PowerShell
+$env:PYTHONPATH = "src"
+py -3 -m pytest tests/unit -q
+py -3 -m g3.run --stage g3a --fixture single_fibre --output results/g3/g3a-demo
 ```
 
 Python precomputes all physics into each `demo/data.js`.  The web pages only

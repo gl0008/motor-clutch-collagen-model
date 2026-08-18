@@ -1,0 +1,31 @@
+{
+  "axis_cos2": 0.2956829818917928,
+  "axis_sin2": 0.2625222242410828,
+  "cell_x_m": -1.873115200747014e-08,
+  "cell_y_m": 1.896178856936695e-10,
+  "condition": "aligned_drag_600",
+  "config_updates": {
+    "cell_drag": 0.6
+  },
+  "direction_rad": 3.1314698694272973,
+  "director_rad": 0.0,
+  "duration_s": 600.0,
+  "feedback_enabled": true,
+  "final_cell_angle_rad": -1.8714887406012792e-05,
+  "final_foi": 0.9969841190071704,
+  "fixture": "aligned_8",
+  "initial_foi": 0.9974731768691989,
+  "max_abs_cell_torque_N_m": 4.3727226445029134e-16,
+  "max_bound_clutches": 12,
+  "max_cell_force_N": 7.813635967099519e-11,
+  "max_force_error": 7.126591249823567e-16,
+  "max_torque_error": 4.440892098500626e-16,
+  "net_displacement_m": 1.8732111746130694e-08,
+  "path_length_m": 1.9851182857052006e-08,
+  "polar_x": -1.873115200747014e-08,
+  "polar_y": 1.896178856936695e-10,
+  "seed": 3,
+  "stage": "g3c",
+  "status": "complete",
+  "wall_time_s": 47.839332500007
+}

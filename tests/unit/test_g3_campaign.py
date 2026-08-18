@@ -1,0 +1,135 @@
+import json
+from dataclasses import replace
+
+import pytest
+
+from g3.campaign import (
+    ALL_CONDITIONS,
+    G3B_CONDITIONS,
+    G3C_CONDITIONS,
+    _checkpoint_is_terminal,
+    campaign_fingerprint,
+    evaluate_gates,
+    run_campaign,
+    selected_conditions,
+    selected_seeds,
+    summarize_condition,
+)
+from g3.config import G3Config
+
+
+def test_campaign_conditions_are_unique_and_cover_preregistered_controls():
+    keys = [(condition.stage, condition.name) for condition in ALL_CONDITIONS]
+    assert len(keys) == len(set(keys))
+    assert {condition.name for condition in G3B_CONDITIONS} >= {
+        "balanced", "isotropic", "aligned", "aligned_rotated_30",
+        "aligned_feedback_off", "no_fibre",
+    }
+    assert {condition.name for condition in G3C_CONDITIONS} >= {
+        "no_fibre", "isotropic", "aligned", "aligned_rotated_30",
+        "asymmetric_torque", "asymmetric_torque_mirror_x",
+        "aligned_drag_150", "aligned_drag_600",
+    }
+
+
+def test_campaign_fingerprint_changes_if_locked_physics_changes():
+    cfg = G3Config()
+    baseline = campaign_fingerprint(cfg, 600.0)
+    assert campaign_fingerprint(replace(cfg, beta_geometry=4.0), 600.0) != baseline
+    assert campaign_fingerprint(cfg, 300.0) != baseline
+
+
+def test_condition_selection_respects_stage_and_name():
+    selected = selected_conditions({"g3b"}, {"aligned"})
+    assert [(condition.stage, condition.name) for condition in selected] == [("g3b", "aligned")]
+
+
+def test_seed_selection_is_phase_locked_and_deduplicated():
+    assert selected_seeds("calibration", [3, 1, 3]) == (1, 3)
+    assert selected_seeds("validation", [1001, 1000]) == (1000, 1001)
+    with pytest.raises(ValueError, match="outside the calibration preregistered range"):
+        selected_seeds("calibration", [1000])
+
+
+def test_summary_uses_independent_run_vectors_and_reports_invalid_overlap():
+    records = [
+        {
+            "status": "complete", "axis_cos2": 1.0, "axis_sin2": 0.0,
+            "polar_x": 1.0, "polar_y": 0.0, "direction_rad": 0.0,
+            "net_displacement_m": 1.0, "path_length_m": 2.0, "duration_s": 60.0,
+            "final_cell_angle_rad": 0.1, "cell_x_m": 1.0, "cell_y_m": 0.0,
+            "max_bound_clutches": 2, "max_cell_force_N": 3.0,
+            "max_abs_cell_torque_N_m": 4.0, "max_force_error": 1e-15,
+            "max_torque_error": 1e-15, "max_contact_count": 2,
+            "max_contact_penetration_m": 3e-9, "max_contact_energy_J": 4e-20,
+            "wall_time_s": 1.0,
+        },
+        {"status": "invalid_geometry_overlap"},
+    ]
+    summary = summarize_condition(records, director=0.0)
+    assert summary["n_valid"] == 1
+    assert summary["n_invalid_overlap"] == 1
+    assert summary["mean_nematic_alignment"] == 1.0
+    assert summary["positive_fraction"] == 1.0
+    assert summary["max_contact_count"] == 2
+    assert summary["max_contact_penetration_m"] == 3e-9
+    assert summary["max_contact_energy_J"] == 4e-20
+
+
+def test_checkpoint_resume_retries_worker_errors_but_preserves_negative_results(tmp_path):
+    worker_error = tmp_path / "worker.json"
+    worker_error.write_text('{"status": "worker_error"}', encoding="utf-8")
+    overlap = tmp_path / "overlap.json"
+    overlap.write_text('{"status": "invalid_geometry_overlap"}', encoding="utf-8")
+    malformed = tmp_path / "malformed.json"
+    malformed.write_text("not-json", encoding="utf-8")
+    assert not _checkpoint_is_terminal(worker_error)
+    assert _checkpoint_is_terminal(overlap)
+    assert not _checkpoint_is_terminal(malformed)
+
+
+def test_halt_marker_blocks_campaign_before_workers_start(tmp_path):
+    marker = tmp_path / "HALT.json"
+    marker.write_text(json.dumps({"reason": "G3B calibration gate failed"}), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="G3B calibration gate failed"):
+        run_campaign(tmp_path, "calibration", G3Config(), 600.0, 1, [])
+
+
+def test_gate_evaluator_handles_partial_campaign_without_inventing_missing_gates():
+    summary = {
+        "g3b/aligned": {
+            "n_records": 20, "n_valid": 20, "n_invalid_overlap": 0,
+            "n_worker_error": 0, "nematic_alignment_ci95": [0.2, 0.8],
+            "positive_fraction": 0.5, "estimated_axis_rad": 0.0,
+        }
+    }
+    gates = evaluate_gates(summary)
+    assert gates["g3b_aligned_guidance_ci_above_zero"]
+    assert gates["g3b_aligned_plus_minus_40_60"]
+    assert gates["g3b/aligned_all_runs_valid"]
+    assert "g3b_feedback_reduces_guidance_50pct" not in gates
+
+
+def test_all_runs_valid_requires_nonempty_complete_phase():
+    empty = {
+        "g3c/completeness_control": {
+            "n_records": 0, "n_valid": 0, "n_invalid_overlap": 0,
+            "n_worker_error": 0,
+        }
+    }
+    partial = {
+        "g3c/completeness_control": {
+            "n_records": 13, "n_valid": 13, "n_invalid_overlap": 0,
+            "n_worker_error": 0,
+        }
+    }
+    complete = {
+        "g3c/completeness_control": {
+            "n_records": 20, "n_valid": 20, "n_invalid_overlap": 0,
+            "n_worker_error": 0,
+        }
+    }
+    gate = "g3c/completeness_control_all_runs_valid"
+    assert not evaluate_gates(empty, expected_records=20)[gate]
+    assert not evaluate_gates(partial, expected_records=20)[gate]
+    assert evaluate_gates(complete, expected_records=20)[gate]

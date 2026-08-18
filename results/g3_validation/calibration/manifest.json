@@ -1,0 +1,192 @@
+{
+  "campaign_fingerprint": "24e5a05ee793d3658456c95bc39312a8980992d782828a6a52ca82fb109caef2",
+  "conditions": [
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "balanced_8",
+      "mirror_axis": null,
+      "name": "balanced",
+      "stage": "g3b"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "isotropic_random_8",
+      "mirror_axis": null,
+      "name": "isotropic",
+      "stage": "g3b"
+    },
+    {
+      "config_updates": {},
+      "director_rad": 0.0,
+      "feedback_enabled": true,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned",
+      "stage": "g3b"
+    },
+    {
+      "config_updates": {},
+      "director_rad": 0.5235987755982988,
+      "feedback_enabled": true,
+      "fixture": "aligned_8_rotated_30",
+      "mirror_axis": null,
+      "name": "aligned_rotated_30",
+      "stage": "g3b"
+    },
+    {
+      "config_updates": {},
+      "director_rad": 0.0,
+      "feedback_enabled": false,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned_feedback_off",
+      "stage": "g3b"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "empty",
+      "mirror_axis": null,
+      "name": "no_fibre",
+      "stage": "g3b"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "empty",
+      "mirror_axis": null,
+      "name": "no_fibre",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "balanced_8",
+      "mirror_axis": null,
+      "name": "balanced",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "isotropic_random_8",
+      "mirror_axis": null,
+      "name": "isotropic",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {},
+      "director_rad": 0.0,
+      "feedback_enabled": true,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {},
+      "director_rad": 0.5235987755982988,
+      "feedback_enabled": true,
+      "fixture": "aligned_8_rotated_30",
+      "mirror_axis": null,
+      "name": "aligned_rotated_30",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "asymmetric_torque",
+      "mirror_axis": null,
+      "name": "asymmetric_torque",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {},
+      "director_rad": null,
+      "feedback_enabled": true,
+      "fixture": "asymmetric_torque",
+      "mirror_axis": "x",
+      "name": "asymmetric_torque_mirror_x",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {
+        "cell_drag": 0.15
+      },
+      "director_rad": 0.0,
+      "feedback_enabled": true,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned_drag_150",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {
+        "cell_drag": 0.6
+      },
+      "director_rad": 0.0,
+      "feedback_enabled": true,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned_drag_600",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {
+        "rotational_drag_factor": 0.5
+      },
+      "director_rad": 0.0,
+      "feedback_enabled": true,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned_rot_drag_0_5",
+      "stage": "g3c"
+    },
+    {
+      "config_updates": {
+        "rotational_drag_factor": 2.0
+      },
+      "director_rad": 0.0,
+      "feedback_enabled": true,
+      "fixture": "aligned_8",
+      "mirror_axis": null,
+      "name": "aligned_rot_drag_2",
+      "stage": "g3c"
+    }
+  ],
+  "duration_s": 600.0,
+  "git_commit_at_launch": "1ea4f31a271363d92dd42e6f4f219258ad623ba4",
+  "phase": "calibration",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ],
+  "workers": 4
+}

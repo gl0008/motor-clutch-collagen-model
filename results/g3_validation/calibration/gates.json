@@ -1,0 +1,17 @@
+{
+  "g3b/aligned_all_runs_valid": true,
+  "g3b/aligned_feedback_off_all_runs_valid": true,
+  "g3b/aligned_rotated_30_all_runs_valid": true,
+  "g3b/balanced_all_runs_valid": true,
+  "g3b/isotropic_all_runs_valid": false,
+  "g3b/no_fibre_all_runs_valid": true,
+  "g3b_aligned_guidance_ci_above_zero": true,
+  "g3b_aligned_plus_minus_40_60": true,
+  "g3b_balanced_no_fixed_polarity": false,
+  "g3b_feedback_reduces_guidance_50pct": true,
+  "g3b_feedback_reduction_fraction": 1.0453898980393397,
+  "g3b_isotropic_polar_ratio_lt_0_1": false,
+  "g3b_no_fibre_has_zero_traction": true,
+  "g3b_rotational_covariance_error_deg": 3.0259780596468904,
+  "g3b_rotational_covariance_within_5deg": true
+}
