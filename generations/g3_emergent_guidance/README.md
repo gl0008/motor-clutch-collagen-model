@@ -69,7 +69,17 @@ py -3 -m unittest discover -s generations/g2_corrected/v4_contact_plasticity/tes
 ## Evidence boundary
 
 Current saved outputs demonstrate implementation mechanisms, not final emergent-guidance
-validation. The 100-seed, 600-s G3B/G3C ensemble is preregistered but has not yet been run.
+validation. The 20-seed, 600-s G3B calibration has been run: aligned guidance, nematic sign
+symmetry, 30-degree rotation covariance, feedback ablation and the no-fibre control support the
+intended mechanism. The overall stage gate nevertheless fails because 7/20 isotropic-random
+runs crossed the rigid-cell overlap guard. The untouched 100-seed final ensemble has not been
+opened, and formal G3C validation is halted until G3B is corrected and recalibrated.
+
+The website keeps the stages separate so their causal roles are not confused:
+
+- [G3A — spatial material-point clutches](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-a)
+- [G3B — collagen-guided protrusion selection](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-b)
+- [G3C — reaction-driven translation and rotation](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-c)
 Absolute speed is a calibrated output because cell drag is provisional.
 
 Every G3 figure must be labeled:

@@ -59,7 +59,9 @@ are not scientific model versions.
 | G2 V2 | [`generations/g2_corrected/v2_crosslink_transmission/`](generations/g2_corrected/v2_crosslink_transmission/) | [`?model=g2-v2`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v2) | `g2-v2` |
 | G2 V3 | [`generations/g2_corrected/v3_two_sided_migration/`](generations/g2_corrected/v3_two_sided_migration/) | [`?model=g2-v3`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v3) | `g2-v3` |
 | G2 V4 | [`generations/g2_corrected/v4_contact_plasticity/`](generations/g2_corrected/v4_contact_plasticity/) | [`?model=g2-v4`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v4) | `g2-v4` |
-| G3 A–C | [`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/) | saved GIF/PNG smoke outputs under [`figures/g3/`](figures/g3/) | pending reviewed G3 tag |
+| G3A | [`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/) | [`?model=g3-a`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-a) | pending reviewed G3 tag |
+| G3B | [`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/) | [`?model=g3-b`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-b) | pending reviewed G3 tag |
+| G3C | [`generations/g3_emergent_guidance/`](generations/g3_emergent_guidance/) | [`?model=g3-c`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-c) | pending reviewed G3 tag |
 
 ## Rule for adding a future model
 

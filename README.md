@@ -120,8 +120,17 @@ Generation 3 is intentionally separate from the frozen G2 folders. Its active en
 
 G3 removes G2 V3's `polarity_probability=0.65`. It does not claim realistic 3D tumor
 migration: pores, nucleus, deformable cortex, MMP, collagen-concentration calibration, SLS,
-plasticity, EMT, and cell-cell interactions remain outside its scope. Current saved G3
-outputs are mechanism smoke tests; the preregistered 100-seed final ensemble is still pending.
+plasticity, EMT, and cell-cell interactions remain outside its scope. G3A mechanism gates pass.
+The 20-seed G3B calibration supports aligned collagen guidance and rotation covariance, but the
+stage remains blocked because 7/20 isotropic runs crossed the rigid-cell overlap guard. The
+untouched 100-seed final ensemble and formal G3C validation have therefore not been opened.
+
+The public notebook now includes separate G3A, G3B and G3C pages with precomputed animations,
+all implemented equations, paper support, assumptions, results and stage-specific limitations:
+
+- [G3A website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-a)
+- [G3B website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-b)
+- [G3C website notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3-c)
 
 ## Run and test
 

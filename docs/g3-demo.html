@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G3 mechanism animation</title>
+<link rel="stylesheet" href="g3-demo.css">
+<script defer src="g3-demo.js"></script>
+</head>
+<body>
+<header>
+  <div><span class="eyebrow">precomputed Python simulation · no browser physics</span><h1 id="title"></h1></div>
+  <nav aria-label="G3 stages">
+    <a href="g3-demo.html?stage=g3a" data-stage="g3a">G3A</a>
+    <a href="g3-demo.html?stage=g3b" data-stage="g3b">G3B</a>
+    <a href="g3-demo.html?stage=g3c" data-stage="g3c">G3C</a>
+  </nav>
+</header>
+<main>
+  <section class="explain">
+    <div><b>What to watch</b><p id="watch"></p></div>
+    <div><b>Cell state</b><p id="cellState"></p></div>
+    <div><b>Evidence status</b><p id="evidence"></p></div>
+  </section>
+  <section class="viewer">
+    <div class="viewerHead"><div><span class="statusDot"></span><b id="animationLabel"></b></div><button id="restart" type="button">Restart animation</button></div>
+    <img id="animation" alt="Animated G3 simulation">
+    <p class="legend"><span class="bead"></span> collagen beads + connected springs <span class="clutch"></span> bound clutch material points/spokes <span class="sector"></span> sector geometry score <span class="active"></span> active protrusions <span class="path"></span> cell path</p>
+  </section>
+  <section class="secondary" id="secondary" hidden>
+    <div class="viewerHead"><b>Direction controls: random, aligned, aligned rotated 30°</b><button id="restartSecondary" type="button">Restart controls</button></div>
+    <img id="secondaryAnimation" alt="G3C direction-control animation">
+  </section>
+  <section class="summary">
+    <div><h2>Recorded outputs</h2><p id="metrics"></p><p class="boundary" id="boundary"></p></div>
+    <img id="summaryImage" alt="Summary plots for this G3 stage">
+  </section>
+</main>
+<footer>Personal simulation / mechanism validation; not yet a realistic 3D tumor-migration prediction.</footer>
+</body>
+</html>

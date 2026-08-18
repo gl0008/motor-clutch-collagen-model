@@ -1,21 +1,23 @@
 (function(){
-  const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4'];
+  const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4','g3-a','g3-b','g3-c'];
   const query=new URLSearchParams(location.search);
   const id=NOTEBOOK_MODELS[query.get('model')]?query.get('model'):'g2-v2';
   const model=NOTEBOOK_MODELS[id];
+  const modelLabel=m=>m.generation==='G3'?m.version:`${m.generation} ${m.version}`;
   const esc=value=>String(value).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   const list=items=>`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
   const button=(href,label,secondary=false)=>`<a class="button${secondary?' secondary':''}" href="${href}" target="_blank" rel="noopener">${label}</a>`;
 
-  document.title=`${model.generation} ${model.version} · ${model.title}`;
+  document.title=`${modelLabel(model)} · ${model.title}`;
   document.querySelector('#hero').classList.toggle('g2',model.generation==='G2');
-  document.querySelector('#eyebrow').textContent=`${model.generation} · ${model.version} · ${model.status}`;
+  document.querySelector('#hero').classList.toggle('g3',model.generation==='G3');
+  document.querySelector('#eyebrow').textContent=`${modelLabel(model)} · ${model.status}`;
   document.querySelector('#title').textContent=model.title;
   document.querySelector('#subtitle').textContent=model.subtitle;
   document.querySelector('#heroMeta').innerHTML=`<b>Question this version asks</b>${model.question}<br><br><b>Units</b>${model.units}`;
   document.querySelector('#versionNav').innerHTML=order.map(key=>{
     const m=NOTEBOOK_MODELS[key];
-    return `<a class="${key===id?'current':''}" href="model-notebook.html?model=${key}">${m.generation} ${m.version}</a>`;
+    return `<a class="${key===id?'current':''}" href="model-notebook.html?model=${key}">${modelLabel(m)}</a>`;
   }).join('');
 
   const brief=model.brief.map(x=>`<li>${x}</li>`).join('');
@@ -24,7 +26,7 @@
   <section class="section">
     <h2>Your purpose in this version · 你當時想做什麼</h2>
     <p class="lead">${model.purpose}</p>
-    <div class="brief ${model.generation==='G2'?'g2-accent':''}"><div class="label">Your brief · condensed from our conversation</div><ul>${brief}</ul></div>
+    <div class="brief ${model.generation==='G2'?'g2-accent':model.generation==='G3'?'g3-accent':''}"><div class="label">Your brief · condensed from our conversation</div><ul>${brief}</ul></div>
     <h3>Causal chain you wanted to isolate</h3><div class="causal-chain">${chain}</div>
   </section>`;
 
@@ -38,7 +40,7 @@
     const m=NOTEBOOK_MODELS[key];
     let groups=[];
     if(m.inherits)groups=groups.concat(collectEquations(m.inherits,[...trail,key]));
-    return groups.concat((m.equationGroups||[]).map(group=>({...group,source:key===id?null:`${m.generation} ${m.version}`})));
+    return groups.concat((m.equationGroups||[]).map(group=>({...group,source:key===id?null:modelLabel(m)})));
   };
   const groups=collectEquations(id);
   html+=`<section class="section"><h2>Complete implemented equation set</h2><div class="scope-note"><b>Scope:</b> every governing, constitutive, stochastic, coupling, time-update and reported-metric equation that determines this version is shown. Low-level line-intersection and random-hash arithmetic are implementation utilities, not additional physics. Highlighted cards are the key equations to emphasize in a meeting.</div>`;
@@ -52,7 +54,7 @@
   html+=`<section class="section talk"><h2>How to explain it to your professor</h2><p class="talk-script">${model.talk.script}</p><h3>If asked “what is the assumption?”</h3>${list(model.talk.assumptions)}<h3>If asked “what would falsify or improve this stage?”</h3>${list(model.talk.nextChecks)}</section>`;
 
   const index=order.indexOf(id),prev=order[index-1],next=order[index+1];
-  html+=`<nav class="footer-nav">${prev?`<a href="model-notebook.html?model=${prev}">← ${NOTEBOOK_MODELS[prev].generation} ${NOTEBOOK_MODELS[prev].version}</a>`:'<span></span>'}${next?`<a href="model-notebook.html?model=${next}">${NOTEBOOK_MODELS[next].generation} ${NOTEBOOK_MODELS[next].version} →</a>`:'<span></span>'}</nav>`;
+  html+=`<nav class="footer-nav">${prev?`<a href="model-notebook.html?model=${prev}">← ${modelLabel(NOTEBOOK_MODELS[prev])}</a>`:'<span></span>'}${next?`<a href="model-notebook.html?model=${next}">${modelLabel(NOTEBOOK_MODELS[next])} →</a>`:'<span></span>'}</nav>`;
   document.querySelector('#notebook').innerHTML=html;
   if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise();
 })();
