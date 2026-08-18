@@ -63,7 +63,7 @@ def _strain_colors(strain, scale=0.006):
 
 
 def render(frames, meta, out_path, mode="full", fps=12, max_frames=90,
-           title="G3 - emergent spheroid guidance"):
+           title="G3 - spheroid collagen remodelling"):
     if len(frames) > max_frames:
         keep = np.unique(np.linspace(0, len(frames) - 1, max_frames).round().astype(int))
         frames = [frames[i] for i in keep]
@@ -110,12 +110,11 @@ def render(frames, meta, out_path, mode="full", fps=12, max_frames=90,
         ax.add_collection(LineCollection(seg, colors=_strain_colors(fr["strain"]),
                                          linewidths=1.0, zorder=2))
 
-        # faint collagen beads (G2 signature: every circle is a bead).
-        # Only in the zoom view, where they are legible and cheap to draw.
-        if mode != "full":
-            bm = (np.abs(pos[:, 0] - center[0]) < win) & (np.abs(pos[:, 1] - center[1]) < win)
-            ax.scatter(pos[bm, 0], pos[bm, 1], s=3.0, c=FIBER, alpha=0.5,
-                       edgecolors="none", zorder=2)
+        # collagen beads drawn as circles (G2 signature: every circle is a bead)
+        bm = (np.abs(pos[:, 0] - center[0]) < win) & (np.abs(pos[:, 1] - center[1]) < win)
+        bead_s = 4.5 if mode != "full" else 1.8
+        ax.scatter(pos[bm, 0], pos[bm, 1], s=bead_s, facecolors="#fbfdfb",
+                   edgecolors=FIBER, linewidths=0.35, zorder=3)
 
         # fixed boundary anchors (only when they are in view)
         fb = r0[fixed]
@@ -167,12 +166,22 @@ def render(frames, meta, out_path, mode="full", fps=12, max_frames=90,
         ax.text(x0 + bar / 2, y0 + 0.015 * (2 * win), "20 um", ha="center", va="bottom",
                 fontsize=8, color=INK)
 
+        # near-shell radial order for this frame (+1 radial / 0 random / -1 tangential)
+        s2 = pos[edges[:, 1]] - pos[edges[:, 0]]
+        tg = s2 / np.maximum(np.linalg.norm(s2, axis=1), 1e-12)[:, None]
+        midp = 0.5 * (pos[edges[:, 0]] + pos[edges[:, 1]]) - center
+        rr = np.linalg.norm(midp, axis=1)
+        er = midp / np.maximum(rr, 1e-12)[:, None]
+        ordr = 2.0 * np.square(np.sum(tg * er, axis=1)) - 1.0
+        nsh = (rr - R >= 0.0) & (rr - R < 20.0)
+        sr = float(np.mean(ordr[nsh])) if np.any(nsh) else 0.0
+
         # header + metric strip
         t_min = fr["time"] / 60.0
         ax.set_title(f"{title}\n({'full 180 um field' if mode=='full' else 'follow-cell zoom'})",
                      fontsize=12, color=INK, loc="left")
-        info = (f"t = {t_min:4.1f} min    engaged protrusions = {int(engaged.sum())}    "
-                f"traction = {fr['traction'].sum():4.1f} nN")
+        info = (f"t = {t_min:4.1f} min    grip = {int(engaged.sum())}    "
+                f"traction = {fr['traction'].sum():4.1f} nN    radial order = {sr:+.2f}")
         ax.text(0.02, 0.025, info, transform=ax.transAxes, fontsize=9, color=INK, va="bottom",
                 bbox=dict(boxstyle="round", fc="white", ec=GHOST, alpha=0.9))
         ax.text(0.985, 0.985, "Mechanism demo - not a 3D tumour-migration prediction",

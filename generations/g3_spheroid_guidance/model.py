@@ -73,14 +73,22 @@ class SpheroidConfig(CollagenConfig):
     # --- domain / spheroid ---
     domain_size: float = 240.0
     cell_radius: float = 22.0            # spheroid body radius
-    gap: float = 12.0                    # fibre-free ring beyond the surface at t=0
+    gap: float = 10.0                    # fibre-free ring beyond the surface at t=0
     n_fibers: int = 150
-    min_fiber_length: float = 30.0
-    max_fiber_length: float = 110.0
+    min_fiber_length: float = 20.0
+    max_fiber_length: float = 70.0
     bead_spacing: float = 1.0
     boundary_width: float = 3.0
-    required_connected_fraction: float = 0.80
+    required_connected_fraction: float = 0.55
     generation_attempts: int = 40
+
+    # --- collagen material (softer than the stiff G2 baseline so a contractile
+    #     spheroid can visibly reorganise the near-field fibres into radial tracts;
+    #     this is a declared G3 choice, closer to soft physiological collagen gels) ---
+    collagen_modulus_mpa: float = 3.0
+    crosslink_stiffness: float = 10.0
+    crosslink_fraction: float = 0.3     # keep this fraction of intersection crosslinks
+                                        # (< 1 lets gripped fibres rotate freely -> radial)
 
     # --- overdamped integration ---
     bead_drag: float = 360.0             # nN s / um  (G2 V3 value)
@@ -93,20 +101,20 @@ class SpheroidConfig(CollagenConfig):
     n_sectors: int = 24
     protrusion_max_length: float = 30.0  # prehensile reach ~= gap + a fibre or two
     protrusion_min_length: float = 2.0
-    protrusion_probe_speed: float = 0.14    # um/s baseline outward probing (all sectors)
-    protrusion_growth_speed: float = 0.16   # extra growth at the polarised front
-    protrusion_retraction_speed: float = 0.22
+    protrusion_probe_speed: float = 0.16    # um/s baseline outward probing (all sectors)
+    protrusion_growth_speed: float = 0.12   # extra growth where activity is high
+    protrusion_retraction_speed: float = 0.06  # gentle: rear protrusions still grip -> radial contraction
     capture_distance: float = 2.5        # tip must reach within this of a fibre
     engagement_update_interval: float = 0.5
 
     # --- motor-clutch bundle per protrusion (G2 V3 scale) ---
-    n_clutches_per_protrusion: int = 8
+    n_clutches_per_protrusion: int = 12
     clutch_stiffness: float = 2.0        # nN / um
     clutch_on_rate: float = 0.08         # 1/s (symmetric -- no side bias)
     clutch_off_rate0: float = 0.02       # 1/s
-    bell_force: float = 2.0              # nN
-    unloaded_actin_speed: float = 0.03   # um/s
-    motor_stall_per_protrusion: float = 4.0   # nN
+    bell_force: float = 2.5              # nN
+    unloaded_actin_speed: float = 0.055  # um/s (inward reel-in of gripped fibres)
+    motor_stall_per_protrusion: float = 6.0   # nN
 
     # --- emergent polarity: mass-conserved replicator + adhesion feedback ---
     # A finite activator pool competes (global inhibition); local self-reinforcement
@@ -115,18 +123,18 @@ class SpheroidConfig(CollagenConfig):
     # biases the front toward sectors that actually grip collagen (Carey 2016).
     # Noise sets which direction (stochastic sign); nothing prescribes +x or 0.65.
     polarity_total_activity: float = 6.0    # conserved pool (sum_i a_i)
-    polarity_gamma: float = 2.2             # autocatalytic self-reinforcement gain
+    polarity_gamma: float = 0.8             # low gain: no winner-take-all -> broad, all-around activity
     polarity_K: float = 0.5                 # half-saturation of the feedback
     polarity_hill: float = 2.0              # feedback cooperativity
-    polarity_diffusion: float = 0.45        # membrane smoothing (sector units)
-    polarity_noise: float = 0.08            # symmetry-breaking noise amplitude
-    polarity_fak_gain: float = 2.5          # FAK/Rac1 adhesion->activity feedback
-    polarity_time: float = 6.0              # front relaxation time (s)
+    polarity_diffusion: float = 1.6         # strong smoothing keeps every sector active
+    polarity_noise: float = 0.06            # mild heterogeneity, not a single front
+    polarity_fak_gain: float = 1.0          # FAK/Rac1 adhesion->activity feedback
+    polarity_time: float = 6.0              # relaxation time (s)
     adhesion_filter_time: float = 20.0      # q_i low-pass (s)
     adhesion_clutch_scale: float = 3.0
 
     # --- reaction-driven motion ---
-    cell_drag: float = 3000.0            # nN s / um; calibrated to ~0.1-0.3 um/min
+    cell_drag: float = 6000.0            # high drag: broad contraction keeps the spheroid ~in place
     rotational_drag_factor: float = 1.0
     max_cell_speed: float = 0.02         # um/s guard
 
@@ -235,6 +243,11 @@ def make_spheroid_network(cfg: SpheroidConfig, seed=None):
         seed_used = base + 7919 * attempt
         spec = _assemble_spheroid_spec(cfg, np.random.default_rng(seed_used), seed_used)
         network = Network(spec, cfg)  # crosslinks built automatically in __init__
+        if cfg.crosslink_fraction < 1.0 and network.crosslinks:
+            rng = np.random.default_rng(seed_used + 101)
+            keep = rng.random(len(network.crosslinks)) < cfg.crosslink_fraction
+            network.crosslinks = [x for x, k in zip(network.crosslinks, keep) if k]
+            network.refresh_crosslink_arrays()
         report = connectivity_report(network)
         score = float(report["connected_fraction"])
         if score > best[0]:

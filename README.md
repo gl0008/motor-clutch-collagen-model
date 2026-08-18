@@ -106,35 +106,40 @@ records the accepted gates and sensitivity runs.
   no resolved excess residual over the elastic control.  This is a negative
   baseline result, not evidence of permanent remodeling.
 
-## Generation 3 — emergent spheroid guidance
+## Generation 3 — contractile spheroid remodels collagen into a radial pattern
 
 Generation 3 is a **2D mechanism demonstration** built directly on the frozen Generation-2
 collagen engine. Its active implementation is
 [`generations/g3_spheroid_guidance/`](generations/g3_spheroid_guidance/) (rebuilt 2026-08-19).
 It asks whether a cell **spheroid** can, with **no prescribed direction and no polarity
-probability**, break symmetry, send protrusions out to grip collagen across an initially
-fibre-free gap, remodel the fibre network, and migrate toward the side where it grips.
+probability**, send protrusions out **in every direction** to grip collagen across an initially
+fibre-free gap and reorganise the surrounding fibres **from a disordered tangle into a radial
+aster** — while the cell itself stays essentially in place. The headline is the matrix
+remodelling, not cell motion.
 
 The rebuild reuses `generations/g2_corrected/common/model.py` unchanged and adds only: a
 spheroid with a fibre-free gap (no contact at `t = 0`); explicit protrusions that bind a fibre
-only when their *tip* reaches it; an **emergent, mass-conserved membrane-polarity field** with
-FAK/Rac1-like adhesion feedback (noise picks the direction, mechanics reinforce it); and
-reaction-driven migration exactly as in G2 V3. **G2 V3's `polarity_probability = 0.65` is
-removed** — the binding bias is now an emergent consequence of the mechanics, not a parameter.
+only when their *tip* reaches it; a **broad, mass-conserved membrane-activity field** (no
+single front) so gripping is symmetric and all-around; motor–clutches that reel captured fibres
+inward; and a **softened, lightly crosslinked** collagen so the near-field fibres can visibly
+rotate radially. **G2 V3's `polarity_probability = 0.65` is removed** — gripping is symmetric
+with no prescribed direction, and excluded-volume repulsion keeps the cell body clear of fibres.
 Design and literature grounding are in
 [`generations/g3_spheroid_guidance/README.md`](generations/g3_spheroid_guidance/README.md) and
 [`docs/G3_MODEL_STATUS.md`](docs/G3_MODEL_STATUS.md).
 
-Reference run (150 fibres, 240 µm, 22 µm spheroid, 60 min): peak traction ~36 nN, ~19 µm
-directional migration at ~0.32 µm/min, near-shell radial order −0.62 → −0.31. A 5-seed
-emergence check gives migration directions spread over ~75°, confirming the direction is
-stochastic. Two GIF views are rendered (like the G2-v3 toggle): full 180 µm-style field and
-follow-cell zoom, in [`figures/g3_spheroid_guidance/`](figures/g3_spheroid_guidance/).
+Reference run (120 fibres, 220 µm, 20 µm spheroid, 90 min): all 24 protrusions engage around
+the perimeter, peak traction ~123 nN, near-shell radial order climbs **−0.49 → −0.04**
+(tangential → approaching radial) with ~12 µm fibre displacement, while net spheroid
+displacement is ~0.6 µm (essentially fixed). Two GIF views are rendered (like the G2-v3 toggle):
+full 180 µm-style field and follow-cell zoom, in
+[`figures/g3_spheroid_guidance/`](figures/g3_spheroid_guidance/); the interactive page shows a
+live radial-order readout.
 
-It does not claim realistic 3D tumour migration: pores, nucleus, deformable cortex, MMP,
-collagen-concentration calibration, stress relaxation, plasticity, EMT and cell–cell
-interactions remain outside scope. The earlier `src/g3/` implementation is archived under
-`legacy/g3_v1_superseded/`.
+It does not claim realistic 3D tumour migration, and the aster here is elastic reorganisation of
+a deliberately softened matrix: nonlinear strain-stiffening, stress relaxation, plasticity, 3D
+pores/nucleus and concentration calibration remain outside scope. The earlier `src/g3/`
+implementation is archived under `legacy/g3_v1_superseded/`.
 
 ## Run and test
 

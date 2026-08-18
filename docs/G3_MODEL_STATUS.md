@@ -2,11 +2,12 @@
 
 ## Scientific claim
 
-G3 is a **2D minimal mechanism model of emergent cell–collagen guidance**. It tests whether
-a cell **spheroid** can, *without any prescribed direction or polarity probability*, break
-symmetry, send protrusions out to grip collagen across an initially fibre-free gap, remodel
-the surrounding fibre network by motor–clutch traction, and migrate toward the side where it
-actually grips.
+G3 is a **2D minimal mechanism model of collagen remodelling by a contractile cell spheroid**.
+It tests whether a cell **spheroid** can, *without any prescribed direction or polarity
+probability*, send protrusions out **in every direction** to grip collagen across an initially
+fibre-free gap, and reorganise the surrounding fibre network **from a disordered/tangential
+tangle into a radial pattern (an aster)** by motor–clutch traction — while the cell itself
+stays essentially in place. The headline result is the matrix remodelling, not cell motion.
 
 It is **not** a realistic three-dimensional tumour-migration model. It does not contain a
 calibrated collagen concentration/pore topology, a deformable cell or nucleus, proteolysis,
@@ -25,38 +26,36 @@ bead–spring network with overdamped dynamics — is reused unchanged; G3 adds 
 2. **Explicit protrusions** that probe outward and can bind a fibre only when their *tip*
    reaches a material point (tip-first encounter), then load it with the G2 slip-bond
    motor–clutch law.
-3. **Emergent polarity** — a mass-conserved replicator membrane-activity field with local
-   autocatalysis, diffusion, noise, and a FAK/Rac1-like adhesion-traction feedback. One
-   stable broad front emerges from a symmetric start; noise sets the direction; adhesion
-   feedback pulls the front toward wherever protrusions grip. **The old G2
-   `polarity_probability = 0.65` side-bias is removed** — the binding bias is now an emergent
-   consequence of the mechanics, not a parameter.
-4. **Reaction-driven migration** (as in G2 V3): spheroid velocity is the summed
-   equal-and-opposite clutch reaction over a cell drag.
+3. **Broad intrinsic activity (no 0.65)** — a mass-conserved membrane-activity field kept
+   deliberately broad (low autocatalytic gain, strong diffusion), so protrusions probe and
+   grip **all around** the spheroid rather than at a single front. **The old G2
+   `polarity_probability = 0.65` side-bias is removed**; gripping is symmetric with no
+   prescribed direction.
+4. **Softened, lightly crosslinked collagen** — the modulus is lowered and only a fraction of
+   the intersection crosslinks are kept (declared G3 material choices), so a contractile cell
+   can visibly rotate the near-field fibres into radial tracts. Excluded-volume repulsion keeps
+   beads off the cell body, and the symmetric reaction leaves the spheroid essentially fixed.
 
 Design rationale, literature grounding, and run instructions are in
 `generations/g3_spheroid_guidance/README.md`.
 
 ## Result of the rebuilt reference run
 
-150-fibre / 240 µm field / 22 µm spheroid / 12 µm gap / 60 min, seed 7
+120-fibre / 220 µm field / 20 µm spheroid / 9 µm gap / 90 min, seed 5
 (`results/g3_spheroid_guidance/main/`, GIFs in `figures/g3_spheroid_guidance/`):
 
 | Quantity | Value | Literature target |
 |---|---|---|
-| Peak collective traction | ~36 nN | tens of nN, ≤100 (Steinwachs 2016) |
-| Net migration in 60 min | ~19 µm (net ≈ path — directional) | — |
-| Migration speed | ~0.32 µm/min | 0.1–0.3 µm/min (Sapudom 2019) |
-| Engaged protrusions at end | ~10 | — |
-| Near-shell radial order | −0.62 → −0.31 (fibres pulled radially) | realignment over tens of min–h |
-| Max bead displacement | ~5 µm | — |
+| Engaged protrusions at end | 24 of 24 — all around | — |
+| Peak collective traction | ~123 nN | tens of nN, ≤~100+ (Steinwachs 2016; Mark 2020) |
+| **Near-shell radial order** | **−0.49 → −0.04** (tangential → approaching radial) | realignment over tens of min–h |
+| Max fibre displacement | ~12 µm | — |
+| Net spheroid displacement | ~0.6 µm in 90 min (essentially fixed) | the point is remodelling, not motion |
 
-**Emergence check** (5 seeds, short runs): the migration direction is 84°, −84°, −8°, −99°,
-64° — spread ≈ 75°. The direction is genuinely stochastic and set per realisation, confirming
-there is no built-in directional bias.
-
-Two GIF view modes are rendered, matching the G2-v3 notebook toggle: `*_full.gif` (full
-180 µm-style field) and `*_follow.gif` (follow-cell zoom).
+The collagen visibly reorganises from a disordered/tangential tangle into a radial aster, and
+the near-shell radial order climbs monotonically (it is still rising at 90 min). Two GIF view
+modes are rendered, matching the G2-v3 notebook toggle: `*_full.gif` (full 180 µm-style field)
+and `*_follow.gif` (follow-cell zoom). The interactive page shows a live radial-order readout.
 
 ## Controls that make the mechanism falsifiable
 

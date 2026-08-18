@@ -1,11 +1,17 @@
-# G3 — emergent spheroid guidance (rebuild on the G2 engine)
+# G3 — contractile spheroid remodels collagen into a radial pattern (rebuild on the G2 engine)
 
 This is a clean rebuild of Generation 3. It is a **2D mechanism demonstration** of how a
-cancer-cell **spheroid** can, without any prescribed direction, break symmetry, send
-protrusions out to grip collagen, remodel the surrounding fibre network, and migrate
-toward the side where it actually grips. It replaces the earlier `src/g3/` package (now
-archived under `legacy/g3_v1_superseded/`), which was mis-scaled, ran for far too short a
-time to show anything, and produced chaotic animations that did not match Gloria's G2.
+cancer-cell **spheroid** can, without any prescribed direction, send protrusions out **in every
+direction** to grip collagen across an initially fibre-free gap, and reorganise the surrounding
+fibres **from a disordered/tangential tangle into a radial aster** by motor–clutch traction —
+while the cell itself stays essentially in place. The headline is the matrix remodelling, not
+cell motion. It replaces the earlier `src/g3/` package (now archived under
+`legacy/g3_v1_superseded/`), which was mis-scaled, ran for far too short a time to show
+anything, and produced chaotic animations that did not match Gloria's G2.
+
+> The model can also be run in a **polarised/migrating** regime (higher autocatalytic gain,
+> stiffer matrix); the default here is the contractile radial-remodelling regime that the
+> figures show.
 
 > Mechanism / personal simulation. **Not** a realistic 3D tumour-migration prediction.
 

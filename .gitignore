@@ -4,3 +4,6 @@ __pycache__/
 results_smoke/
 results/g3_validation/*.log
 results/g3_validation/pre_optimization_*/
+
+# large regenerable solver dumps
+results/**/frames.pkl

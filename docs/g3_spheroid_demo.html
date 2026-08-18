@@ -32,8 +32,8 @@ main{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-column
 </head>
 <body>
 <header>
-<h1>Generation 3 · emergent spheroid guidance</h1>
-<p>A cell spheroid starts with no collagen contact, sends protrusions out across the gap, grips fibres with motor–clutches, remodels the network, and migrates toward the side it grips — with no prescribed direction and no 0.65 polarity. Same overdamped bead–spring collagen engine as Gloria's G2.</p>
+<h1>Generation 3 · spheroid collagen remodelling</h1>
+<p>A contractile cell spheroid starts with no collagen contact, sends protrusions out in every direction, grips the fibres with motor–clutches and reels them inward — reorganising the surrounding collagen from a disordered tangle into a radial pattern. The spheroid itself stays put: the point is the matrix remodelling, not cell motion. Same overdamped bead–spring collagen engine as Gloria's G2, with no prescribed direction and no 0.65 polarity.</p>
 </header>
 <main>
 <section class="panel">
@@ -42,7 +42,7 @@ main{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-column
 </section>
 <section class="side">
   <h2>What you are watching</h2>
-  <p>The <b>peach spheroid</b> grows <b style="color:var(--green)">green protrusions</b> in all directions. When a tip reaches a fibre it turns <b style="color:var(--orange)">orange</b> and a <b style="color:var(--red)">red clutch spoke</b> pulls that <b style="color:var(--magenta)">captured material point</b> inward. The <b>membrane heat-map</b> is the emergent polarity: bright at the front, dark at the rear. The direction is chosen by noise and reinforced by which protrusions actually grip — run a different seed and it points a different way.</p>
+  <p>The <b>peach spheroid</b> grows <b style="color:var(--green)">green protrusions</b> in every direction. When a tip reaches a fibre it turns <b style="color:var(--orange)">orange</b> and a <b style="color:var(--red)">red clutch spoke</b> reels that <b style="color:var(--magenta)">captured material point</b> inward. All around the cell the fibres are drawn in and rotate to point at the spheroid, so the collagen goes from a disordered tangle into a <b>radial aster</b> — watch the <b>radial-order</b> readout climb from tangential toward radial. Excluded-volume keeps the fibres off the cell body, so it never overlaps them. The cell grips wherever it finds collagen, with no prescribed direction.</p>
   <div class="legend">
     <span style="--c:var(--fiber)">collagen spring</span>
     <span style="--c:var(--red)">tension / <span style="color:var(--blue)">compression</span></span>
@@ -64,10 +64,10 @@ main{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-column
   <input id="scrub" type="range" min="0" max="100" value="0">
   <span id="time">0.0 min</span>
 </section>
-<section class="note"><p><b>How to read it:</b> the faint grey network is the initial geometry; springs turn red in tension and blue in compression as the spheroid pulls them. The blue curve is the cell path. Fibres near the front are drawn inward and reorient radially — that is the emergent collagen remodelling.</p></section>
+<section class="note"><p><b>How to read it:</b> the faint grey network is the initial (disordered) geometry; springs turn red in tension and blue in compression as the spheroid contracts. Fibres all around are drawn inward and rotate to point at the cell, so the near-field collagen reorganises into radial tracts — the collagen remodelling, quantified by the rising radial-order readout.</p></section>
 </main>
 
-<script src="g3_spheroid_demo_data.js"></script>
+<script src="g3_spheroid_demo_data.js?v=radial-20260819"></script>
 <script>
 const D=window.G3_DATA, M=D.meta, S=M.n_sectors;
 const enc=D.encoding, F=enc.shape[0], NB=enc.shape[1], quantum=enc.quantum;
