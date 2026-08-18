@@ -141,22 +141,20 @@ def render(frames, meta, out_path, mode="full", fps=12, max_frames=90,
         normals = np.column_stack([np.cos(angles), np.sin(angles)])
         bases = center[None, :] + R * normals
         for k in range(len(act)):
+            # protrusion shaft: green while probing, orange once it grips a fibre
             col = ORANGE if engaged[k] else GREEN
-            lw = 2.2 if engaged[k] else 1.3
-            a = min(1.0, 0.35 + act[k] / (act.max() + 1e-9))
+            lw = 2.4 if engaged[k] else 1.4
             ax.plot([bases[k, 0], tips[k, 0]], [bases[k, 1], tips[k, 1]],
-                    color=col, lw=lw, alpha=a, solid_capstyle="round", zorder=6)
-            ax.scatter(tips[k, 0], tips[k, 1], s=(22 if engaged[k] else 9),
-                       c=col, alpha=a, zorder=7)
+                    color=col, lw=lw, alpha=(1.0 if engaged[k] else 0.75),
+                    solid_capstyle="round", zorder=6)
+            ax.scatter(tips[k, 0], tips[k, 1], s=(20 if engaged[k] else 9),
+                       c=col, alpha=(1.0 if engaged[k] else 0.75), zorder=7)
+            # clutch bundle: the red spoke from the tip to the gripped collagen point
             if engaged[k] and np.isfinite(epts[k, 0]):
                 ax.plot([tips[k, 0], epts[k, 0]], [tips[k, 1], epts[k, 1]],
-                        color=TENSION, lw=1.2, zorder=7)
-                ax.scatter(epts[k, 0], epts[k, 1], s=16, c=MAGENTA, zorder=8)
-
-        # emergent-polarity membrane heat-map (front bright, rear dark)
-        hb = center[None, :] + (R * 1.09) * normals
-        ax.scatter(hb[:, 0], hb[:, 1], c=act, cmap="magma", s=46,
-                   vmin=0.0, vmax=act_vmax, zorder=9, edgecolors="none")
+                        color=TENSION, lw=2.0, zorder=8)
+                ax.scatter(epts[k, 0], epts[k, 1], s=22, c=MAGENTA,
+                           edgecolors=TENSION, linewidths=0.5, zorder=9)
 
         # scale bar
         bar = 20.0

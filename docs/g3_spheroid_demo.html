@@ -42,16 +42,16 @@ main{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-column
 </section>
 <section class="side">
   <h2>What you are watching</h2>
-  <p>The <b>peach spheroid</b> grows <b style="color:var(--green)">green protrusions</b> in every direction. When a tip reaches a fibre it turns <b style="color:var(--orange)">orange</b> and a <b style="color:var(--red)">red clutch spoke</b> reels that <b style="color:var(--magenta)">captured material point</b> inward. All around the cell the fibres are drawn in and rotate to point at the spheroid, so the collagen goes from a disordered tangle into a <b>radial aster</b> — watch the <b>radial-order</b> readout climb from tangential toward radial. Excluded-volume keeps the fibres off the cell body, so it never overlaps them. The cell grips wherever it finds collagen, with no prescribed direction.</p>
+  <p>The <b>peach spheroid</b> grows <b style="color:var(--green)">green protrusion fingers</b> in every direction. When a finger's tip reaches a fibre it turns <b style="color:var(--orange)">orange</b>, and its <b style="color:var(--red)">motor–clutch bundle — the red spoke</b> — grips the fibre at the <b style="color:var(--magenta)">magenta point</b> and reels it inward. All around the cell the fibres are drawn in and rotate to point at the spheroid, so the collagen goes from a disordered tangle toward a <b>radial pattern</b> — watch the <b>radial-order</b> readout climb from tangential toward radial. Excluded-volume keeps the fibres off the cell body, so it never overlaps them. The cell grips wherever it finds collagen, with no prescribed direction.</p>
   <div class="legend">
     <span style="--c:var(--fiber)">collagen spring</span>
     <span style="--c:var(--red)">tension / <span style="color:var(--blue)">compression</span></span>
     <span style="--c:var(--gold)">permanent crosslink</span>
     <span style="--c:var(--ink)">fixed boundary bead</span>
-    <span style="--c:var(--green)">protrusion (probing)</span>
-    <span style="--c:var(--orange)">protrusion (gripping)</span>
-    <span style="--c:var(--red)">clutch spoke</span>
-    <span style="--c:var(--magenta)">captured fibre point</span>
+    <span style="--c:var(--green)">protrusion finger (probing)</span>
+    <span style="--c:var(--orange)">protrusion finger (gripping)</span>
+    <span style="--c:var(--red)">motor–clutch bundle (spoke)</span>
+    <span style="--c:var(--magenta)">collagen point it grips</span>
   </div>
   <p class="boundary">Mechanism demonstration in 2D. Geometry is true 1× scale; the scale bar is 20 µm. Not a realistic 3D tumour-migration prediction.</p>
 </section>
@@ -59,8 +59,7 @@ main{max-width:1200px;margin:auto;padding:14px;display:grid;grid-template-column
   <button class="primary" id="play">Pause</button>
   <button id="step">Step</button>
   <label>View <select id="view"><option value="full">full 180 µm field</option><option value="follow">follow-cell zoom</option></select></label>
-  <label><input type="checkbox" id="pol" checked> polarity</label>
-  <label><input type="checkbox" id="prot" checked> protrusions</label>
+  <label><input type="checkbox" id="prot" checked> protrusions &amp; clutches</label>
   <input id="scrub" type="range" min="0" max="100" value="0">
   <span id="time">0.0 min</span>
 </section>
@@ -141,12 +140,8 @@ function draw(){
       ctx.strokeStyle=eng[k]?'#ca6037':'#2e7c61';ctx.lineWidth=(eng[k]?2.4:1.4)*DPR;
       ctx.beginPath();ctx.moveTo(t.X(bx),t.Y(by));ctx.lineTo(t.X(tx),t.Y(ty));ctx.stroke();
       ctx.fillStyle=eng[k]?'#ca6037':'#2e7c61';ctx.beginPath();ctx.arc(t.X(tx),t.Y(ty),(eng[k]?3.0:1.8)*DPR,0,7);ctx.fill();
-      if(eng[k]&&ep[k]){ctx.strokeStyle='#b53f38';ctx.lineWidth=1.3*DPR;ctx.beginPath();ctx.moveTo(t.X(tx),t.Y(ty));ctx.lineTo(t.X(ep[k][0]),t.Y(ep[k][1]));ctx.stroke();ctx.fillStyle='#b5379b';ctx.beginPath();ctx.arc(t.X(ep[k][0]),t.Y(ep[k][1]),2.6*DPR,0,7);ctx.fill();}
+      if(eng[k]&&ep[k]){ctx.strokeStyle='#b53f38';ctx.lineWidth=2.0*DPR;ctx.beginPath();ctx.moveTo(t.X(tx),t.Y(ty));ctx.lineTo(t.X(ep[k][0]),t.Y(ep[k][1]));ctx.stroke();ctx.fillStyle='#b5379b';ctx.beginPath();ctx.arc(t.X(ep[k][0]),t.Y(ep[k][1]),3.2*DPR,0,7);ctx.fill();ctx.lineWidth=0.8*DPR;ctx.strokeStyle='#b53f38';ctx.stroke();}
     }
-  }
-  // emergent polarity membrane heat-map
-  if(document.getElementById('pol').checked){
-    for(let k=0;k<S;k++){const ang=2*Math.PI*k/S,hx=c[0]+1.09*R*Math.cos(ang),hy=c[1]+1.09*R*Math.sin(ang);ctx.fillStyle=magma(act[k]/vmax);ctx.beginPath();ctx.arc(t.X(hx),t.Y(hy),3.4*DPR,0,7);ctx.fill();}
   }
   // scale bar
   const bx0=40*DPR, by0=cv.height-34*DPR, bar=20*t.s;
@@ -168,7 +163,6 @@ document.getElementById('play').onclick=e=>{playing=!playing;e.target.textConten
 document.getElementById('step').onclick=()=>{playing=false;document.getElementById('play').textContent='Play';frame=Math.min(frame+1,F-1);draw();};
 document.getElementById('scrub').oninput=e=>{playing=false;document.getElementById('play').textContent='Play';frame=Math.round(e.target.value/100*(F-1));draw();};
 document.getElementById('view').onchange=draw;
-document.getElementById('pol').onchange=draw;
 document.getElementById('prot').onchange=draw;
 function tick(ts){if(playing&&ts-last>speed){frame=(frame+1)%F;last=ts;draw();}requestAnimationFrame(tick);}
 draw();requestAnimationFrame(tick);

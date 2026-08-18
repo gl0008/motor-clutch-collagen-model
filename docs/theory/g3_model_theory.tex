@@ -1,0 +1,670 @@
+% !TEX program = xelatex
+% Compile with:  xelatex g3_model_theory.tex   (run twice for the ToC / refs)
+% Requires XeLaTeX + a Traditional-Chinese system font (Microsoft JhengHei).
+\documentclass[11pt]{article}
+
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\setCJKmainfont{Microsoft JhengHei}
+% Latin main/mono fonts left at the fontspec defaults (Latin Modern) for portability.
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks,colorlinks=true,linkcolor=blue!55!black,urlcolor=teal!60!black,citecolor=blue!55!black]{hyperref}
+
+\definecolor{g2col}{HTML}{1f6feb}
+\definecolor{g3col}{HTML}{d9480f}
+\definecolor{codebg}{HTML}{f4f4f4}
+
+\newcommand{\rv}{\mathbf{r}}
+\newcommand{\Fv}{\mathbf{F}}
+\newcommand{\dt}{\Delta t}
+\newcommand{\umt}{\mu\text{m}}            % micrometre, rendered in math mode
+\newcommand{\um}{\,\umt}
+\newcommand{\nN}{\,\text{nN}}
+\newcommand{\GTwo}{\textcolor{g2col}{\textbf{G2}}}
+\newcommand{\GThree}{\textcolor{g3col}{\textbf{G3}}}
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+\titleformat{\section}{\Large\bfseries\color{black!85}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{black!75}}{\thesubsection}{0.6em}{}
+
+\title{\vspace{-1.2cm}\textbf{The Generation-3 Spheroid-Guidance Model}\\[2pt]
+\large Theory, Equations, and What Changed From Generation~2\\[6pt]
+\normalsize\textnormal{Motor--clutch collagen-remodelling project \;/\; \code{generations/g3\_spheroid\_guidance}}}
+\author{}
+\date{2026-08-19}
+
+\begin{document}
+\maketitle
+\vspace{-1.0cm}
+
+% ======================================================================
+\begin{abstract}
+\noindent\textbf{中文摘要。}\;
+Generation~3（\GThree，\code{generations/g3\_spheroid\_guidance}）是一個\textbf{二維機制示範}模型，
+用來說明一顆癌細胞\textbf{spheroid（球體）}如何在\emph{沒有任何預先指定方向}的情況下，
+自發打破對稱、伸出 protrusion（偽足）跨越一圈「無纖維間隙」去抓住 collagen（膠原）纖維、
+用 motor--clutch（馬達--離合器）張力把周圍纖維網路往內拉並重排，最後往它真正抓得住的那一側遷移。
+\GThree\ \textbf{原封不動地重用了} Gloria 已驗證的 Generation~2（\GTwo）膠原力學引擎
+（\code{generations/g2\_corrected/common/model.py}）：珠--彈簧網路、過阻尼動力學、
+軸向彈簧、離散彎曲、可自由轉動的永久 crosslink（交聯）、邊界錨定與細胞表面軟排斥全部不變。
+\GThree\ 只加了四樣東西：（1）帶「無纖維間隙」的 spheroid 幾何；（2）顯式 protrusion 與
+tip-first（尖端先接觸）綁定；（3）\textbf{emergent polarity（湧現極性）}——一個質量守恆的
+wave-pinning（波釘）活性場加上 FAK/Rac1 式的黏著回饋，\textbf{取代了}\GTwo\ V3 寫死的
+\code{polarity\_probability = 0.65}；（4）由反作用力驅動的\emph{二維}遷移。
+本文用中英對照逐一寫出所有方程式、說明其運作，並明確標出哪些與\GTwo\ 相同、哪些被改動。
+
+\medskip
+\noindent\textbf{English.}\;
+\GThree\ is a two-dimensional \emph{mechanism demonstration}: it asks whether a cancer-cell
+\emph{spheroid} can, with no prescribed direction, break symmetry, extend protrusions across an
+initially fibre-free gap to grip collagen, remodel the surrounding network by motor--clutch
+traction, and migrate toward the side where it actually grips. \GThree\ \emph{reuses the frozen,
+validated \GTwo\ collagen engine unchanged} and adds only four ingredients: a spheroid with a
+fibre-free gap, explicit tip-first protrusions, an \emph{emergent} wave-pinning polarity field
+with FAK/Rac1 adhesion feedback (which \emph{replaces} the hardcoded
+\code{polarity\_probability = 0.65} of \GTwo\ V3), and reaction-driven 2-D migration. This report
+states every equation, explains how it works, and marks precisely what is shared with \GTwo\ and
+what changed. \emph{This is not a calibrated 3-D tumour-migration prediction.}
+\end{abstract}
+
+\tableofcontents
+\vspace{4mm}
+
+% ======================================================================
+\section{Positioning and lineage / 定位與傳承}
+
+The project is organised as a sequence of ``generations''. Each generation freezes the previous
+one and isolates a single new mechanism.
+
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \GTwo\ \emph{(corrected)} --- a crosslinked, boundary-anchored bead--spring collagen
+        network with overdamped dynamics, validated at $180\um$ / 99 fibres / $5\nN$. Its
+        sub-versions are \textbf{V2} (elastic crosslink transmission, fixed cell),
+        \textbf{V3} (two-sided motor clutches $+$ rigid-cell translation, $\sim\!0.28\um$/min
+        migration), and \textbf{V4} (contact plasticity, a negative baseline).
+  \item \GThree\ \emph{(spheroid guidance)} --- the subject of this report. It reuses the \GTwo\
+        \emph{engine} verbatim and adds a spheroid, protrusions, emergent polarity, and
+        2-D reaction-driven motion.
+\end{itemize}
+
+\noindent\textbf{Why a rebuild.} An earlier \GThree\ (\code{src/g3/}, now archived under
+\code{legacy/g3\_v1\_superseded/}) built a brand-new spatial-clutch engine from scratch. It was
+mis-scaled, ran for $15$--$60\,\text{s}$ of simulated time --- far too short for the
+tens-of-minutes-to-hours over which fibre realignment and migration actually develop --- and
+produced chaotic animations that did not match \GTwo. Its guidance test even \emph{failed}
+(aligned nematic order $0.0142 <$ isotropic $0.0160$). The current \GThree\ discards that engine and
+instead stands on the already-validated \GTwo\ mechanics.
+
+\medskip
+\noindent\textbf{Units.} Throughout, lengths are micrometres ($\umt$), forces are
+nanonewtons ($\text{nN}$), and time is seconds ($\text{s}$) --- identical to \GTwo, so the two
+models share one coordinate and force language.
+
+% ======================================================================
+\section{The shared Generation-2 engine (unchanged) / 共用的 G2 引擎（不變）}
+\label{sec:engine}
+
+Everything in this section is \emph{inherited from \GTwo\ without modification}. \GThree's
+\code{SpheroidConfig} subclasses \GTwo's \code{CollagenConfig}, and \GThree's integrator
+\code{fast\_advance} reproduces \GTwo's \code{Network.advance} bit-for-bit (it only swaps
+\code{np.add.at} for \code{np.bincount} scatter-adds, $\sim\!2.4\times$ faster). The collagen
+physics below is therefore common ground.
+
+\subsection{Overdamped bead force balance / 過阻尼力平衡}
+
+Collagen is a set of bead chains. Every mobile bead $i$ obeys the professor's overdamped
+(inertia-free) force balance
+\begin{equation}
+  \zeta\,\dot{\rv}_i \;=\;
+  \Fv_i^{\text{stretch}} + \Fv_i^{\text{bend}} + \Fv_i^{\text{crosslink}}
+  + \Fv_i^{\text{repulsion}} + \Fv_i^{\text{active}},
+  \label{eq:balance}
+\end{equation}
+where $\zeta$ is the bead drag (\code{bead\_drag}). The viscous term $\zeta\dot\rv_i$ dissipates
+motion into the surrounding fluid/porous matrix; the elastic bonds store mechanical energy.
+There is deliberately \textbf{no} standard-linear-solid (SLS) element and \textbf{no} plasticity.
+The equation is integrated with an explicit forward-Euler step,
+\begin{equation}
+  \rv_i(t+\dt) = \rv_i(t) + \dt\,\frac{\Fv_i^{\text{total}}}{\zeta}
+  \quad (i \notin \text{fixed}),
+  \qquad \rv_i \equiv \rv_i^{0}\ \ (i \in \text{fixed}).
+  \label{eq:euler}
+\end{equation}
+Boundary beads (those with $\max(|x_i|,|y_i|)\ge \tfrac{L}{2}-w_b$, where $L$ is the domain size
+and $w_b$ the boundary band width) are \emph{fixed}: their positions are pinned to $\rv_i^0$ so
+the network is anchored to a rigid outer frame. Stability requires $\dt < 2\zeta/k_t$; \GThree\ uses
+$\dt = 0.05\,\text{s}$ against $2\zeta/k_t \approx 0.32\,\text{s}$.
+
+\subsection{Axial stretch / 軸向拉伸}
+
+Each bond (edge) joins consecutive beads $i,j$ with initial rest length $\ell_0=\|\rv_j^0-\rv_i^0\|$.
+Writing $\mathbf d=\rv_j-\rv_i$, $\ell=\|\mathbf d\|$, extension $e=\ell-\ell_0$, the bond is a
+Hookean spring whose stiffness switches between tension and compression:
+\begin{equation}
+  k =
+  \begin{cases}
+    k_t = EA/\ell_0, & e \ge 0 \quad(\text{tension}),\\[2pt]
+    k_c = \rho\,k_t,  & e < 0 \quad(\text{compression / microbuckling}),
+  \end{cases}
+  \qquad
+  \Fv_i^{\text{stretch}} = +k\,e\,\hat{\mathbf d},\quad
+  \Fv_j^{\text{stretch}} = -k\,e\,\hat{\mathbf d}.
+  \label{eq:stretch}
+\end{equation}
+Here $EA$ is the axial rigidity (\code{axial\_rigidity}), $EA = E\,A$ with fibre cross-section
+$A=\pi(D/2)^2$, diameter $D$, and modulus $E$. The compression ratio $\rho=0.10$
+(\code{compression\_ratio}) softens compressed bonds, representing fibre microbuckling
+(Notbohm 2015). The stored energy is $U_{\text{stretch}}=\tfrac12\sum k\,e^2$.
+
+\subsection{Discrete bending / 離散彎曲}
+
+For every interior triplet $(a,b,c)$ of consecutive beads on a fibre, the discrete curvature is
+$\boldsymbol\kappa = \rv_a - 2\rv_b + \rv_c$ with a stress-free reference $\boldsymbol\kappa_0$
+taken from the initial geometry. Bending penalises the deviation
+$\Delta\boldsymbol\kappa=\boldsymbol\kappa-\boldsymbol\kappa_0$:
+\begin{equation}
+  \Fv_a^{\text{bend}} = -k_b\,\Delta\boldsymbol\kappa,\quad
+  \Fv_b^{\text{bend}} = +2k_b\,\Delta\boldsymbol\kappa,\quad
+  \Fv_c^{\text{bend}} = -k_b\,\Delta\boldsymbol\kappa,
+  \qquad
+  k_b = \frac{EI}{\bar\ell^{\,3}},
+  \label{eq:bend}
+\end{equation}
+where $EI$ is the bending rigidity (\code{bending\_rigidity}), $EI = E\,I$ with second moment
+$I=\pi D^4/64$, and $\bar\ell$ is the mean bond length. These forces are the negative gradient of
+$U_{\text{bend}}=\tfrac12 k_b\sum\|\Delta\boldsymbol\kappa\|^2$.
+
+\subsection{Freely-hinged permanent crosslinks / 可自由轉動的永久交聯}
+
+Where two \emph{different} fibres cross, a permanent hinged link joins the two coincident
+material points. A material point on edge $(a_1,a_2)$ at parameter $\alpha_a$ is
+$\mathbf p_a=(1-\alpha_a)\rv_{a_1}+\alpha_a\rv_{a_2}$ (similarly $\mathbf p_b$). The link stores
+\begin{equation}
+  U_x = \tfrac12 k_x\,\bigl\|(\mathbf p_b-\mathbf p_a)-\mathbf d_{x,0}\bigr\|^2,
+  \qquad
+  \mathbf f = k_x\bigl[(\mathbf p_b-\mathbf p_a)-\mathbf d_{x,0}\bigr],
+  \label{eq:xlink}
+\end{equation}
+with $\mathbf d_{x,0}=\mathbf 0$ for a permanent link (the two points are initially coincident)
+and stiffness $k_x$ (\code{crosslink\_stiffness}). The force $\mathbf f$ is distributed back onto
+the four host beads by the interpolation weights:
+$+(1-\alpha_a)\mathbf f$ on $a_1$, $+\alpha_a\mathbf f$ on $a_2$,
+$-(1-\alpha_b)\mathbf f$ on $b_1$, $-\alpha_b\mathbf f$ on $b_2$. The link is \emph{freely hinged}
+(it resists separation of the two points, not the angle between fibres) and \emph{never breaks} in
+\GTwo/\GThree\ --- there is no crosslink rupture manufacturing motion.
+
+\subsection{Soft cell-surface repulsion / 細胞表面軟排斥}
+
+The cell is a rigid circle of radius $R$ centred at $\rv_c$. Beads that penetrate its surface
+(plus a small clearance $c$) feel a one-sided linear penalty that pushes them radially out:
+\begin{equation}
+  \delta_i = \max\!\bigl(0,\; R + c - \|\rv_i-\rv_c\|\bigr),
+  \qquad
+  \Fv_i^{\text{repulsion}} = k_{\text{rep}}\,\delta_i\,
+  \frac{\rv_i-\rv_c}{\|\rv_i-\rv_c\|},
+  \label{eq:repulsion}
+\end{equation}
+with $k_{\text{rep}}$ = \code{repulsion\_stiffness} and $c$ = \code{cell\_clearance}. This is the
+repulsive branch of a linear-elastic contact; it adds no adhesion and no friction.
+
+\subsection{Network generation and the percolation gate / 網路生成與滲流閘}
+\label{sec:gen}
+
+Finite curved fibres of length $20$--$110\um$ are laid down (a sine-perturbed segment, function
+\code{\_curved\_segment}, reused from \GTwo). Interior fibres are seeded at random angles; a fraction
+are ``boundary-seeded'' so they reach the anchored frame. Permanent crosslinks are then placed at
+all pairwise fibre intersections (\code{build\_crosslinks}). A generated network is \textbf{accepted
+only if} it percolates: at least a required fraction of fibres are connected through the crosslink
+graph to the fixed boundary (\code{connectivity\_report}). \GThree\ relaxes the gate slightly
+(required connected fraction $0.80$ vs $0.85$) and, crucially, changes the geometry --- see
+\S\ref{sec:gap}.
+
+% ======================================================================
+\section{The shared motor--clutch law / 共用的馬達--離合器定律}
+\label{sec:clutch}
+
+The stochastic motor--clutch law is also inherited from \GTwo\ V3 (Bell 1978; Bangasser \& Odde
+2013). \GThree\ applies \emph{the identical law}, but per \emph{protrusion} rather than to two fixed
+left/right ensembles. A bundle has $C$ parallel Hookean clutches; clutch $c$ has extension
+$x_c$ and force $F_c=k_c x_c$ (stiffness $k_c$ = \code{clutch\_stiffness}).
+
+\paragraph{Bond kinetics (Bell slip-bond).}
+An unbound clutch binds within $\dt$ with probability $1-e^{-k_{\text{on}}\dt}$. A bound clutch's
+off-rate accelerates with its own load, and it unbinds with probability
+$1-e^{-k_{\text{off}}\dt}$:
+\begin{equation}
+  k_{\text{off}} = k_{\text{off}}^{0}\,\exp\!\Bigl(\tfrac{F_c}{F_b}\Bigr),
+  \qquad
+  P_{\text{unbind}} = 1-e^{-k_{\text{off}}\dt},
+  \qquad
+  P_{\text{bind}} = 1-e^{-k_{\text{on}}\dt},
+  \label{eq:bell}
+\end{equation}
+with unloaded off-rate $k_{\text{off}}^0$ (\code{clutch\_off\_rate0}), on-rate $k_{\text{on}}$
+(\code{clutch\_on\_rate}), and characteristic bond force $F_b$ (\code{bell\_force}).
+
+\paragraph{Motor force--velocity and clutch loading.}
+The actin retrograde flow slows under load through a linear force--velocity relation, and bound
+clutches stretch at the difference between actin flow and substrate (fibre) motion:
+\begin{equation}
+  v_{\text{actin}} = v_u\,\max\!\Bigl(0,\; 1-\tfrac{T}{F_{\text{stall}}}\Bigr),
+  \qquad
+  \dot x_c = \max\!\bigl(0,\; v_{\text{actin}} - v_{\text{sub}}\bigr)\ \ (\text{bound}),
+  \label{eq:motor}
+\end{equation}
+where $v_u$ = \code{unloaded\_actin\_speed}, $F_{\text{stall}}$ = the bundle's stall force
+(\code{motor\_stall\_per\_protrusion}), $T=\sum_{c\in\text{bound}}k_c x_c$ is the current bundle
+traction, and $v_{\text{sub}}=\mathbf v(\mathbf x)\!\cdot\!\hat{\mathbf n}_{\text{in}}$ is the
+inward speed of the gripped material point (its interpolated bead velocity projected onto the
+inward normal). The bundle traction $T\,\hat{\mathbf n}_{\text{in}}$ is applied to the two host
+beads of the gripped edge --- the collagen is pulled \emph{inward}, toward the cell.
+
+\paragraph{The key removal.} \GTwo\ V3 biased the two sides with a hardcoded probability: its
+on-probability carried a factor $\text{side} = [\,2(1-\psi),\,2\psi\,]$ with $\psi = 0.65$
+(\code{polarity\_probability}). \textbf{\GThree\ deletes this entirely}: all sectors use the same
+symmetric $k_{\text{on}}$, and any binding bias is an \emph{emergent} consequence of which
+protrusions physically reach and load fibres (\S\ref{sec:polarity}).
+
+% ======================================================================
+\section{What Generation-3 adds on top / G3 在其上新增的東西}
+
+The next four sections are the actual content of \GThree. They are the \emph{only} physics that is
+new relative to \S\ref{sec:engine}--\S\ref{sec:clutch}.
+
+\subsection{A spheroid with a fibre-free gap / 帶無纖維間隙的球體}
+\label{sec:gap}
+
+\GThree\ enlarges the cell into a \emph{spheroid} of radius $R=22\um$ (vs $9\um$ in \GTwo) and leaves a
+fibre-free ring of width $g$ (\code{gap}) around it. The generator rejects any candidate fibre
+that intrudes inside the gap radius,
+\begin{equation}
+  \min_{p\in\text{fibre}}\|\mathbf p\| \;<\; R_g \equiv R + g
+  \;\;\Longrightarrow\;\; \text{reject the fibre},
+  \label{eq:gap}
+\end{equation}
+so at $t=0$ there is genuinely \textbf{no cell--ECM contact}: nothing is pre-attached, and every
+fibre is a \emph{potential} contact fibre rather than a pre-placed one (contrast \GTwo, which seeds
+eight curved Bézier contact fibres reaching the surface). The spheroid must \emph{earn} its grip
+by reaching across the gap.
+
+\subsection{Explicit protrusions and tip-first engagement / 顯式偽足與尖端先接觸}
+\label{sec:protrusion}
+
+The membrane is divided into $S$ equal angular sectors (\code{n\_sectors} $=24$) with outward unit
+normals $\hat{\mathbf n}_k=(\cos\theta_k,\sin\theta_k)$. Sector $k$ carries one protrusion of
+length $L_k$, whose \emph{tip} sits at
+\begin{equation}
+  \mathbf t_k = \rv_c + (R + L_k)\,\hat{\mathbf n}_k.
+  \label{eq:tip}
+\end{equation}
+
+\paragraph{Length dynamics.} Every sector probes outward at a baseline speed (so the spheroid
+explores in all directions and can break symmetry mechanically); sectors above the mean polarity
+grow further, sectors well below it retract, and \emph{engaged} protrusions hold their length
+(they are anchored). With headroom $h_k = 1 - L_k/L_{\max}$ and normalised polarity excess
+$\varepsilon_k = (a_k-\bar a)/(\bar a+\epsilon)$,
+\begin{equation}
+  \dot L_k =
+  \begin{cases}
+    0, & \text{engaged},\\[3pt]
+    \underbrace{v_{\text{probe}}\,h_k}_{\text{explore}}
+    + \underbrace{v_{\text{grow}}\,[\varepsilon_k]_0^{3}\,h_k}_{\text{front growth}}
+    - \underbrace{v_{\text{ret}}\,[-\varepsilon_k]_0^{1}}_{\text{rear retraction}}, & \text{free},
+  \end{cases}
+  \qquad
+  L_k \leftarrow \operatorname{clip}(L_k+\dt\,\dot L_k,\,L_{\min},\,L_{\max}),
+  \label{eq:length}
+\end{equation}
+where $[\,\cdot\,]_0^{m}=\operatorname{clip}(\cdot,0,m)$, and
+$v_{\text{probe}},v_{\text{grow}},v_{\text{ret}}$ are \code{protrusion\_probe\_speed},
+\code{protrusion\_growth\_speed}, \code{protrusion\_retraction\_speed}. Reach is capped at
+$L_{\max}=30\um$ (\code{protrusion\_max\_length}), i.e.\ roughly the gap plus a fibre or two
+($\sim\!0.7$--$4\times$ cell radius, Carey 2016; Fraley 2010/2015).
+
+\paragraph{Tip-first engagement.} A protrusion can bind only once its tip physically reaches a
+fibre. Let $d_k=\min_{\text{edges}}\operatorname{dist}(\mathbf t_k,\text{edge})$ be the distance
+from the tip to the nearest material point on any fibre segment (with foot-point parameter
+$\alpha_k$ and host edge $e_k$). Then
+\begin{equation}
+  d_k \le d_{\text{cap}}
+  \;\;\Longrightarrow\;\;
+  \text{sector $k$ engages edge $e_k$ at $\alpha_k$},
+  \label{eq:engage}
+\end{equation}
+with capture distance $d_{\text{cap}}$ (\code{capture\_distance} $=2.5\um$). An engaged sector
+stays engaged while any of its clutches is bound; when all release, its tip is re-tested against
+the (now moved) fibre and it disengages if $d_k>d_{\text{cap}}$. Engagement is refreshed every
+\code{engagement\_update\_interval} $=0.5\,\text{s}$.
+
+\subsection{Emergent polarity: wave-pinning + adhesion feedback / 湧現極性}
+\label{sec:polarity}
+
+This is the heart of the rebuild and the direct replacement for the deleted
+\code{polarity\_probability = 0.65}. The membrane carries a scalar \emph{activity}
+field $a_k$ ($k=1,\dots,S$), a coarse-grained Rho-GTPase-like ``front'' marker, subject to a
+\textbf{mass-conserved replicator / wave-pinning} dynamic (Mori, Jilkine \& Edelstein-Keshet 2008).
+The conserved pool is
+\begin{equation}
+  \sum_{k=1}^{S} a_k = A_{\text{tot}} \quad(\text{\code{polarity\_total\_activity}}),
+  \label{eq:mass}
+\end{equation}
+enforced by renormalisation each step (this is the \emph{global inhibition}). Local
+self-reinforcement is a saturating Hill term plus the FAK/Rac1 adhesion signal $q_k$
+(\S\ref{sec:fak}):
+\begin{equation}
+  \phi_k = \gamma\,\frac{a_k^{\,h}}{K^{\,h}+a_k^{\,h}} \;+\; k_{\text{FAK}}\,q_k,
+  \qquad
+  \text{fitness}_k = \phi_k - \langle\phi\rangle,
+  \label{eq:fitness}
+\end{equation}
+where $\gamma$ = \code{polarity\_gamma}, $K$ = \code{polarity\_K}, $h$ = \code{polarity\_hill},
+$k_{\text{FAK}}$ = \code{polarity\_fak\_gain}, and $\langle\phi\rangle$ is the sector mean. The
+zero-sum fitness makes it a \textbf{replicator} (winner-take-all): sectors whose reinforcement
+beats the mean grow at the expense of the rest. Membrane diffusion (a discrete ring Laplacian)
+keeps the front contiguous, and a small stochastic term breaks the initial symmetry:
+\begin{equation}
+  (\text{lap}\,a)_k = a_{k+1} + a_{k-1} - 2a_k,
+  \qquad
+  a_k \;\leftarrow\; a_k
+  + \frac{\dt}{\tau_p}\bigl(a_k\,\text{fitness}_k + D\,(\text{lap}\,a)_k\bigr)
+  + \sigma\sqrt{\dt}\,\xi_k,
+  \label{eq:polarity}
+\end{equation}
+followed by $a_k\leftarrow\max(a_k,10^{-4})$ and renormalisation to
+Eq.~\eqref{eq:mass}. Here $\tau_p$ = \code{polarity\_time} (front relaxation time),
+$D$ = \code{polarity\_diffusion}, $\sigma$ = \code{polarity\_noise}, and
+$\xi_k\sim\mathcal N(0,1)$ i.i.d.\ per step.
+
+\paragraph{How it works.} From a near-uniform, symmetric start
+($a_k \approx A_{\text{tot}}/S$ with $2\%$ noise), the bistable local kinetics plus mass
+conservation collapse the field to \textbf{one stable broad front} (a pinned wave), rather than a
+spread of many peaks. Three ingredients play distinct roles:
+\begin{itemize}[leftmargin=1.4em,itemsep=2pt]
+  \item \textbf{Noise $\sigma\sqrt{\dt}\,\xi_k$} chooses \emph{which} direction --- the sign is
+        genuinely stochastic and differs between seeds (verified: five seeds polarise toward
+        $84^\circ,\,-84^\circ,\,-8^\circ,\,-99^\circ,\,64^\circ$).
+  \item \textbf{Adhesion feedback $k_{\text{FAK}}q_k$} pulls the front toward sectors that
+        \emph{actually grip} collagen --- a mechanochemical positive loop.
+  \item \textbf{Aligned collagen} (optional fixture) biases only the front \emph{axis}, never its
+        sign.
+\end{itemize}
+Nothing prescribes $+x$, a left/right probability, or the number $0.65$.
+
+\subsection{FAK/Rac1 adhesion signal / 黏著訊號}
+\label{sec:fak}
+
+The feedback variable $q_k$ is a low-pass-filtered measure of adhesion success in sector $k$. Let
+$n_k$ be the number of currently bound clutches and $T_k$ the bundle traction. Define an
+engagement saturation and a normalised load, combine them, and filter:
+\begin{equation}
+  q_k^{\text{raw}} = \underbrace{\bigl(1-e^{-n_k/n_s}\bigr)}_{\text{engagement}}\cdot
+  \underbrace{\frac{\lambda_k}{1+\lambda_k}}_{\text{load}},
+  \qquad
+  \lambda_k = \frac{T_k}{\tfrac12 F_{\text{stall}}},
+  \qquad
+  q_k \leftarrow q_k + \frac{\dt}{\tau_q}\bigl(q_k^{\text{raw}}-q_k\bigr),
+  \label{eq:fak}
+\end{equation}
+with clutch scale $n_s$ = \code{adhesion\_clutch\_scale} and filter time $\tau_q$ =
+\code{adhesion\_filter\_time}. The low-pass ($\tau_q=20\,\text{s}$) makes the feedback respond to
+\emph{sustained} traction rather than momentary binding flicker, which is what stabilises a single
+front instead of the ``twitchy'' flicker of the superseded \GThree.
+
+\subsection{Reaction-driven 2-D migration / 反作用力驅動的二維遷移}
+\label{sec:motion}
+
+Motion follows the same reaction principle as \GTwo\ V3 but in full 2-D. The clutch bundles apply a
+total inward force field $\Fv^{\text{active}}$ on the collagen (\S\ref{sec:clutch}). Because those
+clutch forces are internal to the cell--ECM pair, the net reaction on the rigid spheroid is
+minus their sum, and it points \emph{toward} the gripping front:
+\begin{equation}
+  \mathbf R = -\sum_i \Fv_i^{\text{active}},
+  \qquad
+  \mathbf v_c = \frac{\mathbf R}{\gamma_c},
+  \qquad
+  \mathbf v_c \leftarrow \mathbf v_c\,\frac{\min(\|\mathbf v_c\|,\,v_{\max})}{\|\mathbf v_c\|},
+  \qquad
+  \rv_c \leftarrow \rv_c + \dt\,\mathbf v_c,
+  \label{eq:motion}
+\end{equation}
+with cell drag $\gamma_c$ = \code{cell\_drag} $=3000\,\text{nN\,s/}\umt$ (calibrated to
+$0.1$--$0.3\um$/min) and a numerical/biological speed guard $v_{\max}$ = \code{max\_cell\_speed}.
+In \code{--fixed} mode the spheroid is clamped ($\mathbf v_c\equiv0$): fibres still get pulled and
+realigned, but there is no migration --- a clean falsifiability control.
+
+\emph{Contrast with \GTwo\ V3:} V3 intentionally allowed only one translational degree of freedom,
+$\dot x_c = \text{reaction}_x/\gamma_c$, $\dot y_c = 0$, on a declared left/right axis. \GThree\ has no
+declared axis: both components of $\mathbf R$ act, and the direction is set by the emergent front.
+
+% ======================================================================
+\section{The full G3 time step / G3 完整時間步}
+\label{sec:loop}
+
+Each step of \code{run\_spheroid} (size $\dt$) executes the following, in order. Steps 1--3 and 5
+are new; step 4 is the shared clutch law (\S\ref{sec:clutch}); step 7 is the shared engine
+(\S\ref{sec:engine}).
+
+\begin{enumerate}[leftmargin=1.6em,itemsep=2pt]
+  \item \textbf{Emergent polarity} --- one wave-pinning update, Eq.~\eqref{eq:polarity}
+        (\code{step\_polarity}).
+  \item \textbf{Protrusion growth} --- update every $L_k$, Eq.~\eqref{eq:length}
+        (\code{step\_protrusions}).
+  \item \textbf{Tip-first engagement} --- every $0.5\,\text{s}$, re-test tips and (dis)engage,
+        Eq.~\eqref{eq:engage} (\code{update\_engagement}).
+  \item \textbf{Motor--clutch loading} --- advance every bundle, build the inward nodal force
+        field $\Fv^{\text{active}}$, Eqs.~\eqref{eq:bell}--\eqref{eq:motor}
+        (\code{step\_clutches}).
+  \item \textbf{Adhesion filter} --- update $q_k$, Eq.~\eqref{eq:fak}
+        (\code{update\_adhesion}).
+  \item \textbf{Reaction-driven motion} --- move the spheroid, Eq.~\eqref{eq:motion}.
+  \item \textbf{Advance the collagen} --- one overdamped step of the frozen \GTwo\ engine,
+        Eqs.~\eqref{eq:balance}--\eqref{eq:repulsion} (\code{fast\_advance}); returns the bead
+        velocity field used as $v_{\text{sub}}$ next step.
+\end{enumerate}
+
+The narrative this produces: $t=0$ fibre-free gap $\to$ protrusions probe outward in all
+directions $\to$ some tips reach fibres and bind $\to$ motor--clutches load and pull those fibres
+inward (the network realigns radially at the front) $\to$ a single front is selected and reinforced
+by adhesion feedback $\to$ the spheroid migrates toward that front, remodelling collagen along its
+path.
+
+% ======================================================================
+\section{Metrics / 量測}
+\label{sec:metrics}
+
+\paragraph{Radial nematic order.} For each fibre segment with unit tangent $\hat{\mathbf t}$ and
+midpoint radial unit vector $\hat{\mathbf e}_r$ (from the spheroid centre), the nematic radial order
+is
+\begin{equation}
+  S_r = \bigl\langle\,2(\hat{\mathbf t}\!\cdot\!\hat{\mathbf e}_r)^2 - 1\,\bigr\rangle,
+\end{equation}
+averaged in near/mid/far shells (surface distances $0$--$20$, $20$--$45$, $45$--$90\um$).
+$S_r=+1$ means fibres point radially (toward the spheroid), $0$ random, $-1$ tangential. Radial
+pulling drives the near-shell $S_r$ from $\approx\!-0.62$ toward $-0.31$ over the run.
+
+\paragraph{Polarity vector and traction.} The net polarity direction is
+$\mathbf P=\sum_k a_k\hat{\mathbf n}_k$ (its angle is the migration heading); the collective
+traction is $\sum_k T_k$; and the path length accumulates $\|\rv_c(t+\dt)-\rv_c(t)\|$.
+
+% ======================================================================
+\section{Parameters and literature anchors / 參數與文獻依據}
+\label{sec:params}
+
+\begin{longtable}{@{}l l r l@{}}
+\toprule
+\textbf{Symbol} & \textbf{Config field} & \textbf{Value} & \textbf{Meaning / source} \\
+\midrule
+\endhead
+\multicolumn{4}{@{}l}{\emph{Shared \GTwo\ engine}}\\
+$L$ & \code{domain\_size} & $240\um$ & field size (\GTwo: $180$) \\
+$E$ & \code{collagen\_modulus\_mpa} & $32\,\text{MPa}$ & wet fibre modulus (Lee 2014) \\
+$D$ & \code{fiber\_diameter} & $0.30\um$ & fibre diameter \\
+$\rho$ & \code{compression\_ratio} & $0.10$ & microbuckling softening (Notbohm 2015) \\
+$k_x$ & \code{crosslink\_stiffness} & $75\,\text{nN}/\umt$ & hinged-link penalty \\
+$k_{\text{rep}}$ & \code{repulsion\_stiffness} & $600\,\text{nN}/\umt$ & cell-surface penalty \\
+$\zeta$ & \code{bead\_drag} & $360\,\text{nN\,s}/\umt$ & bead drag (\GTwo\ V3) \\
+$\dt$ & \code{dt} & $0.05\,\text{s}$ & integration step \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Spheroid \& protrusions (new)}}\\
+$R$ & \code{cell\_radius} & $22\um$ & spheroid radius (\GTwo: $9$) \\
+$g$ & \code{gap} & $12\um$ & fibre-free ring \\
+$N_f$ & \code{n\_fibers} & $150$ & fibre count (\GTwo: $99$) \\
+$S$ & \code{n\_sectors} & $24$ & membrane sectors / protrusions \\
+$L_{\max}$ & \code{protrusion\_max\_length} & $30\um$ & max reach (Carey 2016) \\
+$v_{\text{probe}}$ & \code{protrusion\_probe\_speed} & $0.14\um/\text{s}$ & baseline probing \\
+$v_{\text{grow}}$ & \code{protrusion\_growth\_speed} & $0.16\um/\text{s}$ & front growth \\
+$v_{\text{ret}}$ & \code{protrusion\_retraction\_speed} & $0.22\um/\text{s}$ & rear retraction \\
+$d_{\text{cap}}$ & \code{capture\_distance} & $2.5\um$ & tip capture radius \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Motor--clutch bundle (shared law)}}\\
+$C$ & \code{n\_clutches\_per\_protrusion} & $8$ & clutches per bundle \\
+$k_c$ & \code{clutch\_stiffness} & $2.0\,\text{nN}/\umt$ & clutch spring \\
+$k_{\text{on}}$ & \code{clutch\_on\_rate} & $0.08\,\text{s}^{-1}$ & symmetric binding \\
+$k_{\text{off}}^0$ & \code{clutch\_off\_rate0} & $0.02\,\text{s}^{-1}$ & unloaded off-rate \\
+$F_b$ & \code{bell\_force} & $2.0\nN$ & Bell bond force \\
+$v_u$ & \code{unloaded\_actin\_speed} & $0.03\um/\text{s}$ & unloaded actin flow \\
+$F_{\text{stall}}$ & \code{motor\_stall\_per\_protrusion} & $4.0\nN$ & motor stall \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Emergent polarity + adhesion (new)}}\\
+$A_{\text{tot}}$ & \code{polarity\_total\_activity} & $6.0$ & conserved pool \\
+$\gamma$ & \code{polarity\_gamma} & $2.2$ & autocatalytic gain \\
+$K$ & \code{polarity\_K} & $0.5$ & Hill half-saturation \\
+$h$ & \code{polarity\_hill} & $2.0$ & Hill cooperativity \\
+$D$ & \code{polarity\_diffusion} & $0.45$ & membrane smoothing \\
+$\sigma$ & \code{polarity\_noise} & $0.08$ & symmetry-breaking noise \\
+$k_{\text{FAK}}$ & \code{polarity\_fak\_gain} & $2.5$ & FAK/Rac1 feedback gain \\
+$\tau_p$ & \code{polarity\_time} & $6.0\,\text{s}$ & front relaxation time \\
+$\tau_q$ & \code{adhesion\_filter\_time} & $20\,\text{s}$ & $q_k$ low-pass \\
+$n_s$ & \code{adhesion\_clutch\_scale} & $3.0$ & engagement scale \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Motion (new geometry, shared principle)}}\\
+$\gamma_c$ & \code{cell\_drag} & $3000\,\text{nN\,s}/\umt$ & spheroid drag \\
+$v_{\max}$ & \code{max\_cell\_speed} & $0.02\um/\text{s}$ & speed guard \\
+\bottomrule
+\end{longtable}
+
+\noindent The literature sets \emph{targets and plausible scales}, not fits: spheroid traction of
+tens of nN (Steinwachs 2016; Mark 2020), MDA-MB-231 3-D speed $0.1$--$0.3\um$/min (Sapudom 2019;
+Aguilar-Rojas 2024), protrusion reach $\sim\!0.7$--$4\times$ cell radius (Carey 2016; Fraley
+2010/2015), wave-pinning polarisation in $\sim\!10\,\text{s}$ with stochastic sign (Mori 2008;
+Jilkine 2011), and fibre realignment over tens of minutes to hours (Kim 2017; Han 2018).
+
+% ======================================================================
+\section{Side-by-side: G2 vs G3 / 逐項對照}
+\label{sec:compare}
+
+\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{@{}p{0.24\textwidth} p{0.35\textwidth} p{0.35\textwidth}@{}}
+\toprule
+\textbf{Aspect} & \textbf{\GTwo\ (corrected)} & \textbf{\GThree\ (spheroid guidance)} \\
+\midrule
+\endhead
+Collagen engine & bead--spring, overdamped, axial $EA/\ell_0$, bending $EI/\ell^3$, hinged crosslinks, boundary anchoring, soft repulsion & \textbf{identical} --- reused verbatim (\S\ref{sec:engine}) \\
+Integrator & \code{Network.advance} (\code{np.add.at}) & \code{fast\_advance} (\code{np.bincount}); \textbf{bit-identical}, $\sim2.4\times$ faster \\
+Cell body & rigid circle, $R=9\um$ & rigid spheroid, $R=22\um$ \\
+Contact at $t=0$ & 8 pre-placed Bézier contact fibres touch the surface & \textbf{fibre-free gap} --- no contact; nothing pre-attached (Eq.~\ref{eq:gap}) \\
+Cell--ECM coupling & Gaussian-weighted contact patches in a $\pm30^\circ$ sector & \textbf{explicit protrusions}, tip-first engagement (Eqs.~\ref{eq:tip}--\ref{eq:engage}) \\
+Motor--clutch law & Bell slip-bond $+$ motor F--V (V3) & \textbf{same law}, one bundle per protrusion (\S\ref{sec:clutch}) \\
+Directional bias & hardcoded \code{polarity\_probability}$=0.65$ (V3 side factor) & \textbf{removed}; emergent wave-pinning $+$ FAK feedback (\S\ref{sec:polarity}) \\
+Polarity origin & prescribed constant & noise breaks symmetry; mechanics pick direction; sign is stochastic per seed \\
+Migration & 1-D, $\dot x_c=\text{reaction}_x/\gamma_c$, $\dot y_c=0$ (V3) & \textbf{full 2-D}, $\mathbf v_c=\mathbf R/\gamma_c$ (Eq.~\ref{eq:motion}) \\
+Force scale & $5\nN$ local pull (V2) & tens of nN collective ($\sim\!36\nN$ peak) \\
+Domain / fibres & $180\um$ / 99 fibres & $240\um$ / 150 fibres \\
+Percolation gate & connected fraction $\ge0.85$ & $\ge0.80$ (relaxed for the gap) \\
+Duration & $30$--$60\,\text{min}$ & $60\,\text{min}$ (realign $+$ migrate) \\
+Constitutive law & purely elastic; no SLS, no plasticity & \textbf{identical} --- no SLS, no plasticity \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{One-line summary.} \GThree\ = \emph{the \GTwo\ collagen engine and \GTwo\ motor--clutch
+law, unchanged}, wrapped around a spheroid-with-gap geometry, explicit tip-first protrusions, an
+emergent wave-pinning polarity field that \emph{replaces} the $0.65$ constant, and full-2-D
+reaction-driven motion.
+
+% ======================================================================
+\section{Reference run and falsifiability / 參考結果與可證偽性}
+\label{sec:results}
+
+The reference run --- 150 fibres, $240\um$ field, $22\um$ spheroid, $12\um$ gap, $60\,\text{min}$,
+seed 7 (\code{results/g3\_spheroid\_guidance/main/}) --- gives:
+
+\begin{center}
+\begin{tabular}{@{}l r l@{}}
+\toprule
+\textbf{Quantity} & \textbf{Value} & \textbf{Literature target} \\
+\midrule
+Peak collective traction & $\approx 36\nN$ & tens of nN, $\le100$ (Steinwachs 2016) \\
+Net migration in $60\,$min & $\approx 18.8\um$ & --- \\
+Migration speed & $\approx 0.32\um$/min & $0.1$--$0.3\um$/min (Sapudom 2019) \\
+Engaged protrusions at end & $\approx 10$ & --- \\
+Near-shell radial order & $-0.62 \to -0.31$ & realignment over tens of min--h \\
+Max bead displacement & $\approx 5.1\um$ & --- \\
+Connected fraction & $1.0$ & gate $\ge 0.80$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Emergence check.} Across five seeds the migration heading is
+$84^\circ,\,-84^\circ,\,-8^\circ,\,-99^\circ,\,64^\circ$ (spread $\approx75^\circ$): the direction
+is genuinely stochastic and set per realisation, confirming there is no built-in bias.
+
+\noindent\textbf{Controls that make the mechanism falsifiable.}
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+  \item \code{--fixed} clamps the spheroid: fibres still realign, but migration vanishes.
+  \item Zero motor stall force: protrusions attach without deforming fibres.
+  \item An empty gap with no reachable fibre: zero engagement, zero traction, zero motion.
+\end{itemize}
+
+Two view modes are rendered in the \GTwo\ visual grammar (springs coloured by strain, gold-diamond
+crosslinks, black-square fixed beads, peach cell, orange protrusions/contacts, faint ghost of the
+initial network, true $1\times$ scale $+$ scale bar): \code{*\_full.gif} (full field) and
+\code{*\_follow.gif} (follow-cell zoom), matching the G2-v3 notebook toggle.
+
+% ======================================================================
+\section{Evidence boundary / 證據邊界}
+
+\GThree\ is a \textbf{2-D minimal mechanism model of emergent cell--collagen guidance}. It is
+\emph{not} a realistic three-dimensional tumour-migration prediction: it contains no calibrated
+collagen concentration or pore topology, no deformable cell or nucleus, no proteolysis, no EMT, no
+cell--cell interactions, no stress relaxation, and no irreversible plasticity. \GTwo\
+(\code{generations/g2\_corrected/}) remains frozen and unchanged; \GThree\ reuses its engine without
+rewriting any \GTwo\ file. Every generated figure carries the boundary:
+\emph{``Mechanism demo --- not a 3-D tumour-migration prediction.''}
+
+% ======================================================================
+\section*{References / 參考文獻}
+\addcontentsline{toc}{section}{References}
+\small
+\begin{enumerate}[leftmargin=1.6em,itemsep=1pt]
+  \item Lee et al.\ (2014). A 3-D computational model of collagen network mechanics. \emph{PLoS ONE} 9:e111896.
+  \item Notbohm et al.\ (2015). Microbuckling of fibrin provides a mechanism for cell mechanosensing. \emph{J. R. Soc. Interface}.
+  \item Bell (1978). Models for the specific adhesion of cells to cells. \emph{Science} 200:618.
+  \item Bangasser \& Odde (2013). Master-equation analysis of a motor-clutch model. \emph{Cell. Mol. Bioeng.} 6:449.
+  \item Prahl et al.\ (2020). Predicting confined 1-D cell migration from a 2-D motor-clutch model. \emph{Biophys. J.} 118:1709.
+  \item Steinwachs et al.\ (2016). Three-dimensional force microscopy of cells in biopolymer networks. \emph{Nat. Methods} 13:171.
+  \item Carey et al.\ (2016). Local ECM alignment directs protrusion dynamics and migration through Rac1 and FAK. \emph{Integr. Biol.} 8:821.
+  \item Mori, Jilkine \& Edelstein-Keshet (2008). Wave-pinning and cell polarity from a bistable reaction--diffusion system. \emph{Biophys. J.} 94:3684.
+  \item Fraley et al.\ (2010). A distinctive role for focal-adhesion proteins in 3-D motility. \emph{Nat. Cell Biol.} 12:598.
+  \item Fraley et al.\ (2015). 3-D matrix fibre alignment modulates migration and MT1-MMP utility. \emph{Sci. Rep.} 5:14580.
+  \item Kim et al.\ (2017). Stress-induced plasticity of dynamic collagen networks. \emph{Nat. Commun.} 8:842.
+  \item Han et al.\ (2018). Cell contraction induces long-ranged stress stiffening in the ECM. \emph{PNAS}.
+  \item Sapudom et al.\ (2019) / Aguilar-Rojas et al.\ (2024). MDA-MB-231 3-D migration speeds in collagen.
+\end{enumerate}
+\normalsize
+
+\vfill
+\noindent\footnotesize\emph{Source of truth:} \code{generations/g3\_spheroid\_guidance/model.py}
+(\code{SpheroidConfig}, \code{step\_polarity}, \code{step\_protrusions}, \code{update\_engagement},
+\code{step\_clutches}, \code{update\_adhesion}, \code{run\_spheroid}, \code{fast\_advance}) and the
+frozen \GTwo\ engine \code{generations/g2\_corrected/common/model.py}. All equations above were
+transcribed directly from that code.
+
+\end{document}
