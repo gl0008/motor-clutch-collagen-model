@@ -1,7 +1,8 @@
 (function(){
   const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4','g3-a','g3-b','g3-c'];
   const query=new URLSearchParams(location.search);
-  const id=NOTEBOOK_MODELS[query.get('model')]?query.get('model'):'g2-v2';
+  const requested=(query.get('model')||'').replace(/;+$/,'');
+  const id=NOTEBOOK_MODELS[requested]?requested:'g2-v2';
   const model=NOTEBOOK_MODELS[id];
   const modelLabel=m=>m.generation==='G3'?m.version:`${m.generation} ${m.version}`;
   const esc=value=>String(value).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
