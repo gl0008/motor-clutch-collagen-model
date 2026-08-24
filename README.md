@@ -1,10 +1,12 @@
 # Motor–clutch collagen model
 
-This repository preserves two completed model generations and develops a third.
+This repository preserves three model generations and develops a fourth.
 Generation 1 records the historical development path; Generation 2 corrects the
 boundary conditions, network coupling, physical units, migration comparison, and
-visualization; Generation 3 asks whether guidance can emerge without prescribing
-a persistent left/right polarity.
+visualization; Generation 3 demonstrates symmetric spheroid-driven radial
+reorganisation; Generation 4 calibrates the elastic ECM interactively, verifies
+crosslink-mediated indirect motion, adds motor-clutch slip, and finally releases
+the rigid cell without a prescribed direction.
 
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
@@ -12,7 +14,8 @@ a persistent left/right polarity.
 ## How the repository is organized
 
 Generation 1 is the conceptual archive; Generation 2 is the corrected mechanism
-baseline; Generation 3 is the active minimal-guidance extension. The default Git
+baseline; Generation 3 is the preserved spheroid-remodelling extension; and
+Generation 4 is the active elastic-calibration-to-motion sequence. The default Git
 branch `main` remains the reviewed catalogue.
 
 - [`VERSION_MAP.md`](VERSION_MAP.md) — branch/tag lineage, permanent folder map
@@ -141,12 +144,41 @@ a deliberately softened matrix: nonlinear strain-stiffening, stress relaxation, 
 pores/nucleus and concentration calibration remain outside scope. The earlier `src/g3/`
 implementation is archived under `legacy/g3_v1_superseded/`.
 
+## Generation 4 — calibrate first, then slip, then move
+
+[`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/)
+implements one cumulative four-stage experiment on a 99-fibre,
+outer-boundary-anchored network:
+
+| Stage | Fixed ingredients | One new question |
+|---|---|---|
+| G4A | fixed rigid cell, deterministic local pull, elastic fibres | how do pull, bending, bead drag, crosslink probability and crosslink stiffness change the response? |
+| G4B | G4A fixed-cell mechanics | do non-contact fibres move only through retained-link graph paths? |
+| G4C | accepted G4B ECM, fixed cell | do effective motor clutches show Bell loading → slip → traction drop → recoil? |
+| G4D | everything in G4C | what changes when only rigid-cell translation and rotation are released? |
+
+The [interactive G4 laboratory](https://gl0008.github.io/motor-clutch-collagen-model/g4-lab.html)
+explains every tuning coefficient on hover/focus, shows every collagen bead and
+spring, renders permanent links explicitly, and labels direct/one-hop/two+-hop
+fibres. G4A sliders select exact Python-precomputed one-coefficient trajectories;
+the browser never interpolates mechanics. G4C and G4D use the same network and
+counter-addressed stochastic proposals, and G4D contains no prescribed `+x`,
+velocity, or `polarity_probability`.
+
+The planning statement about “3–8 fibres, no crosslinks and both ends fixed” is
+preserved in the G4 README and website as the gap found in the **superseded early
+G3 fixtures**. The active G3 was later rebuilt with 120–150 fibres,
+outer-boundary anchoring and reduced link density; G4 formalizes the calibration
+logic without rewriting that history. Plastic crosslink breaking is deliberately
+deferred beyond G4D.
+
 ## Run and test
 
 ```bash
 python3 -m unittest discover -s generations/g2_corrected/v2_crosslink_transmission/tests -v
 python3 -m unittest discover -s generations/g2_corrected/v3_two_sided_migration/tests -v
 python3 -m unittest discover -s generations/g2_corrected/v4_contact_plasticity/tests -v
+python3 -m unittest discover -s generations/g4_interactive_calibration/tests -v
 
 python3 generations/g2_corrected/validate.py
 python3 generations/g2_corrected/v3_two_sided_migration/run.py
@@ -156,6 +188,9 @@ cd generations/g3_spheroid_guidance
 python run.py    --out ../../results/g3_spheroid_guidance/main --fibers 150 --domain 240 \
                  --radius 22 --gap 12 --duration 3600 --dt 0.06 --seed 7
 python render.py --run ../../results/g3_spheroid_guidance/main --out ../../figures/g3_spheroid_guidance
+
+# Generation 4 static-site data (all physics precomputed in Python)
+python3 generations/g4_interactive_calibration/build_demo.py
 ```
 
 For G2, Python precomputes all physics into each `demo/data.js`; the web pages only play saved

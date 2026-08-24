@@ -24,6 +24,10 @@ should only be copied into the repository when redistribution rights are clear.
 | G2 V4 | R1, R2, R11, R12 | new-contact weak-link hypothesis, load–unload control and alternative sliding/merging mechanism |
 | G3 A–C | R1, R5, R13, R15–R18 | bead fibres, Bell kinetics, motor-clutch scales, protrusion feedback, FOI/κ diagnostics, elastic parameter scales and conservative cell contact |
 | Proposed G3-R | R1–R3, R5–R6, R8–R9, R15, R19–R25 | cell-intrinsic polarity, explicit protrusion/adhesion feedback, crosslinked scale-up, nonlinear/relaxing collagen and later pore/nucleus gates; proposal only |
+| G4A | R1–R4, R8, R10 | finite bead fibres, probabilistic intersection-link calibration, microbuckling, traction range and spatial-response metrics |
+| G4B | R1–R3, R10 | crosslink-graph transmission, no-link negative control and spatially decaying indirect reorientation |
+| G4C | R5–R7, R13 | Bell slip hazard, motor–clutch loading and declared effective-clutch starting values |
+| G4D | R6–R9, R15 | reaction-driven motion, unbiased spatial modules, speed comparison and later collagen-guided persistence boundary |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography

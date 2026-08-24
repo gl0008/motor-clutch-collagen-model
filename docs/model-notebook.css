@@ -18,11 +18,13 @@ a{color:var(--teal)}
 .eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#e7b49d}
 .hero.g2 .eyebrow{color:#8fd0c3}
 .hero.g3 .eyebrow{color:#b8c9ff}
+.hero.g4 .eyebrow{color:#efb292}
 .hero h1{font:750 clamp(35px,6vw,66px)/.98 Georgia,serif;margin:10px 0 14px;max-width:850px}
 .hero p{margin:0;color:#d3dee1;font-size:18px;max-width:800px}
 .hero-meta{border-left:3px solid var(--orange);padding-left:17px;color:#d3dee1}
 .hero.g2 .hero-meta{border-color:var(--teal)}
 .hero.g3 .hero-meta{border-color:#7893df}
+.hero.g4 .hero-meta{border-color:#cf6740}
 .hero-meta b{display:block;color:white;margin-bottom:5px}
 .wrap{max-width:1180px;margin:auto;padding:30px 20px 58px}
 .section{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:clamp(19px,3vw,31px);margin-bottom:18px}
