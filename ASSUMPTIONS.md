@@ -43,6 +43,24 @@ Generation 2 baseline.
 
 Full values and provenance are in [`docs/parameter_provenance.md`](docs/parameter_provenance.md).
 
+## Generation 4 assumptions
+
+| ID | Stage | Choice | Evidence / reason | Remaining follow-up |
+|---|---|---|---|---|
+| G4-A1 | A–D | 99 finite fibres, 180 µm field, outer-boundary-only anchoring | inherit the accepted G2-scale geometry so G4 changes topology/contact rather than the whole field at once | use image-derived 3D geometry |
+| G4-A2 | A–D | 3 MPa axial modulus and independently tunable bending multiplier | inherit the active G3 softened realignment fixture; professor requested lower bending | fit shear/tension and time-resolved fibre rotation |
+| G4-A3 | A–D | retain an intersection when a fixed random mark is below `p_x` | avoids G2's every-intersection link while keeping nested, comparable topologies | infer crosslink density/topology from imaging or rheology |
+| G4-A4 | A–D | retained links are permanent, linear and freely hinged | isolates elastic transmission before crosslink breaking/plasticity | add breaking only in a later generation |
+| G4-A5 | A–D | hard 3 µm contact eligibility then Gaussian `sigma=1.5 µm` only on direct fibres | professor-approved hybrid; prevents whole-network Gaussian leakage | fit contact width to cell-surface imaging |
+| G4-A6 | B | indirect fibre has zero active force and is classified by retained-link graph distance | makes indirect realignment falsifiable against `p_x=0` | repeat over network seeds and Euclidean shells |
+| G4-A7 | C–D | 12 symmetric sites × 12 effective clutches; Bell slip law with G2 V3 starting values | Bell/Bangasser/Prahl support the mechanism; existing G2 provides a reproducible starting calibration | fit dwell, force and recoil distributions to videos |
+| G4-A8 | C–D | update a site only when its entire bundle is detached | bound clutches must remain at one material coordinate; professor requested updated sites as fibres/cell move | compare alternative capture/search rules |
+| G4-A9 | D | released rigid cell translates and rotates only from equal-and-opposite ECM reaction | isolates movement without `+x`, prescribed velocity or `polarity_probability` | add persistence feedback only after unbiased ensembles |
+| G4-A10 | A–D | one-coefficient-at-a-time website cases are exact precomputed trajectories | preserves cause/effect and avoids a duplicate browser solver | add multi-parameter response surfaces after one-axis calibration |
+
+Full G4 values, derived slip landmarks and evidence boundaries are in
+[`docs/g4_parameter_provenance.md`](docs/g4_parameter_provenance.md).
+
 ## Important negative result
 
 At the accepted 5 nN baseline, V4 creates only one pair that satisfies the

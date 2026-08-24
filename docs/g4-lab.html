@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 · collagen calibration laboratory</title>
+  <link rel="stylesheet" href="g4-lab.css">
+</head>
+<body>
+<header class="hero">
+  <a class="back" href="index.html">← all model generations</a>
+  <div class="eyebrow">Generation 4 · one cumulative experiment</div>
+  <h1>Calibrate the ECM first. Then add slip. Then release the cell.</h1>
+  <p>Every displayed trajectory was precomputed by the Python bead–spring model. The browser only selects and plays saved data; it does not interpolate or run a second physics engine.</p>
+</header>
+
+<main>
+  <section class="history">
+    <h2>The decision that created G4</h2>
+    <blockquote lang="zh-Hant">G3A/B/C 只有 3–8 條、沒有 crosslink、而且每條 fiber 兩端固定；G2 雖然有 99-fiber outer-boundary network，卻把每個 2D intersection 都設為 crosslink。所以下一版最合理的做法不是直接繼續調 G3，而是保留 G3，建立一個新的 elastic calibration generation：沿用 G2 的網路幾何與 boundary anchoring、G3 的 material-point clutch/contact，再把 crosslink 改成有機率的永久 elastic links。先固定 cell 把 ECM 調對，再恢復 protrusion 與 cell movement。</blockquote>
+    <p class="correction"><b>Version-history correction:</b> this diagnosed the superseded early G3 fixtures. The active G3 was later rebuilt with 120–150 fibres, outer-boundary anchoring and a 0.30 crosslink fraction. G4 preserves the reasoning and turns it into a controlled calibration sequence rather than claiming that it is still the current G3 code.</p>
+  </section>
+
+  <nav class="stage-tabs" aria-label="G4 stages">
+    <button class="active" data-stage="a"><b>G4A</b><span>Tune mechanics</span></button>
+    <button data-stage="b"><b>G4B</b><span>Indirect realignment</span></button>
+    <button data-stage="c"><b>G4C</b><span>Clutch slippage</span></button>
+    <button data-stage="d"><b>G4D</b><span>Release the cell</span></button>
+  </nav>
+
+  <section id="stage-a" class="stage active">
+    <div class="stage-copy">
+      <div><div class="stage-number">G4A</div><h2>Tune the basic mechanics with a fixed cell</h2></div>
+      <p>Change <b>one coefficient at a time</b> around the baseline. This is intentional: if stiffness, drag and link density all change together, a prettier animation cannot tell us which mechanism caused it. Moving any slider selects an exact Python-precomputed trajectory and resets the causal comparison to baseline vs that value.</p>
+    </div>
+    <div class="controls-grid" id="tuningControls">
+      <label class="control"><span>Pull intensity <button class="info" type="button" tabindex="0" data-tip="Total scalar inward force shared by eligible direct contact points. It changes physical loading, not arrow display size.">?</button></span><input type="range" data-axis="pull"><output></output><small>Σ|Factive| among direct contacts; baseline 24 nN.</small></label>
+      <label class="control"><span>Bending multiplier <button class="info" type="button" tabindex="0" data-tip="Multiplies EI/l³ in the discrete curvature force only. Lower values let fibres rotate and unbend more easily without secretly softening axial EA.">?</button></span><input type="range" data-axis="bend"><output></output><small>EI/EI₀; baseline 0.25.</small></label>
+      <label class="control"><span>Bead drag <button class="info" type="button" tabindex="0" data-tip="ζb in ζb·ṙ=ΣF. Higher drag slows the approach and dissipates more power. It does not change the final elastic equilibrium if you wait long enough.">?</button></span><input type="range" data-axis="drag"><output></output><small>nN·s/µm; baseline 180.</small></label>
+      <label class="control"><span>Crosslink probability <button class="info" type="button" tabindex="0" data-tip="Every geometric fibre intersection has a fixed random mark u. The permanent elastic link exists when u&lt;px. Increasing px adds links without reshuffling old ones.">?</button></span><input type="range" data-axis="probability"><output></output><small>fraction of intersections retained; baseline 0.35.</small></label>
+      <label class="control"><span>Crosslink stiffness <button class="info" type="button" tabindex="0" data-tip="kx in Fx=kxδx for each retained material-point link. It changes compliance of a link, not how many links exist.">?</button></span><input type="range" data-axis="link"><output></output><small>nN/µm; baseline 10.</small></label>
+    </div>
+  </section>
+
+  <section id="stage-b" class="stage">
+    <div class="stage-copy">
+      <div><div class="stage-number">G4B</div><h2>Why can an indirect fibre realign?</h2></div>
+      <p><b>Setup, not assumption:</b> Gaussian force is evaluated only after a hard 0–3 µm surface-contact test and is assigned only to the 12 orange direct fibres. An indirect fibre gets zero active force. It can move only when deformation of a permanent material-point crosslink produces <span class="math">F<sub>x</sub>=k<sub>x</sub>δ<sub>x</sub></span>, transferring force through the graph. The left negative control removes all links on the same geometry.</p>
+    </div>
+    <div class="b-controls" role="group" aria-label="G4B mechanical condition">
+      <button data-bcase="b_mobile">linked + low drag</button>
+      <button class="active" data-bcase="b_baseline">linked baseline</button>
+      <button data-bcase="b_constrained">linked + high drag</button>
+    </div>
+    <div class="mechanism-chain"><span>direct contact fibre<br><b>active force</b></span><i>→</i><span>crosslink deformation<br><b>k<sub>x</sub>δ<sub>x</sub></b></span><i>→</i><span>1-hop fibre<br><b>indirect motion</b></span><i>→</i><span>2+-hop fibres<br><b>decaying response</b></span></div>
+    <p class="test-note"><b>Verification:</b> direct, one-hop, two+-hop and unconnected fibres are identified from the actual retained-link graph. Compare their measured displacement and orientation change. If the no-link control moves an indirect class, or linked one-hop fibres remain indistinguishable from unconnected fibres, the proposed transmission mechanism has failed.</p>
+  </section>
+
+  <section id="stage-c" class="stage">
+    <div class="stage-copy">
+      <div><div class="stage-number">G4C</div><h2>Add pulling → stochastic slip → traction drop → recoil</h2></div>
+      <p>The ECM and cell constraint from G4B remain. Each surface site now has 12 effective clutches. A bound clutch loads as <span class="math">F=k<sub>c</sub>x</span>; the Bell off-rate grows continuously as <span class="math">k<sub>off</sub>=k<sub>off</sub><sup>0</sup>e<sup>F/F<sub>b</sub></sup></span>. There is no hard “too long” threshold: larger extension or force makes detachment increasingly likely at every time step.</p>
+    </div>
+    <div class="slip-cards">
+      <article><b>0 nN</b><span>x = 0 µm</span><strong>38.5 s</strong><small>median lifetime at constant force</small></article>
+      <article><b>1.5 nN = F<sub>b</sub></b><span>x = 0.75 µm</span><strong>14.2 s</strong><small>median lifetime; hazard ×e</small></article>
+      <article><b>3.0 nN = 2F<sub>b</sub></b><span>x = 1.50 µm</span><strong>5.2 s</strong><small>median lifetime; hazard ×e²</small></article>
+    </div>
+    <p class="provenance"><b>Why these defaults?</b> <span>k<sub>c</sub>=2 nN/µm, k<sub>on</sub>=0.055 s⁻¹, k<sub>off</sub><sup>0</sup>=0.018 s⁻¹, F<sub>b</sub>=1.5 nN, v<sub>0</sub>=0.025 µm/s and F<sub>stall</sub>=8 nN/site</span> are inherited from the repository's G2 V3 <em>effective-clutch</em> mechanism calibration. Bell supports the exponential force sensitivity; Bangasser &amp; Odde support motor–clutch loading; Prahl supports opposing modules. These exact coarse-grained nN values are starting values to sweep against experimental pulling/slip/recoil videos, not direct single-integrin measurements.</p>
+  </section>
+
+  <section id="stage-d" class="stage">
+    <div class="stage-copy">
+      <div><div class="stage-number">G4D</div><h2>Yes: everything in G4C, plus a released rigid cell</h2></div>
+      <p>The left and right runs have the same geometry, permanent links, motor–clutch parameters and proposed random events. G4C constrains the cell centre and angle; G4D alone integrates the equal-and-opposite ECM reaction. No direction, +x force, velocity, or polarization probability is prescribed.</p>
+    </div>
+    <div class="equation-strip"><span><b>ECM</b> ζ<sub>b</sub>ṙ<sub>i</sub> = ΣF<sub>i</sub></span><span><b>translation</b> γ<sub>c</sub>ṙ<sub>c</sub> = −ΣF<sub>active</sub><br><small>γ<sub>c</sub>=600 nN·s/µm keeps the 12-site path speed in the existing 0.2–0.4 µm/min mechanism target.</small></span><span><b>rotation</b> γ<sub>θ</sub>θ̇ = Σ(a−r<sub>c</sub>)×F<sub>reaction</sub></span></div>
+  </section>
+
+  <section class="lab" aria-label="interactive precomputed G4 trajectories">
+    <div class="lab-head">
+      <div><div class="eyebrow dark">Synchronized model view</div><h2 id="labTitle">G4A · baseline versus tuned coefficient</h2></div>
+      <div class="playback">
+        <button id="play" aria-label="play or pause">Pause</button>
+        <button id="step" aria-label="advance one frame">Step</button>
+        <label>speed <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+        <label>view <select id="view"><option value="near">near cell</option><option value="full">full field</option></select></label>
+      </div>
+    </div>
+    <input id="scrub" type="range" min="0" max="30" value="0" aria-label="animation time">
+    <div class="time-row"><b id="time">t = 0 s</b><span>solid = current fibre · faint = initial fibre · arrows are display-capped so they do not cover motion</span></div>
+    <div class="panels">
+      <article class="panel"><h3 id="leftTitle">baseline</h3><canvas id="leftCanvas" width="720" height="600"></canvas><div id="leftMetrics" class="metrics"></div></article>
+      <article class="panel"><h3 id="rightTitle">tuned</h3><canvas id="rightCanvas" width="720" height="600"></canvas><div id="rightMetrics" class="metrics"></div></article>
+    </div>
+    <div class="legend">
+      <span><i class="bead"></i> bead + spring fibre</span><span><i class="link"></i> permanent material-point crosslink</span><span><i class="direct"></i> direct cell contact</span><span><i class="one"></i> one-hop indirect</span><span><i class="two"></i> two+-hop</span><span><i class="anchor"></i> outer-boundary anchor</span>
+    </div>
+    <div class="plots"><canvas id="plot" width="1440" height="300"></canvas></div>
+  </section>
+
+  <section class="equations">
+    <div><div class="eyebrow dark">Implemented physics</div><h2>What the code solves</h2></div>
+    <article class="key"><b>KEY · overdamped bead force balance</b><p>ζ<sub>b</sub>ṙ<sub>i</sub> = F<sub>stretch</sub> + F<sub>bend</sub> + F<sub>crosslink</sub> + F<sub>repulsion</sub> + F<sub>active</sub></p><small>Drag dissipates motion; the springs and links store elastic energy. No SLS appears in G4.</small></article>
+    <article><b>probabilistic but permanent links</b><p>link exists ⇔ u<sub>intersection</sub> &lt; p<sub>x</sub>; &nbsp; F<sub>x</sub>=k<sub>x</sub>[(p<sub>b</sub>−p<sub>a</sub>)−ℓ<sub>x</sub><sup>0</sup>]</p><small>The probability sets initial topology. Retained G4 links do not break.</small></article>
+    <article><b>hybrid direct coupling</b><p>0≤d<sub>surface</sub>≤3 µm, then w<sub>m</sub>∝exp(−d<sub>m</sub>²/σ<sub>c</sub>²), σ<sub>c</sub>=1.5 µm</p><small>Gaussian weighting never reaches an indirect fibre.</small></article>
+    <article class="key"><b>KEY · stochastic Bell slip</b><p>P<sub>off</sub>=1−exp[−k<sub>off</sub><sup>0</sup>exp(F/F<sub>b</sub>)Δt]</p><small>“Too long/heavy” means higher probability, not a deterministic cutoff.</small></article>
+  </section>
+
+  <section class="references">
+    <h2>Paper support and evidence boundary</h2>
+    <ul>
+      <li><a href="https://doi.org/10.1371/journal.pone.0111896">Lee et al. (2014)</a> — finite bead–spring collagen fibres and intersection links; does not choose G4's exact link probability.</li>
+      <li><a href="https://doi.org/10.1016/j.bpj.2014.08.029">Abhilash et al. (2014)</a> and <a href="https://doi.org/10.1016/j.bpj.2014.09.044">Wang et al. (2014)</a> — contractile cells reorganize fibrous networks and transmit force nonlocally; do not prove this 2D parameter set.</li>
+      <li><a href="https://doi.org/10.1126/science.347575">Bell (1978)</a> — exponential force-dependent slip-bond kinetics; does not validate an effective nN clutch as one molecule.</li>
+      <li><a href="https://doi.org/10.1007/s12195-013-0296-5">Bangasser &amp; Odde (2013)</a> and <a href="https://doi.org/10.1016/j.bpj.2020.01.048">Prahl et al. (2020)</a> — motor–clutch load-and-fail dynamics and opposing modules; exact G4 values remain calibration assumptions.</li>
+    </ul>
+    <p><a href="model-notebook.html?model=g4-a">Open the complete G4A notebook and equation record →</a></p>
+  </section>
+</main>
+<footer>G1–G3 are preserved. G4A–D add one identifiable mechanism at a time; plastic remodelling is deliberately deferred.</footer>
+<script src="g4-demo-data.js"></script>
+<script src="g4-lab.js"></script>
+</body>
+</html>

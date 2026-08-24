@@ -1,5 +1,5 @@
 (function(){
-  const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4','g3'];
+  const order=['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4','g2-v2','g2-v3','g2-v4','g3','g4-a','g4-b','g4-c','g4-d'];
   const query=new URLSearchParams(location.search);
   const requested=(query.get('model')||'').replace(/;+$/,'');
   const id=NOTEBOOK_MODELS[requested]?requested:'g2-v2';
@@ -12,6 +12,7 @@
   document.title=`${modelLabel(model)} · ${model.title}`;
   document.querySelector('#hero').classList.toggle('g2',model.generation==='G2');
   document.querySelector('#hero').classList.toggle('g3',model.generation==='G3');
+  document.querySelector('#hero').classList.toggle('g4',model.generation==='G4');
   document.querySelector('#eyebrow').textContent=`${modelLabel(model)} · ${model.status}`;
   document.querySelector('#title').textContent=model.title;
   document.querySelector('#subtitle').textContent=model.subtitle;
