@@ -14,8 +14,11 @@ G1 V0  →  G1 V1  →  G1 V2  →  G1 V3  →  G1 V4
                                                        └── G3 emergent guidance
                                                             G3 spheroid remodelling
                                                                  │
-                                                                 └── G4 calibration
+                                                                 └── G4 calibration v1 (preserved)
                                                                       G4A → G4B → G4C → G4D
+                                                                                  │
+                                                                                  └── G4 v2 long-time/multiscale
+                                                                                       G4A → G4B → G4C → G4D
 ```
 
 Generation 1 is the conceptual mainline: it records how the question developed
@@ -26,7 +29,9 @@ visual encoding. Generation 3 preserves G2 as evidence and replaces its prescrib
 directional imbalance with spatial clutches and unbiased protrusion feedback.
 Generation 4 preserves G3 and formalizes the next calibration sequence: tune
 elastic ECM, verify indirect graph transmission, add slippage, then release the
-rigid cell.
+rigid cell. G4 v1 is the short-time implementation; G4 v2 branches from it and
+adds two-hour observation, multiscale rendering, explicit individual-clutch
+state, a shared-load alternative and fixed/moving/mobile-ECM controls.
 
 The repository's default Git branch remains `main` because it is the published
 catalogue and GitHub Pages source. It contains both generations so that the
@@ -41,6 +46,7 @@ website can compare them. This does **not** mean that G2 overwrote G1.
 | `generation/g2` | Corrected branch descended from G1 | may receive later G2-only work |
 | `codex/g3-emergent-guidance` | Historical G3 construction branch | preserved implementation history |
 | `agent/g4-interactive-calibration` | G4A–D construction/review branch | merge after tests and site validation |
+| `agent/g4-v2-multiscale` | G4 v2 long-time/multiscale construction branch | merge after tests and site validation |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
 | `g2-v2` … `g2-v4` | Stable pointers to the documented corrected release | immutable tags |
 
@@ -68,10 +74,11 @@ are not scientific model versions.
 | G2 V4 | [`generations/g2_corrected/v4_contact_plasticity/`](generations/g2_corrected/v4_contact_plasticity/) | [`?model=g2-v4`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g2-v4) | `g2-v4` |
 | G3 active spheroid | [`generations/g3_spheroid_guidance/`](generations/g3_spheroid_guidance/) | [`?model=g3`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g3) | preserved current G3 |
 | G3 early fixtures | [`legacy/g3_v1_superseded/`](legacy/g3_v1_superseded/) | historical notebook data retained | superseded archive |
-| G4A | [`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/) | [`?model=g4-a`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g4-a) | pending reviewed G4 tag |
-| G4B | [`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/) | [`?model=g4-b`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g4-b) | pending reviewed G4 tag |
-| G4C | [`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/) | [`?model=g4-c`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g4-c) | pending reviewed G4 tag |
-| G4D | [`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/) | [`?model=g4-d`](https://gl0008.github.io/motor-clutch-collagen-model/model-notebook.html?model=g4-d) | pending reviewed G4 tag |
+| G4 v1 A–D | [`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/) | [preserved G4 v1 lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-lab.html) | preserved short-time generation |
+| G4 v2 A | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [mechanics calibration](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#a) | current long-time generation |
+| G4 v2 B | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [realignment paths](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#b) | current long-time generation |
+| G4 v2 C | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [clutch failure](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#c) | current long-time generation |
+| G4 v2 D | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [fixed/moving cell](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#d) | current long-time generation |
 
 ## Rule for adding a future model
 

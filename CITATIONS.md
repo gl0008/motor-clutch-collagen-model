@@ -200,3 +200,30 @@ coarse-grained defaults into a fit; assumptions remain explicit in
     - Motivates later local-pore and phenotype validation; it does not map the
       current eight-fibre fixture or 99-fibre planar network to a collagen
       concentration.
+
+26. **Riching et al. (2014), “3D Collagen Alignment Limits Protrusions to
+    Enhance Breast Cancer Cell Persistence.”** Biophysical Journal 107:2546–2558.
+    [PMCID: PMC4255204](https://pmc.ncbi.nlm.nih.gov/articles/PMC4255204/)
+    - Supports observing single breast-cancer-cell collagen displacement over
+      roughly two hours with four-minute image intervals.
+    - It does not calibrate the present 2-D topology, bead drag or pull; G4 v2
+      adopts the observation scale, not a fitted trajectory.
+
+27. **Erdmann & Schwarz (2004), “Adhesion clusters under shared linear
+    loading: a stochastic analysis.”**
+    [arXiv:cond-mat/0403552](https://arxiv.org/abs/cond-mat/0403552)
+    - Supports a birth–death cluster in which total load is redistributed among
+      the closed bonds, increasing remaining-bond hazard after rupture while
+      also permitting rebinding.
+    - It does not determine G4 v2's effective-clutch number, force scale or
+      time-dependent motor loading; those remain coarse-grained defaults.
+
+28. **Gao, Qian & Chen (2011), “Probing mechanical principles of focal
+    contacts in cell–matrix adhesion with a coupled stochastic–elastic
+    modelling framework.”** Journal of the Royal Society Interface 8:1217–1232.
+    [PMCID: PMC3140725](https://pmc.ncbi.nlm.nih.gov/articles/PMC3140725/)
+    - Provides a cell-adhesion context for stochastic receptor–ligand clusters
+      with load sharing, rupture and rebinding.
+    - It does not establish that G4 v2's equal-load-sharing closure is the
+      unique molecular mechanism in collagen; the independent baseline is
+      retained beside it for this reason.

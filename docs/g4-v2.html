@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 v2 · multiscale collagen and clutch laboratory</title>
+  <link rel="stylesheet" href="g4-v2.css?v=20260901">
+</head>
+<body>
+<header class="hero">
+  <div class="toplinks"><a href="index.html">← all generations</a><div class="version-switch"><a href="g4-lab.html">G4 v1 · original short lab</a><b>G4 v2 · multiscale</b></div></div>
+  <div class="eyebrow">Generation 4 · version 2 · single-cell mechanism laboratory</div>
+  <h1>Keep the biology. Change the observation scale.</h1>
+  <p>The cell remains a 10 µm-radius single cell and the physical coefficients remain in the declared G4 range. What changes is what we can observe: two-hour collagen mechanics, a local displacement microscope, and a 20-second clutch-failure microscope.</p>
+  <div class="hero-facts"><span><b>2 h</b> ECM response</span><span><b>30 min</b> clutch overview</span><span><b>20 s</b> failure event</span><span><b>0</b> prescribed polarity</span></div>
+</header>
+
+<main>
+  <section class="why">
+    <div><div class="section-kicker">Why G4 v1 looked static</div><h2>The mechanism was moving, but the picture could not resolve it.</h2></div>
+    <div class="why-grid">
+      <article><b>Time mismatch</b><p>G4 v1 showed 2–5 minutes. MDA-MB-231 collagen displacement experiments commonly compare two-hour records with four-minute imaging intervals.</p></article>
+      <article><b>Subpixel indirect motion</b><p>One-hop fibres moved orders of magnitude less than directly pulled fibres. At a 180 µm full-field view, much of that response was below one screen pixel.</p></article>
+      <article><b>Hidden individual slips</b><p>Five-second website frames skipped many stochastic events, and only total bound count was saved. A rupture could not be assigned to a site or clutch.</p></article>
+      <article><b>Parallel redundancy</b><p>Twelve independent clutches let one clutch fail while eleven continue carrying load. That is a slip, but not a visible loss of the whole attachment.</p></article>
+    </div>
+  </section>
+
+  <nav class="stage-tabs" aria-label="G4 v2 stages">
+    <button class="active" data-stage="a"><b>G4A v2</b><span>2 h calibration</span></button>
+    <button data-stage="b"><b>G4B v2</b><span>realignment paths</span></button>
+    <button data-stage="c"><b>G4C v2</b><span>visible failure</span></button>
+    <button data-stage="d"><b>G4D v2</b><span>release cell</span></button>
+  </nav>
+
+  <section id="stage-a" class="stage active">
+    <div class="stage-head"><div><div class="stage-code">G4A v2</div><h2>Fixed-cell mechanics calibration</h2></div><p>Every slider selects one exact Python trajectory against the same baseline. Values snap to precomputed points, so the browser never invents or interpolates mechanics.</p></div>
+    <div class="controls" id="aControls">
+      <label><span>Active pull <button class="info" data-tip="Total inward force distributed only among eligible cell-surface material points. Higher pull increases real loading; it is not an arrow-size control.">?</button></span><input type="range" data-axis="pull"><output></output><small>nN</small></label>
+      <label><span>Bending stiffness <button class="info" data-tip="Multiplier on the discrete EI/l³ curvature force. Lower values let a fibre rotate or unbend more readily without changing axial EA.">?</button></span><input type="range" data-axis="bend"><output></output><small>× EI₀</small></label>
+      <label><span>Axial stiffness <button class="info" data-tip="Collagen Young's modulus used in EA/l₀. It changes resistance to bond extension and compression, not crosslink density.">?</button></span><input type="range" data-axis="stretch"><output></output><small>MPa</small></label>
+      <label><span>Bead drag <button class="info" data-tip="ζb in ζb ṙ=ΣF. Higher drag slows the approach to equilibrium and increases viscous dissipation, but does not create a new elastic equilibrium.">?</button></span><input type="range" data-axis="drag"><output></output><small>nN·s/µm</small></label>
+      <label><span>Crosslink probability <button class="info" data-tip="Each geometric intersection has a fixed random mark u. A permanent link is retained when u&lt;px, so higher probability adds links without reshuffling earlier ones.">?</button></span><input type="range" data-axis="probability"><output></output><small>fraction</small></label>
+      <label><span>Crosslink stiffness <button class="info" data-tip="kx in Fx=kxδx at a retained material-point link. This changes how strongly a link transmits deformation, not how many links exist.">?</button></span><input type="range" data-axis="link"><output></output><small>nN/µm</small></label>
+      <label><span>Contact width σc <button class="info" data-tip="Gaussian width used only after a hard 0–3 µm cell-surface eligibility test. It redistributes force among direct contacts and never acts on the whole network.">?</button></span><input type="range" data-axis="sigma"><output></output><small>µm</small></label>
+    </div>
+    <div class="condition-row"><b>ECM boundary</b><button class="choice active" data-acase="a_baseline">anchored outer band · primary</button><button class="choice" data-acase="a_mobile_boundary">mobile-boundary control</button><span>Use the control to detect whole-network drift; do not call drift realignment.</span></div>
+    <p class="however"><b>HOWEVER → G4B:</b> coefficient sensitivity alone cannot prove why a non-contact fibre moves. The next stage classifies fibres by the actual retained-crosslink graph.</p>
+  </section>
+
+  <section id="stage-b" class="stage">
+    <div class="stage-head"><div><div class="stage-code">G4B v2</div><h2>Trace indirect realignment through real links</h2></div><p>Only direct orange fibres receive active force. One-hop and two+-hop fibres receive force exclusively through permanent crosslinks, stretching and bending.</p></div>
+    <div class="mechanism"><span>cell-surface material point<br><b>Gaussian-weighted direct pull</b></span><i>→</i><span>retained crosslink<br><b>F<sub>x</sub>=k<sub>x</sub>δ<sub>x</sub></b></span><i>→</i><span>one-hop fibre<br><b>indirect displacement + rotation</b></span><i>→</i><span>two+-hop network<br><b>decaying response</b></span></div>
+    <div class="condition-row"><b>Comparison</b><button class="choice" data-bcase="b_no_links">no links · negative control</button><button class="choice active" data-bcase="b_linked">linked · anchored</button><button class="choice" data-bcase="b_mobile_boundary">linked · mobile ECM</button></div>
+    <p class="verification"><b>Pass condition:</b> one-hop displacement/orientation must exceed the unconnected control, and the displayed force path must contain real crosslinks. Geometry, initial fibre positions and direct contacts stay identical.</p>
+    <p class="however"><b>HOWEVER → G4C:</b> the cell force is still deterministic. It cannot display load-dependent attachment loss, traction drop or recoil.</p>
+  </section>
+
+  <section id="stage-c" class="stage">
+    <div class="stage-head"><div><div class="stage-code">G4C v2</div><h2>Independent slips versus shared-load cluster failure</h2></div><p>Both panels receive the same counter-addressed random proposals. The only changed hypothesis is whether bound clutches carry their own extension or share one site load.</p></div>
+    <div class="compare-models">
+      <article><h3>Independent baseline</h3><p>Each bound clutch has its own extension and Bell rate. One rupture removes one spoke; the other clutches are not assigned its load.</p><div class="formula">k<sub>off,j</sub>=k<sub>off</sub><sup>0</sup> exp(F<sub>j</sub>/F<sub>b</sub>)</div></article>
+      <article class="key"><h3>Shared-load cluster</h3><p>If (i) clutches remain, the site load is divided among them. One rupture raises the load and hazard on every survivor, allowing a cascade.</p><div class="formula">r<sub>i</sub>=i k<sub>off</sub><sup>0</sup> exp[F<sub>site</sub>/(iF<sub>b</sub>)]</div></article>
+    </div>
+    <div class="condition-row"><b>Time lens</b><button class="choice active" data-cview="overview">30 min overview</button><button class="choice" data-cview="event">20 s event microscope</button><span id="ensembleNote"></span></div>
+    <div class="defaults"><span><b>N</b> 12/site</span><span><b>k<sub>c</sub></b> 2 nN/µm</span><span><b>k<sub>on</sub></b> 0.055 s⁻¹</span><span><b>k<sub>off</sub><sup>0</sup></b> 0.018 s⁻¹</span><span><b>F<sub>b</sub></b> 1.5 nN</span><span><b>F<sub>stall</sub></b> 8 nN/site</span></div>
+    <p class="verification"><b>Interpretation:</b> these remain effective-clutch defaults, not single-integrin measurements. A single broken spoke is an individual slip. The entire cell–collagen site disappears only when (N_{bound}=0), after which the fibre may recoil and the site may later rebind.</p>
+    <p class="however"><b>HOWEVER → G4D:</b> G4C computes the equal-and-opposite reaction but constrains the cell centre and rotation.</p>
+  </section>
+
+  <section id="stage-d" class="stage">
+    <div class="stage-head"><div><div class="stage-code">G4D v2</div><h2>Release the rigid cell without assigning a direction</h2></div><p>The left cell remains fixed. The right cell integrates reaction-force translation and torque. Network, links, clutch parameters and random stream remain matched.</p></div>
+    <div class="condition-row"><b>Released condition</b><button class="choice active" data-dcase="d_moving">moving cell · anchored ECM</button><button class="choice" data-dcase="d_mobile_ecm">moving cell · mobile ECM control</button></div>
+    <div class="mechanism"><span>asymmetric surviving sites<br><b>traction imbalance</b></span><i>→</i><span>ECM reaction<br><b>−ΣF<sub>active</sub></b></span><i>→</i><span>overdamped rigid body<br><b>γ<sub>c</sub>ṙ<sub>c</sub>=−ΣF</b></span><i>→</i><span>cell path<br><b>emergent, not prescribed</b></span></div>
+    <p class="verification"><b>Control logic:</b> anchored ECM distinguishes cell translation from global matrix drift. No (+x) force, preferred velocity or polarization probability is present.</p>
+  </section>
+
+  <section class="lab" aria-label="G4 v2 precomputed interactive trajectories">
+    <div class="lab-head"><div><div class="section-kicker light">Lazy-loaded Python results</div><h2 id="labTitle">G4A v2 · baseline vs selected coefficient</h2></div><div id="loadState" role="status">loading selected case…</div></div>
+    <div class="lab-controls">
+      <button id="play">Pause</button><button id="step">Step</button>
+      <label>speed <select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+      <label>view <select id="view"><option value="full">full 180 µm</option><option value="near">near cell</option></select></label>
+      <label>colour <select id="colour"><option value="graph">crosslink distance</option><option value="angle">orientation change Δθ</option></select></label>
+      <label>displacement arrows <select id="dispScale"><option value="1">1×</option><option value="10">10×</option><option value="50">50×</option></select></label>
+    </div>
+    <input id="scrub" type="range" min="0" max="1" value="0" aria-label="animation time">
+    <div class="time-row"><b id="timeLabel">t = 0</b><span id="scaleNotice">geometry 1× · displacement arrows 1×</span></div>
+    <div class="panels">
+      <article><h3 id="leftTitle">baseline</h3><canvas id="leftCanvas" width="760" height="610"></canvas><div class="metrics" id="leftMetrics"></div></article>
+      <article><h3 id="rightTitle">selected</h3><canvas id="rightCanvas" width="760" height="610"></canvas><div class="metrics" id="rightMetrics"></div></article>
+    </div>
+    <div class="legend"><span><i class="bead"></i> bead–spring collagen</span><span><i class="link"></i> permanent crosslink</span><span><i class="direct"></i> direct</span><span><i class="one"></i> one-hop</span><span><i class="two"></i> two+-hop</span><span><i class="anchor"></i> outer anchor</span><span><i class="rupture"></i> clutch rupture</span></div>
+    <canvas id="plot" width="1520" height="300" aria-label="synchronized quantitative plot"></canvas>
+  </section>
+
+  <section class="equations">
+    <div class="equation-head"><div class="section-kicker">Complete implemented equation record</div><h2>What every stage actually solves</h2><p>Orange-bordered equations are the shortest explanation of the mechanism; the remaining equations are still part of the implementation.</p></div>
+    <article class="key"><b>KEY · overdamped ECM balance</b><div class="formula">ζ<sub>b</sub> ṙ<sub>i</sub> = F<sub>stretch</sub> + F<sub>bend</sub> + F<sub>crosslink</sub> + F<sub>repulsion</sub> + F<sub>active</sub></div><p>Drag dissipates motion; collagen bonds and links store elastic energy. No SLS material memory is present.</p></article>
+    <article><b>Axial bead–spring force</b><div class="formula">F<sub>ij</sub> = (EA/ℓ<sub>ij</sub><sup>0</sup>)(ℓ<sub>ij</sub>−ℓ<sub>ij</sub><sup>0</sup>) ê<sub>ij</sub></div><p>Compression uses 10% of tensile stiffness to represent fibre microbuckling.</p></article>
+    <article><b>Discrete bending</b><div class="formula">E<sub>b</sub> = ½(EI/ℓ³) ‖r<sub>i−1</sub>−2r<sub>i</sub>+r<sub>i+1</sub>−κ<sub>i</sub><sup>0</sup>‖²</div><p>The initial curved fibre is stress free; bending penalizes curvature change.</p></article>
+    <article><b>Permanent material-point link</b><div class="formula">F<sub>x</sub> = k<sub>x</sub>[(p<sub>b</sub>−p<sub>a</sub>)−ℓ<sub>x</sub><sup>0</sup>], &nbsp; link ⇔ u&lt;p<sub>x</sub></div><p>Probability chooses initial topology. G4 v2 links do not break or remodel.</p></article>
+    <article class="key"><b>KEY · hybrid cell coupling</b><div class="formula">0≤d<sub>surface</sub>≤3 µm, then w<sub>m</sub>∝exp(−d<sub>m</sub>²/σ<sub>c</sub>²)</div><p>Hard contact defines eligibility; Gaussian weights only direct material points.</p></article>
+    <article><b>Radial order</b><div class="formula">S<sub>r</sub> = ⟨2(t̂·r̂)²−1⟩</div><p>(+1) is radial, (−1) tangential. Orientation change uses nematic angle, so reversing a fibre does not change its direction.</p></article>
+    <article><b>Independent Bell slip</b><div class="formula">P<sub>off,j</sub> = 1−exp{−k<sub>off</sub><sup>0</sup> exp(F<sub>j</sub>/F<sub>b</sub>) Δt}</div><p>There is no deterministic “too long” cutoff; force continuously increases rupture probability.</p></article>
+    <article class="key"><b>KEY · equal-load-sharing cluster</b><div class="formula">f<sub>i</sub>=F<sub>site</sub>/i, &nbsp; r<sub>i</sub>=i k<sub>off</sub><sup>0</sup> exp[F<sub>site</sub>/(iF<sub>b</sub>)]</div><p>After one rupture, (i) decreases and survivor hazard rises. Complete detachment is the first passage to (i=0).</p></article>
+    <article><b>Binding and motor feedback</b><div class="formula">g<sub>i</sub>=(N−i)k<sub>on</sub>, &nbsp; v<sub>a</sub>=v<sub>0</sub> max(0,1−F<sub>site</sub>/F<sub>stall</sub>)</div><p>Rebinding can rescue a partially failed cluster; collective failure is possible, not guaranteed.</p></article>
+    <article><b>Released rigid cell</b><div class="formula">γ<sub>c</sub>ṙ<sub>c</sub>=−ΣF<sub>cell→ECM</sub>, &nbsp; γ<sub>θ</sub>θ̇=Σ(r<sub>i</sub>−r<sub>c</sub>)×(−F<sub>i</sub>)</div><p>Translation and rotation emerge from reaction-force imbalance.</p></article>
+  </section>
+
+  <section class="references">
+    <div class="section-kicker">Evidence boundary</div><h2>References used in G4 v2</h2>
+    <ul>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4255204/">Riching et al. (2014)</a> — MDA-MB-231 collagen displacement recorded for two hours at four-minute intervals; supports observation scale, not the exact G4 coefficients.</li>
+      <li><a href="https://arxiv.org/abs/cond-mat/0403552">Erdmann &amp; Schwarz (2004)</a> — stochastic adhesion clusters under shared linear loading; supports the (i\to i-1) load-sharing rupture equation.</li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3140725/">Gao et al. (2011)</a> — coupled stochastic–elastic focal contacts and catastrophic failure after load redistribution; supports the comparison hypothesis, not a guaranteed avalanche.</li>
+      <li><a href="https://doi.org/10.1126/science.347575">Bell (1978)</a> — exponential force-dependent slip-bond hazard.</li>
+      <li><a href="https://doi.org/10.1371/journal.pone.0111896">Lee et al. (2014)</a>, <a href="https://doi.org/10.1016/j.bpj.2014.08.029">Abhilash et al. (2014)</a>, and <a href="https://doi.org/10.1016/j.bpj.2014.09.044">Wang et al. (2014)</a> — bead–spring fibrous networks, links, nonlocal force transmission and cell-driven reorganization.</li>
+    </ul>
+    <p><b>Deliberately absent:</b> SLS, crosslink breaking, plastic rest-state reset, nonlinear strain stiffening, proteolysis, cell deformation, nucleus and 3D pore constraints. G4 v2 remains an elastic single-cell mechanism calibration.</p>
+  </section>
+</main>
+<footer>G4 v1 is preserved · G4 v2 changes observation scale and clutch-load sharing · generated frames remain separate from the explanation.</footer>
+<script src="g4-v2-manifest.js?v=20260901"></script>
+<script src="g4-v2.js?v=20260901"></script>
+</body>
+</html>

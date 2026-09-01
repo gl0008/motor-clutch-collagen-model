@@ -61,6 +61,28 @@ Full values and provenance are in [`docs/parameter_provenance.md`](docs/paramete
 Full G4 values, derived slip landmarks and evidence boundaries are in
 [`docs/g4_parameter_provenance.md`](docs/g4_parameter_provenance.md).
 
+## Generation 4 v2 assumptions
+
+G4 v1 above is preserved unchanged. G4 v2 keeps its elastic network and extends
+the observation window and clutch outputs; it is a new generation folder, not a
+silent recalibration of the archived trajectories.
+
+| ID | Stage | Choice | Evidence / reason | Remaining follow-up |
+|---|---|---|---|---|
+| G4V2-A1 | A–D | Single rigid cell of radius 10 µm; no organoid rescaling | isolates whether the missing visual response came from observation/encoding rather than changing the biological object | replace with measured cell-size distribution for the intended experiment |
+| G4V2-A2 | A–B/D | 2 h simulation; overview sampled every 4 min | matches the order and acquisition interval of the single-cell collagen-displacement experiment in Riching et al. (R26) | reproduce the exact experimental imaging protocol and field size |
+| G4V2-A3 | A–D | Geometry is always drawn at true scale; arrows may be 1×, 10× or 50× | graph-mediated displacements can be real but subpixel in a 180 µm field | report numerical displacement beside every visual magnification |
+| G4V2-A4 | A–D | Crosslinks remain permanent, linear and probabilistic; mobile outer boundary is a control | preserves the requested elastic calibration before breaking or plastic remodeling | calibrate link topology and boundary condition from imaging/rheology |
+| G4V2-A5 | B | Non-contact fibres receive no active Gaussian force and move only through retained crosslink, stretch and bend forces | makes indirect realignment a testable graph-transmission mechanism | repeat over network seeds and 3-D geometries |
+| G4V2-A6 | C–D | Independent and shared-load clutch hypotheses are displayed side by side | Bell/Bangasser support force-accelerated rupture; Erdmann–Schwarz and Gao et al. (R27–R28) motivate load redistribution and collective failure | fit cluster size, rebinding and force scales to the intended adhesion data |
+| G4V2-A7 | C–D | While a site is attached, its effective stiffness is `N k_c`; total force is shared equally by its `i` bound clutches | explicit coarse-grained closure that keeps the site loading law defined as `i` changes | compare constant-site versus `i k_c` stiffness after calibration |
+| G4V2-A8 | C | 200 isolated-site trials select the animation seed nearest the median first-failure time | shows a representative event without selecting an extreme cascade and avoids rerunning a full ECM network 200 times | validate cluster-lifetime distributions in the fully coupled network |
+| G4V2-A9 | D | Cell translation and rotation use ECM reaction forces only; no polarity parameter | tests whether geometry and stochastic attachment imbalance alone move the cell | add measured intracellular polarity only if unbiased mechanics is insufficient |
+| G4V2-A10 | A–D | Plasticity, crosslink rupture, fibre sliding, proteolysis, cell deformation and Brownian forcing remain absent | keeps G4 v2 focused on long-time elastic mechanics plus clutch detachment | add each mechanism as a separately testable later generation |
+
+Full equations, parameter ranges, tooltip definitions and source links are in
+[`generations/g4_v2_multiscale/README.md`](generations/g4_v2_multiscale/README.md).
+
 ## Important negative result
 
 At the accepted 5 nN baseline, V4 creates only one pair that satisfies the

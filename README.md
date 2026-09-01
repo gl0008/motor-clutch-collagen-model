@@ -15,8 +15,9 @@ the rigid cell without a prescribed direction.
 
 Generation 1 is the conceptual archive; Generation 2 is the corrected mechanism
 baseline; Generation 3 is the preserved spheroid-remodelling extension; and
-Generation 4 is the active elastic-calibration-to-motion sequence. The default Git
-branch `main` remains the reviewed catalogue.
+Generation 4 is the active elastic-calibration-to-motion sequence. Its short-time
+v1 remains archived beside v2, which adds long-time, multiscale and explicit
+clutch-failure views. The default Git branch `main` remains the reviewed catalogue.
 
 - [`VERSION_MAP.md`](VERSION_MAP.md) — branch/tag lineage, permanent folder map
   and the rule that prevents versions from overwriting one another;
@@ -146,8 +147,11 @@ implementation is archived under `legacy/g3_v1_superseded/`.
 
 ## Generation 4 — calibrate first, then slip, then move
 
-[`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/)
-implements one cumulative four-stage experiment on a 99-fibre,
+The preserved **G4 v1** implementation is in
+[`generations/g4_interactive_calibration/`](generations/g4_interactive_calibration/).
+The current **G4 v2** branch is in
+[`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/). Both implement
+the same cumulative four-stage experiment on a 99-fibre,
 outer-boundary-anchored network:
 
 | Stage | Fixed ingredients | One new question |
@@ -157,13 +161,15 @@ outer-boundary-anchored network:
 | G4C | accepted G4B ECM, fixed cell | do effective motor clutches show Bell loading → slip → traction drop → recoil? |
 | G4D | everything in G4C | what changes when only rigid-cell translation and rotation are released? |
 
-The [interactive G4 laboratory](https://gl0008.github.io/motor-clutch-collagen-model/g4-lab.html)
-explains every tuning coefficient on hover/focus, shows every collagen bead and
-spring, renders permanent links explicitly, and labels direct/one-hop/two+-hop
-fibres. G4A sliders select exact Python-precomputed one-coefficient trajectories;
-the browser never interpolates mechanics. G4C and G4D use the same network and
-counter-addressed stochastic proposals, and G4D contains no prescribed `+x`,
-velocity, or `polarity_probability`.
+The website keeps both labs selectable: [G4 v1](https://gl0008.github.io/motor-clutch-collagen-model/g4-lab.html)
+and [G4 v2](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html).
+G4 v2 explains every tuning coefficient on hover/focus, runs G4A/B/D for two
+hours, and adds a near-cell zoom plus 1×/10×/50× displacement arrows. Geometry
+never changes scale. G4C compares independent and shared-load clutch hypotheses
+and includes a 20-second, 0.1-second-resolution event microscope. The browser
+only lazy-loads Python-precomputed trajectories; it does not implement a second
+mechanics solver. G4D contains no prescribed `+x`, velocity, or
+`polarity_probability`.
 
 The planning statement about “3–8 fibres, no crosslinks and both ends fixed” is
 preserved in the G4 README and website as the gap found in the **superseded early
@@ -179,6 +185,7 @@ python3 -m unittest discover -s generations/g2_corrected/v2_crosslink_transmissi
 python3 -m unittest discover -s generations/g2_corrected/v3_two_sided_migration/tests -v
 python3 -m unittest discover -s generations/g2_corrected/v4_contact_plasticity/tests -v
 python3 -m unittest discover -s generations/g4_interactive_calibration/tests -v
+python3 -m unittest discover -s generations/g4_v2_multiscale/tests -v
 
 python3 generations/g2_corrected/validate.py
 python3 generations/g2_corrected/v3_two_sided_migration/run.py
@@ -191,6 +198,9 @@ python render.py --run ../../results/g3_spheroid_guidance/main --out ../../figur
 
 # Generation 4 static-site data (all physics precomputed in Python)
 python3 generations/g4_interactive_calibration/build_demo.py
+
+# Generation 4 v2 long-time data (compact, lazy-loaded JSON chunks)
+python3 generations/g4_v2_multiscale/build_demo.py --workers 4
 ```
 
 For G2, Python precomputes all physics into each `demo/data.js`; the web pages only play saved

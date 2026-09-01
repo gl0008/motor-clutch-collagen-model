@@ -28,6 +28,9 @@ should only be copied into the repository when redistribution rights are clear.
 | G4B | R1–R3, R10 | crosslink-graph transmission, no-link negative control and spatially decaying indirect reorientation |
 | G4C | R5–R7, R13 | Bell slip hazard, motor–clutch loading and declared effective-clutch starting values |
 | G4D | R6–R9, R15 | reaction-driven motion, unbiased spatial modules, speed comparison and later collagen-guided persistence boundary |
+| G4 v2 A–B | R1–R4, R8, R10, R26 | preserved elastic network, two-hour observation scale, four-minute sampling, crosslink-path transmission and multiscale reporting |
+| G4 v2 C | R5–R7, R27–R28 | Bell rupture, independent versus shared-load cluster hypotheses, force redistribution and collective failure |
+| G4 v2 D | R6–R9, R15 | same shared-load mechanics with only reaction-driven cell translation/rotation released |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography
@@ -119,6 +122,16 @@ should only be copied into the repository when redistribution rights are clear.
 - **R25 — Krause et al. (2019).** “Fiber stiffness, pore size and adhesion
   control migratory phenotype of MDA-MB-231 cells in collagen gels.” *PLOS ONE*.
   [PMCID: PMC6853323](https://pmc.ncbi.nlm.nih.gov/articles/PMC6853323/)
+- **R26 — Riching et al. (2014).** “3D Collagen Alignment Limits Protrusions
+  to Enhance Breast Cancer Cell Persistence.” *Biophysical Journal* 107:2546–2558.
+  [PMCID: PMC4255204](https://pmc.ncbi.nlm.nih.gov/articles/PMC4255204/)
+- **R27 — Erdmann & Schwarz (2004).** “Adhesion clusters under shared linear
+  loading: a stochastic analysis.”
+  [arXiv:cond-mat/0403552](https://arxiv.org/abs/cond-mat/0403552)
+- **R28 — Gao, Qian & Chen (2011).** “Probing mechanical principles of focal
+  contacts in cell–matrix adhesion with a coupled stochastic–elastic modelling
+  framework.” *Journal of the Royal Society Interface* 8:1217–1232.
+  [PMCID: PMC3140725](https://pmc.ncbi.nlm.nih.gov/articles/PMC3140725/)
 
 The candidate-by-candidate decision table for G3-R is in
 [`../docs/G3_REVISION_PLAN.md`](../docs/G3_REVISION_PLAN.md). Sources R19–R25
