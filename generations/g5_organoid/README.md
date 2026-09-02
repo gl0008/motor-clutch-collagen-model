@@ -105,9 +105,32 @@ unchanged with symmetric springs) and not slow relaxation (κ plateaus at ~0.85 
 hold on a small network). To measure κ cleanly, the grippable near fibres must be boundary-connected, or
 use a topology-change / near-field-order metric instead of global rms. Left as the next refinement.
 
-## Not yet built / next refinements
+## Near-field connectivity fix (A + B) — done
 
-- Clean κ demonstration (boundary-connected corona, or a topology-based plasticity metric).
+The grippable near-field fibres used to **float** (short tangential stubs poorly linked to the fixed
+boundary), which weakened alignment, limited force reach, and confounded the Stage-E κ. Two changes fix
+the root cause:
+
+- **(A)** `make_organoid` now re-requires the **contact (grippable) fibres to be boundary-connected**
+  (the G2 gate that was dropped in the scale-up) — networks with floating grippable fibres are rejected.
+- **(B)** `_corona_fiber` now seeds **longer fibres whose inner end hugs the organoid and which extend
+  outward with wide angular noise** (radial-tract-like, cf. TACS-3). Being longer they crosslink into
+  the boundary-connected bulk instead of floating, and they carry the pull farther out.
+
+Result: connectivity **0.74 → 0.96**, `contact_fibers_connected = True`, and force now reaches the
+mid-field (75–100 µm shells become radially ordered). The ±80° heading noise keeps t=0 near-isotropic so
+reorganisation is still visible. Grip coverage is ~15/43 (radial tracts are sparser at the surface than
+the old dense tangential ring).
+
+**Still open:** the load-unload κ remains ~0.88 for *both* elastic and plastic even at 0.96 connectivity
+— so κ is limited by **slow large-scale elastic relaxation**, not connectivity. The clean plasticity
+signal is therefore the **topological** one (elastic: 0 rupture/reform events; plastic: ~95 ruptures +
+~137 re-welds). A relaxation-independent κ (e.g. from the crosslink-topology change or near-field order)
+is the remaining refinement.
+
+## Next refinements
+
+- Relaxation-independent plasticity metric (topology- or order-based) instead of load-unload rms κ.
 - Sharper **swirling** / true radial aster (tangential motility bias or higher traction).
 
 ## Status

@@ -234,26 +234,28 @@ def _organoid_fiber(cfg: OrganoidConfig, rng, centers: np.ndarray, exclude: floa
 
 def _corona_fiber(cfg: OrganoidConfig, rng, centers: np.ndarray, exclude: float,
                   organoid_outer: float):
-    """A short near-field fibre hugging the organoid perimeter (grippable collagen).
+    """A grippable near-field fibre: inner end at the organoid, extending OUTWARD.
 
-    Seeded in the annulus just outside the organoid so it presses against the
-    perimeter cells (imaging shows collagen right against the boundary).  Union
-    exclusion keeps it out of the cell disks; it fills the gaps between perimeter
-    cells so every rim cell has collagen to grip.
+    Fix (B): instead of short tangential stubs that float, seed a longer fibre whose
+    inner end presses against the perimeter (so surface cells grip it) and which
+    extends outward with a radial-but-noisy heading (like the radial TACS-3 tracts
+    seen around invasive tumours).  Being longer and radial-ish, it crosses many bulk
+    fibres -> it crosslinks into the boundary-connected network instead of floating,
+    and it carries the pull farther out.  The wide angular noise keeps t=0 only mildly
+    ordered so reorganisation is still visible.
     """
 
     phi = rng.uniform(0.0, 2.0 * math.pi)
-    r0 = organoid_outer + rng.uniform(-cfg.cell_radius * 0.5, cfg.corona_band)
+    inner_r = organoid_outer + rng.uniform(0.5, cfg.gap + 3.0)
     radial = np.array([math.cos(phi), math.sin(phi)])
-    tangent = np.array([-radial[1], radial[0]])
-    mid = r0 * radial
-    length = rng.uniform(cfg.min_fiber_length * 0.6, cfg.min_fiber_length * 1.2)
-    # orientation: biased tangential but noisy, so t=0 is not already radial
-    theta = rng.uniform(0.0, math.pi)
-    direction = math.cos(theta) * tangent + math.sin(theta) * radial * 0.6
-    direction /= max(np.linalg.norm(direction), 1e-12)
-    start = mid - 0.5 * length * direction
-    end = mid + 0.5 * length * direction
+    inner = inner_r * radial
+    length = rng.uniform(0.6 * cfg.max_fiber_length, cfg.max_fiber_length)
+    # heading: outward (+radial) with wide noise (~+/-80 deg) -> bridges to the bulk
+    # (connectivity) yet starts near-isotropic so reorganisation is still visible.
+    heading = phi + rng.uniform(-1.4, 1.4)
+    direction = np.array([math.cos(heading), math.sin(heading)])
+    start = inner
+    end = inner + length * direction
     half = cfg.domain_size / 2.0
     if np.max(np.abs(end)) > half - 0.3 or np.max(np.abs(start)) > half - 0.3:
         return None
@@ -419,7 +421,7 @@ def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
     gap_radius = organoid_outer + cfg.gap
 
     base = cfg.seed if seed is None else int(seed)
-    best = (-1.0, None)
+    best = (-1, -1.0, None)  # (contact_connected, connected_fraction, network)
     for attempt in range(cfg.generation_attempts):
         seed_used = base + 7919 * attempt
         spec = _assemble_organoid_spec(
@@ -435,12 +437,17 @@ def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
             network.refresh_crosslink_arrays()
         report = connectivity_report(network)
         score = float(report["connected_fraction"])
-        if score > best[0]:
-            best = (score, network)
-        if score >= cfg.required_connected_fraction:
+        # Fix (A): require the grippable near-field (contact) fibres to be
+        # boundary-connected -- the G2 gate that was dropped in the scale-up.  Rank
+        # candidates by (contact-connected, then fraction) so the accepted network
+        # never has floating grippable fibres.
+        cc = 1 if report["contact_fibers_connected"] else 0
+        if (cc, score) > (best[0], best[1]):
+            best = (cc, score, network)
+        if report["contact_fibers_connected"] and score >= cfg.required_connected_fraction:
             return network, centers, gap_radius, report
-    if best[1] is not None:
-        return best[1], centers, gap_radius, connectivity_report(best[1])
+    if best[2] is not None:
+        return best[2], centers, gap_radius, connectivity_report(best[2])
     raise RuntimeError("organoid network percolation gate failed")
 
 
