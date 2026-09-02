@@ -86,11 +86,29 @@ collective-vs-escape knob (low `cc_adhesion` → larger max single-cell displace
 
 Still elastic and speed-capped, so invasion saturates; progressive, persistent invasion needs Stage E.
 
-## Not yet built
+## Stage E — matrix plasticity (built; mechanism works, κ metric confounded)
 
-- **Stage E** — matrix plasticity (crosslink rupture/reform) so deformation and invasion persist
-  (irreversible), matching the multi-hour experimental window instead of an elastic plateau.
-- Sharper **swirling** / true radial aster (may need a tangential motility bias or higher traction).
+`plasticity=True` adds stress-driven crosslink turnover (`update_plasticity`): each loaded crosslink
+ruptures at a Bell rate `k_off0·exp(F/F_b)`, and fibres re-weld at their **current** crossings — the
+topological remodelling Nam 2016 / Wisdom 2018 attribute plasticity to. `run_organoid_pull` supports a
+load → fast-unload → **hold-at-zero** schedule and reports `kappa` (residual/peak strain) and
+`plastic_events`.
+
+**Verified:** rupture is **stress-selective** — with `k_off0 = 2e-4`, an elastic run has 0 events while
+a loaded run ruptures ~70 welds and re-forms ~127 (real rewiring).
+
+**Honest limitation (diagnosed):** a clean plasticity-index κ from load-unload recovery is **confounded**
+and cannot yet isolate crosslink plasticity. Even the *elastic* network gives κ ≈ 0.87–0.91: the
+near-field/corona fibres that are pulled hardest are **poorly connected to the fixed boundary** (they sit
+on rigid-body zero modes), so they stay displaced and dominate the residual rms — not buckling (κ
+unchanged with symmetric springs) and not slow relaxation (κ plateaus at ~0.85 after 780 s of zero-load
+hold on a small network). To measure κ cleanly, the grippable near fibres must be boundary-connected, or
+use a topology-change / near-field-order metric instead of global rms. Left as the next refinement.
+
+## Not yet built / next refinements
+
+- Clean κ demonstration (boundary-connected corona, or a topology-based plasticity metric).
+- Sharper **swirling** / true radial aster (tangential motility bias or higher traction).
 
 ## Status
 

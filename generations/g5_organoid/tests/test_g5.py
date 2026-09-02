@@ -114,5 +114,23 @@ class StageDInvasion(unittest.TestCase):
         self.assertGreater(last["mean_cell_radial_disp"], 0.0)   # net outward = invasion
 
 
+class StageEPlasticity(unittest.TestCase):
+    def test_plasticity_rewires_under_load_only(self):
+        """Stage E: crosslink rupture/reform is stress-selective.
+
+        Under load the plastic network rewires (loaded welds rupture, new welds form);
+        an identical elastic run leaves the crosslink set untouched.
+        """
+        from generations.g5_organoid.model import parameter_variant
+        cfg = parameter_variant(SMALL, plasticity=True, plasticity_interval=3.0,
+                                duration=45.0, total_pull_force=30.0)
+        out = run_organoid_pull(cfg, seed=23)
+        self.assertTrue(np.all(np.isfinite(out["final_positions"])))
+        ev = out["plastic_events"]
+        self.assertGreater(ev["ruptured"] + ev["formed"], 0)     # network rewired
+        elastic = run_organoid_pull(parameter_variant(cfg, plasticity=False), seed=23)
+        self.assertEqual(elastic["plastic_events"], {"ruptured": 0, "formed": 0})
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

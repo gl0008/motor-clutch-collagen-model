@@ -101,6 +101,20 @@ class OrganoidConfig(CollagenConfig):
     cell_drag: float = 400.0             # nN*s/um, cell body drag
     max_cell_speed: float = 0.02         # um/s, biological guard on cell speed
 
+    # --- Stage E: matrix plasticity (Bell crosslink rupture + reformation) ---
+    # Loaded crosslinks rupture at Bell rate k_off0*exp(F/F_b); fibres then re-weld at
+    # their CURRENT crossings.  Breaking restoring welds + re-welding the deformed
+    # config makes strain irreversible (Nam 2016 plasticity index kappa; Wisdom 2018).
+    # This is crosslink-topology plasticity, distinct from SLS (still deferred) and
+    # from Bell on the CLUTCHES.  Check crosslink-force magnitudes before trusting it.
+    plasticity: bool = False
+    xl_k_off0: float = 2e-4              # s^-1, zero-force rupture rate (stress-selective:
+                                         #   negligible at F=0, accelerates as exp(F/F_b))
+    xl_F_b: float = 3.0                  # nN, Bell force scale for crosslink rupture
+    xl_reform_prob: float = 0.5          # prob a fresh fibre crossing re-welds per update
+    plasticity_interval: float = 5.0     # s between rupture/reform updates
+    unload_time: float = 0.0             # s at end with pull ramped to 0 (for kappa)
+
     # --- collagen network (scaled up from the 99-fibre / 180 um G2 baseline) ---
     # Softened, lightly crosslinked collagen so the pull can visibly reorganise the
     # near-field into a radial aster (same prof-requested softening as G3/G4:
@@ -347,6 +361,48 @@ def build_crosslinks_grid(network: Network) -> list:
                 seen.add(key)
                 links.append(Crosslink(int(e), float(ta), int(f), float(tb), np.zeros(2), stiffness))
     return links
+
+
+def _link_key(network: Network, link) -> tuple:
+    """Coarse identity of a crosslink by fibre pair + rounded material point."""
+    fa = int(network.edge_fiber[link.edge_a])
+    fb = int(network.edge_fiber[link.edge_b])
+    pt = network.material_point(link.edge_a, link.alpha_a)
+    lo, hi = (fa, fb) if fa < fb else (fb, fa)
+    return (lo, hi, int(round(pt[0] / 0.6)), int(round(pt[1] / 0.6)))
+
+
+def update_plasticity(network: Network, cfg: OrganoidConfig, dt_eff: float, rng) -> tuple:
+    """Bell rupture of loaded crosslinks + re-weld at current fibre crossings.
+
+    Ruptured welds no longer pull the fibres back; new welds (rest = current, i.e.
+    zero strain at the deformed crossing) pin the deformed configuration -> the strain
+    becomes irreversible (Nam 2016; Wisdom 2018).  Returns ``(ruptured, formed)``.
+    """
+
+    ruptured = 0
+    if len(network.crosslinks):
+        *_, link_force = network.elastic_forces(True)          # |force| per link, nN
+        rate = cfg.xl_k_off0 * np.exp(np.minimum(link_force / cfg.xl_F_b, 50.0))
+        prob = 1.0 - np.exp(-rate * dt_eff)
+        keep = rng.random(len(network.crosslinks)) >= prob
+        ruptured = int(np.count_nonzero(~keep))
+        if ruptured:
+            network.crosslinks = [x for x, k in zip(network.crosslinks, keep) if k]
+
+    # re-weld: current geometric crossings not already linked
+    existing = {_link_key(network, x) for x in network.crosslinks}
+    formed = 0
+    for cand in build_crosslinks_grid(network):
+        if _link_key(network, cand) in existing:
+            continue
+        if rng.random() < cfg.xl_reform_prob:
+            network.crosslinks.append(cand)                    # rest_vector = 0 at the
+            existing.add(_link_key(network, cand))             # current (deformed) crossing
+            formed += 1
+
+    network.refresh_crosslink_arrays()
+    return ruptured, formed
 
 
 def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
@@ -766,9 +822,13 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
     nsteps = int(round(cfg.duration / cfg.dt))
     every = max(1, int(round(cfg.sample_interval / cfg.dt)))
     contact_every = max(1, int(round(cfg.contact_update_interval / cfg.dt)))
+    plastic_every = max(1, int(round(cfg.plasticity_interval / cfg.dt)))
+    rng = np.random.default_rng((cfg.seed if seed is None else int(seed)) + 555)
+    load_end = cfg.duration - cfg.unload_time
 
     frames: list[dict] = []
     snaps: list[np.ndarray] = []
+    plastic_events = {"ruptured": 0, "formed": 0}
     # ``active_full`` is the nodal pull at full magnitude for the current material
     # contacts; forces_from_patches is linear in the force, so each step just scales
     # it by the ramp -- no per-step per-cell loop.  Refreshed only on contact update.
@@ -778,21 +838,36 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
 
     for step in range(nsteps + 1):
         time = step * cfg.dt
-        ramp = min(1.0, time / cfg.force_ramp_time) if cfg.force_ramp_time else 1.0
+        # load, hold, then (if unload_time>0) drop the pull to zero FAST and hold at
+        # zero for the rest of the window so the network can relax -> plasticity index
+        # kappa = residual / peak strain (residual is measured after the relaxation).
+        if cfg.force_ramp_time and time < cfg.force_ramp_time:
+            ramp = time / cfg.force_ramp_time
+        elif time <= load_end:
+            ramp = 1.0
+        else:
+            ramp = max(0.0, 1.0 - (time - load_end) / max(cfg.force_ramp_time, cfg.dt))
         if step and step % contact_every == 0:
             active_full, per_cell = organoid_active_forces(
                 network, centers, cfg.total_pull_force, candidates=candidates
             )
         active = active_full * ramp
 
+        if cfg.plasticity and step and step % plastic_every == 0:
+            rup, form = update_plasticity(network, cfg, cfg.plasticity_interval, rng)
+            plastic_events["ruptured"] += rup
+            plastic_events["formed"] += form
+
         if step % every == 0:
             prof = radial_alignment_profile(network, organoid_center)
             frames.append(
                 {
                     "time": time,
+                    "ramp": ramp,
                     "global_radial_order": prof["global_radial_order"],
                     "shells": prof["shells"],
                     "n_gripping_cells": int(sum(1 for p in per_cell if p)),
+                    "n_crosslinks": len(network.crosslinks),
                     "rms_bead_disp": float(
                         np.sqrt(np.mean(np.sum((network.r - network.r0) ** 2, axis=1)))
                     ),
@@ -806,6 +881,11 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
 
         stepper.step(active, cfg.dt)
 
+    # plasticity index kappa = residual strain after unload / peak strain under load
+    rms = [fr["rms_bead_disp"] for fr in frames]
+    peak = max(rms) if rms else 0.0
+    kappa = float(rms[-1] / peak) if (cfg.unload_time > 0 and peak > 0) else None
+
     return {
         "config": asdict(cfg),
         "centers": centers,
@@ -816,6 +896,8 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
         "n_beads": len(network.r),
         "n_fibers": len(network.fibers),
         "n_crosslinks": len(network.crosslinks),
+        "plastic_events": plastic_events,
+        "kappa": kappa,
         "frames": frames,
         "snapshots": np.asarray(snaps) if snapshots else None,
         "final_positions": network.r.copy(),
