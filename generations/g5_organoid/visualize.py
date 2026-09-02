@@ -63,6 +63,59 @@ def render(npz_path: str, out_path: str | None = None, cell_radius: float = 9.0)
     return out_path
 
 
+def _crosslink_points(pos, edges, links):
+    """Material-point pairs (a, b) for each crosslink at the given positions."""
+    if not len(links):
+        return np.empty((0, 2)), np.empty((0, 2))
+    links = np.asarray(links, dtype=float)
+    ea = links[:, 0].astype(int); aa = links[:, 1][:, None]
+    eb = links[:, 2].astype(int); ab = links[:, 3][:, None]
+    pa = (1 - aa) * pos[edges[ea, 0]] + aa * pos[edges[ea, 1]]
+    pb = (1 - ab) * pos[edges[eb, 0]] + ab * pos[edges[eb, 1]]
+    return pa, pb
+
+
+def animate(snapshots, edges, centers, out_path, *, crosslinks=None, cell_radius=9.0,
+            span=None, fps=6, title="G5 organoid contracts -> collagen turns radial",
+            show_links=True):
+    """Render a GIF of the collagen reorganising, coloured by radial order.
+
+    Fibres are coloured blue (tangential) -> red (radial); crosslinks are drawn as
+    small yellow ties so their role is visible; cell disks overlaid.
+    """
+    from matplotlib.animation import FuncAnimation, PillowWriter
+
+    snapshots = np.asarray(snapshots)
+    center = np.zeros(2)
+    if span is None:
+        span = float(np.max(np.abs(snapshots[0]))) * 1.02
+    fig, ax = plt.subplots(figsize=(6.2, 6.2))
+
+    def draw(k):
+        ax.clear()
+        pos = snapshots[k]
+        order = _order(pos, edges, center)
+        segs = np.stack([pos[edges[:, 0]], pos[edges[:, 1]]], axis=1)
+        lc = LineCollection(segs, cmap="coolwarm", norm=plt.Normalize(-1, 1), linewidths=0.7)
+        lc.set_array(order)
+        ax.add_collection(lc)
+        if show_links and crosslinks is not None and len(crosslinks):
+            pa, pb = _crosslink_points(pos, edges, crosslinks)
+            ls = np.stack([pa, pb], axis=1)
+            ax.add_collection(LineCollection(ls, colors="#d8a329", linewidths=1.1, alpha=0.9))
+        for c in centers:
+            ax.add_patch(plt.Circle(c, cell_radius, color="0.25", alpha=0.5, lw=0))
+        ax.set_xlim(-span, span); ax.set_ylim(-span, span)
+        ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+        ax.set_title("%s\nframe %d/%d   (yellow = crosslinks)" % (title, k + 1, len(snapshots)),
+                     fontsize=10)
+
+    anim = FuncAnimation(fig, draw, frames=len(snapshots), interval=1000 / fps)
+    anim.save(out_path, writer=PillowWriter(fps=fps))
+    plt.close(fig)
+    return out_path
+
+
 if __name__ == "__main__":
     src = sys.argv[1] if len(sys.argv) > 1 else "output/g5_fullscale_seed23.npz"
     print("wrote", render(src))

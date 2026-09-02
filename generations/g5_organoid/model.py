@@ -100,6 +100,14 @@ class OrganoidConfig(CollagenConfig):
     # 3 MPa modulus, 10 nN/um links).  Not the stiff 32 MPa G2 default.
     collagen_modulus_mpa: float = 3.0
     crosslink_stiffness: float = 10.0
+    # --- Stage C: nonlinear fibre strain-stiffening (off = Stage B linear) ---
+    # Tensile stiffness multiplies by exp(strain / stiffen_strain_ref), capped, so
+    # taut (radial) fibres stiffen and transmit the pull further -> sharper, longer-
+    # range aster (Steinwachs 2016; Mark 2020 eLife 51912; Shenoy 2014). Compression
+    # stays soft (microbuckling), unchanged.  The on/off flag is the Stage-C ablation.
+    strain_stiffening: bool = False
+    stiffen_strain_ref: float = 0.06     # e-fold tensile stiffening strain
+    stiffen_cap: float = 12.0            # max stiffening multiple (numerical guard)
     n_fibers: int = 420
     crosslink_fraction: float = 0.85     # keep most auto-generated links (connectivity)
     boundary_width: float = 6.0          # anchoring band; wider -> better boundary percolation
@@ -157,10 +165,20 @@ def hex_centers(radius: float, spacing: float) -> np.ndarray:
 
 
 # =================================================================================
-# Network generation with a fibre-free organoid gap (G3-style, larger gap)
+# Network generation excluding the UNION of cell disks (collagen reaches every
+# perimeter cell, not just the outermost ring of a circular gap)
 # =================================================================================
-def _organoid_fiber(cfg: OrganoidConfig, rng, gap_radius: float, *, boundary_seeded: bool):
-    """One curved fibre that avoids the whole fibre-free organoid disk."""
+def _inside_any_cell(points: np.ndarray, centers: np.ndarray, clearance: float) -> bool:
+    """True if any point lies within (cell_radius + clearance) of any cell centre."""
+    # points (P,2), centers (M,2) -> min distance to a centre per point
+    diff = points[:, None, :] - centers[None, :, :]
+    dmin = np.sqrt(np.min(np.sum(diff * diff, axis=2), axis=1))
+    return bool(np.any(dmin < clearance))
+
+
+def _organoid_fiber(cfg: OrganoidConfig, rng, centers: np.ndarray, exclude: float,
+                    organoid_outer: float, *, boundary_seeded: bool):
+    """One curved fibre that avoids every cell disk (union exclusion)."""
 
     half = cfg.domain_size / 2.0
     length = rng.uniform(cfg.min_fiber_length, cfg.max_fiber_length)
@@ -188,22 +206,23 @@ def _organoid_fiber(cfg: OrganoidConfig, rng, gap_radius: float, *, boundary_see
     if np.max(np.abs(end)) > half - 0.2 or np.max(np.abs(start)) > half - 0.2:
         return None
     points = _curved_segment(start, end, cfg, rng)
-    if np.min(np.linalg.norm(points, axis=1)) < gap_radius:
+    if _inside_any_cell(points, centers, exclude):
         return None
     return points
 
 
-def _corona_fiber(cfg: OrganoidConfig, rng, gap_radius: float):
-    """A short fibre hugging the organoid, so surface cells have collagen to grip.
+def _corona_fiber(cfg: OrganoidConfig, rng, centers: np.ndarray, exclude: float,
+                  organoid_outer: float):
+    """A short near-field fibre hugging the organoid perimeter (grippable collagen).
 
-    The imaging shows collagen pressed right against the organoid boundary; the
-    corona represents that grippable near-field matrix (it is reorganised into the
-    radial aster).  Fibres are placed just outside the fibre-free gap with a mild
-    tangential-to-random orientation and are NOT boundary-anchored.
+    Seeded in the annulus just outside the organoid so it presses against the
+    perimeter cells (imaging shows collagen right against the boundary).  Union
+    exclusion keeps it out of the cell disks; it fills the gaps between perimeter
+    cells so every rim cell has collagen to grip.
     """
 
     phi = rng.uniform(0.0, 2.0 * math.pi)
-    r0 = gap_radius + rng.uniform(0.5, cfg.corona_band)
+    r0 = organoid_outer + rng.uniform(-cfg.cell_radius * 0.5, cfg.corona_band)
     radial = np.array([math.cos(phi), math.sin(phi)])
     tangent = np.array([-radial[1], radial[0]])
     mid = r0 * radial
@@ -218,13 +237,15 @@ def _corona_fiber(cfg: OrganoidConfig, rng, gap_radius: float):
     if np.max(np.abs(end)) > half - 0.3 or np.max(np.abs(start)) > half - 0.3:
         return None
     points = _curved_segment(start, end, cfg, rng)
-    if np.min(np.linalg.norm(points, axis=1)) < gap_radius:
+    if _inside_any_cell(points, centers, exclude):
         return None
     return points
 
 
-def _assemble_organoid_spec(cfg: OrganoidConfig, rng, gap_radius: float, seed_used: int) -> NetworkSpec:
+def _assemble_organoid_spec(cfg: OrganoidConfig, rng, centers: np.ndarray,
+                            organoid_outer: float, seed_used: int) -> NetworkSpec:
     half = cfg.domain_size / 2.0
+    exclude = cfg.cell_radius + cfg.cell_clearance + cfg.gap
     positions: list[np.ndarray] = []
     fibers: list[list[int]] = []
     fixed: list[bool] = []
@@ -237,12 +258,12 @@ def _assemble_organoid_spec(cfg: OrganoidConfig, rng, gap_radius: float, seed_us
             fixed.append(bool(np.max(np.abs(p)) >= half - cfg.boundary_width))
         fibers.append(ids)
 
-    # 1) near-field corona hugging the organoid (grippable collagen)
+    # 1) near-field corona hugging the organoid perimeter (grippable collagen)
     corona = 0
     attempts = 0
-    while corona < cfg.n_corona_fibers and attempts < 200_000:
+    while corona < cfg.n_corona_fibers and attempts < 400_000:
         attempts += 1
-        pts = _corona_fiber(cfg, rng, gap_radius)
+        pts = _corona_fiber(cfg, rng, centers, exclude, organoid_outer)
         if pts is not None:
             append(pts)
             corona += 1
@@ -252,15 +273,16 @@ def _assemble_organoid_spec(cfg: OrganoidConfig, rng, gap_radius: float, seed_us
     target_total = cfg.n_fibers
     target_boundary = corona + max(24, int(round(0.45 * (target_total - corona))))
     attempts = 0
-    while len(fibers) < target_total and attempts < 400_000:
+    while len(fibers) < target_total and attempts < 600_000:
         attempts += 1
         pts = _organoid_fiber(
-            cfg, rng, gap_radius, boundary_seeded=len(fibers) < target_boundary
+            cfg, rng, centers, exclude, organoid_outer,
+            boundary_seeded=len(fibers) < target_boundary,
         )
         if pts is not None:
             append(pts)
     if len(fibers) != target_total:
-        raise RuntimeError("could not construct the requested fibre-free-gap network")
+        raise RuntimeError("could not construct the requested organoid network")
     return NetworkSpec(np.asarray(positions), fibers, np.asarray(fixed), contact_fibers, seed_used)
 
 
@@ -338,7 +360,7 @@ def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
     for attempt in range(cfg.generation_attempts):
         seed_used = base + 7919 * attempt
         spec = _assemble_organoid_spec(
-            cfg, np.random.default_rng(seed_used), gap_radius, seed_used
+            cfg, np.random.default_rng(seed_used), centers, organoid_outer, seed_used
         )
         network = Network(spec, cfg, crosslinks=[])  # skip G2 O(F^2) auto-build
         network.crosslinks = build_crosslinks_grid(network)  # O(E) grid crosslinker
@@ -410,13 +432,13 @@ if njit is not None:
         link_edge_a, link_edge_b, link_alpha_a, link_alpha_b,
         link_rest, link_stiffness, active, centers,
         cell_radius, cell_clearance, repulsion_stiffness,
-        bead_drag, dt, velocity, total,
+        bead_drag, dt, stiffen_on, stiffen_ref, stiffen_cap, velocity, total,
     ):
         """Allocation-free G2 force balance with repulsion summed over M disks.
 
-        Identical stretch / bend / crosslink law to the G2 ``elastic_forces``
-        (lifted from g4_v2 ``_advance_numba``); the only generalisation is the
-        repulsion loop, which sums soft no-penetration over every cell centre.
+        Same bend / crosslink law as G2 ``elastic_forces`` (lifted from g4_v2
+        ``_advance_numba``).  Generalisations: repulsion sums over every cell centre,
+        and (Stage C) tensile stiffness stiffens as exp(strain/ref) when stiffen_on.
         """
 
         total[:, :] = 0.0
@@ -429,7 +451,15 @@ if njit is not None:
             if length < 1e-12:
                 length = 1e-12
             extension = length - l0[e]
-            stiffness = k_tension[e] if extension >= 0.0 else k_compression[e]
+            if extension >= 0.0:
+                stiffness = k_tension[e]
+                if stiffen_on == 1:
+                    mult = math.exp((extension / l0[e]) / stiffen_ref)
+                    if mult > stiffen_cap:
+                        mult = stiffen_cap
+                    stiffness = stiffness * mult
+            else:
+                stiffness = k_compression[e]
             scale = stiffness * extension / length
             fx = scale * dx
             fy = scale * dy
@@ -513,6 +543,9 @@ class OrganoidStepper:
 
     def step(self, active: np.ndarray, dt: float) -> None:
         n = self.n
+        stiffen_on = 1 if getattr(n.cfg, "strain_stiffening", False) else 0
+        stiffen_ref = float(getattr(n.cfg, "stiffen_strain_ref", 0.06))
+        stiffen_cap = float(getattr(n.cfg, "stiffen_cap", 12.0))
         if njit is not None:
             _advance_organoid_numba(
                 n.r, n.r0, n.fixed, n.edges, n.l0, n.k_tension, n.k_compression,
@@ -520,15 +553,36 @@ class OrganoidStepper:
                 n.link_edge_a, n.link_edge_b, n.link_alpha_a, n.link_alpha_b,
                 n.link_rest, n.link_stiffness, active, self.centers,
                 n.cfg.cell_radius, n.cfg.cell_clearance, n.cfg.repulsion_stiffness,
-                n.cfg.bead_drag, dt, self.velocity, self.total,
+                n.cfg.bead_drag, dt, stiffen_on, stiffen_ref, stiffen_cap,
+                self.velocity, self.total,
             )
         else:  # pragma: no cover - exercised only without Numba
-            fs, fb, fx, _, _, _ = n.elastic_forces(True)
+            _, fb, fx, _, _, _ = n.elastic_forces(True)
+            fs = _stiffened_stretch(n, stiffen_on, stiffen_ref, stiffen_cap)
             total = fs + fb + fx + multi_cell_repulsion(n, self.centers) + active
             total[n.fixed] = 0.0
             n.r[~n.fixed] += dt * (total[~n.fixed] / n.cfg.bead_drag)
         if not np.all(np.isfinite(n.r)):
             raise FloatingPointError("non-finite bead position; reduce dt")
+
+
+def _stiffened_stretch(n: Network, stiffen_on: int, ref: float, cap: float) -> np.ndarray:
+    """Vectorised stretch force with optional exp strain-stiffening (NumPy fallback)."""
+
+    i, j = n.edges.T
+    d = n.r[j] - n.r[i]
+    length = np.linalg.norm(d, axis=1)
+    extension = length - n.l0
+    taut = extension >= 0.0
+    stiffness = np.where(taut, n.k_tension, n.k_compression)
+    if stiffen_on == 1:
+        mult = np.minimum(cap, np.exp(np.where(taut, extension / n.l0, 0.0) / ref))
+        stiffness = np.where(taut, n.k_tension * mult, n.k_compression)
+    pair = (stiffness * extension / np.maximum(length, 1e-12))[:, None] * d
+    fs = np.zeros_like(n.r)
+    np.add.at(fs, i, pair)
+    np.add.at(fs, j, -pair)
+    return fs
 
 
 # =================================================================================
@@ -690,13 +744,16 @@ def radial_alignment_profile(
 # =================================================================================
 # Stage B driver: fixed contractile organoid -> radial alignment
 # =================================================================================
-def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict:
+def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
+                      snapshots: bool = False) -> dict:
     """Integrate a fixed (non-translating) contractile organoid pulling collagen.
 
     Cells stay put; each surface cell reels in nearby fibres.  The gate is whether
     the surrounding collagen's radial-alignment order RISES over the run (Hongbo's
     minimal criterion: pull -> alignment).  Cell-cell forces are computed and
-    reported but do not move the fixed cells (they act in Stage D).
+    reported but do not move the fixed cells (they act in Stage D).  With
+    ``snapshots=True`` the full bead positions at each sampled frame are stored under
+    ``snapshots`` for animation.
     """
 
     network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
@@ -712,6 +769,7 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict
     contact_every = max(1, int(round(cfg.contact_update_interval / cfg.dt)))
 
     frames: list[dict] = []
+    snaps: list[np.ndarray] = []
     # ``active_full`` is the nodal pull at full magnitude for the current material
     # contacts; forces_from_patches is linear in the force, so each step just scales
     # it by the ramp -- no per-step per-cell loop.  Refreshed only on contact update.
@@ -741,6 +799,8 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict
                     ),
                 }
             )
+            if snapshots:
+                snaps.append(network.r.copy())
 
         if step == nsteps:
             break
@@ -758,9 +818,12 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict
         "n_fibers": len(network.fibers),
         "n_crosslinks": len(network.crosslinks),
         "frames": frames,
+        "snapshots": np.asarray(snaps) if snapshots else None,
         "final_positions": network.r.copy(),
         "initial_positions": network.r0.copy(),
         "edges": network.edges.copy(),
+        "crosslinks": [(int(x.edge_a), float(x.alpha_a), int(x.edge_b), float(x.alpha_b))
+                       for x in network.crosslinks],
         "cell_cell_rest_force_max": float(
             np.max(np.linalg.norm(cell_cell_forces(centers, cfg), axis=1))
         ),

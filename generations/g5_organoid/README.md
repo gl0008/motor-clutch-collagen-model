@@ -48,12 +48,38 @@ fibres, 2400 steps) runs in **~8 s** (was ~300 s):
 `python generations/g5_organoid/visualize.py output/<run>.npz` renders a before/after radial-order
 figure.
 
+## Stage C — strain-stiffening (built, ablation flag)
+
+`strain_stiffening=True` makes tensile stiffness multiply by `exp(strain / stiffen_strain_ref)`
+(capped); compression stays soft. This is the Stage-C ablation (Steinwachs 2016; Mark 2020; Shenoy
+2014). **Finding: in the current gentle-contraction regime it barely changes the aster** (strains are
+~1–5 %, so stiffening hardly engages: near-field order −0.24 with vs −0.24 without). Time and grip
+coverage are the real levers here, not stiffening.
+
+## Demo & animation
+
+`python generations/g5_organoid/build_demo.py` runs a longer (300 s) contractile organoid with a dense
+grippable corona and writes `output/g5_demo.gif` (near-field zoom, fibres coloured by radial order,
+**crosslinks drawn in yellow**) + a before/after PNG. The network generator excludes the **union of
+cell disks** (not one circular gap), so collagen reaches every perimeter cell — grip coverage went
+6 → 20 of 43 cells.
+
+## What the demo shows (honest)
+
+The near-field collagen ring is pulled inward and its radial order rises, but the effect is **modest**:
+fixed cells pulling radially inward is *contraction*, which translates the tangential corona inward
+without strongly *reorienting* it to radial. The literature's dramatic radial aster (Saraswathibhatla
+2025) comes from **swirling — tangential cell motion at the interface → shear → radial alignment** —
+which needs **Stage D (released cells)**, not fixed contraction. Longer time helps (near-field order
+−0.41 → −0.22 from 120 s → 300 s) but plateaus at mechanical equilibrium; progressive remodelling
+beyond that needs **Stage E plasticity**.
+
 ## Not yet built (later stages)
 
-Cell translation/rotation (**Stage D**, collective vs single-cell), strain-stiffening (**C**, to
-propagate the pull further and sharpen the aster), matrix plasticity / persistent aster (**E**). The
-current near-field alignment is real but modest (sparse corona → only surface cells grip); Stage C and
-a denser corona are the levers to a dramatic aster.
+- **Stage D** — release cell translation/rotation (cell–cell adhesion already implemented as
+  `cell_cell_forces`); expected to produce the swirling that drives a real radial aster + the
+  collective-vs-single-cell transition.
+- **Stage E** — matrix plasticity (crosslink rupture/reform) so the aster persists.
 
 ## Status
 

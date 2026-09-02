@@ -66,8 +66,9 @@ class StageAScaffold(unittest.TestCase):
         self.assertGreater(len(net.r), 500)
         self.assertEqual(len(net.fibers), SMALL.n_fibers)
         self.assertGreater(report["connected_fraction"], 0.5)
-        # fibre-free gap: no bead inside the organoid disk
-        self.assertGreaterEqual(float(np.min(np.linalg.norm(net.r, axis=1))), gap_r - 1.0)
+        # union exclusion: no bead sits inside any cell disk
+        dmin = np.min(np.linalg.norm(net.r[:, None, :] - centers[None, :, :], axis=2), axis=1)
+        self.assertGreaterEqual(float(np.min(dmin)), SMALL.cell_radius - 1e-6)
 
     def test_repulsion_keeps_beads_outside_cells(self):
         net, centers, gap_r, _ = make_organoid(SMALL, seed=23)
@@ -92,6 +93,14 @@ class StageBAlignment(unittest.TestCase):
         # net displacement occurred and alignment moved toward radial (+)
         self.assertGreater(out["frames"][-1]["rms_bead_disp"], 1e-3)
         self.assertGreater(order1, order0)
+
+    def test_stage_c_stiffening_runs_and_is_stable(self):
+        """Stage-C strain-stiffening (ablation flag) runs and stays finite."""
+        from generations.g5_organoid.model import parameter_variant
+        cfg = parameter_variant(SMALL, strain_stiffening=True)
+        out = run_organoid_pull(cfg, seed=23)
+        self.assertTrue(np.all(np.isfinite(out["final_positions"])))
+        self.assertGreater(out["frames"][-1]["rms_bead_disp"], 1e-3)
 
 
 if __name__ == "__main__":
