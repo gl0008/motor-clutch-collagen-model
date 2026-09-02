@@ -1,12 +1,14 @@
 # Motor–clutch collagen model
 
-This repository preserves three model generations and develops a fourth.
+This repository preserves four model generations and develops a fifth.
 Generation 1 records the historical development path; Generation 2 corrects the
 boundary conditions, network coupling, physical units, migration comparison, and
 visualization; Generation 3 demonstrates symmetric spheroid-driven radial
 reorganisation; Generation 4 calibrates the elastic ECM interactively, verifies
 crosslink-mediated indirect motion, adds motor-clutch slip, and finally releases
-the rigid cell without a prescribed direction.
+the rigid cell without a prescribed direction; Generation 5 scales the single cell
+up to a multicellular tumour **organoid** (many motor-clutch cells + cell–cell
+adhesion) that remodels and invades the collagen network.
 
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
@@ -178,6 +180,36 @@ outer-boundary anchoring and reduced link density; G4 formalizes the calibration
 logic without rewriting that history. Plastic crosslink breaking is deliberately
 deferred beyond G4D.
 
+## Generation 5 — tumour organoid remodels and invades collagen
+
+Generation 5 scales the single-cell core up to a multicellular **organoid**: N motor–clutch
+**disks** held together by a simplified **cell–cell adhesion** potential, all coupled to one shared
+G2 collagen network. Implementation and full notes:
+[`generations/g5_organoid/`](generations/g5_organoid/). It is grounded in Kolade/Gloria's 4MOSC1
+OSCC/PDAC organoid movies (~200 µm organoid; radial collagen alignment; collective + occasional
+single-cell escape) and the plan in [`docs/G5_organoid_plan.md`](docs/G5_organoid_plan.md)
+(literature: [`docs/G5_research_findings.md`](docs/G5_research_findings.md); engine audit:
+[`docs/G5_code_assessment.md`](docs/G5_code_assessment.md)).
+
+| Stage | One new question | Status |
+|---|---|---|
+| A | Do N adhesive cells pack into a cohesive, force-balanced organoid? | ✅ built |
+| B | Does the fixed organoid's contractile pull turn near-field collagen radial? | ✅ built (effect real but modest) |
+| C | Does fibre strain-stiffening sharpen/extend the aster? | ✅ built — honest negative in this gentle regime (strains ~1–5 %) |
+| D | When cells are released, do they invade outward, and does adhesion set collective vs single-cell escape? | ✅ built (organoid spreads 38→44 µm, invades +5.8 µm; low adhesion → more escape) |
+| E | Does Bell crosslink rupture + re-weld make deformation irreversible (plasticity κ)? | ✅ mechanism built + stress-selective; a clean κ is **confounded** and diagnosed |
+
+Choices: **softened, lightly crosslinked** collagen (3 MPa, 10 nN/µm links) as in G3/G4 so the pull
+visibly reorganises the near field; the network generator excludes the **union of cell disks** so
+collagen reaches every perimeter cell. Performance: a full-scale run (43 cells, ~24k beads, 2400
+steps) takes ~8 s via a Numba integrator, an O(E) grid crosslinker, and cached contacts.
+
+Honest limits (all recorded in the G5 README): Stage-B alignment is modest and Stage-E κ cannot yet
+be isolated because the grippable **near-field fibres are under-connected to the fixed boundary** — the
+next refinement (a boundary-connected near-field / TACS-3-like radial tracts) is expected to improve
+alignment, force transmission, and κ together. Own-simulation output is *personal testing*, not a
+confirmed finding.
+
 ## Run and test
 
 ```bash
@@ -201,13 +233,21 @@ python3 generations/g4_interactive_calibration/build_demo.py
 
 # Generation 4 v2 long-time data (compact, lazy-loaded JSON chunks)
 python3 generations/g4_v2_multiscale/build_demo.py --workers 4
+
+# Generation 5 tumour organoid (Stage A–E)
+python3 -m pytest generations/g5_organoid/tests/test_g5.py -q
+python3 generations/g5_organoid/build_demo.py            # Stage-B animation
 ```
 
 For G2, Python precomputes all physics into each `demo/data.js`; the web pages only play saved
 frames. The rebuilt G3 renders its GIFs directly with matplotlib in the same visual grammar.
 
-See [`ASSUMPTIONS.md`](ASSUMPTIONS.md), [`RESULTS.md`](RESULTS.md), and
-[`CITATIONS.md`](CITATIONS.md) for interpretation boundaries and sources.
+See [`ASSUMPTIONS.md`](ASSUMPTIONS.md), [`RESULTS.md`](RESULTS.md),
+[`CITATIONS.md`](CITATIONS.md), and
+[`parameter_provenance.md`](parameter_provenance.md) (English) or
+[`parameter_provenance_zh-TW.md`](parameter_provenance_zh-TW.md)（繁體中文）
+for interpretation boundaries, sources, and the current-versus-target ECM
+parameter table.
 
 ## Separate future biology track
 
