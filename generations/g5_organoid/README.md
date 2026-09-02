@@ -74,12 +74,23 @@ which needs **Stage D (released cells)**, not fixed contraction. Longer time hel
 −0.41 → −0.22 from 120 s → 300 s) but plateaus at mechanical equilibrium; progressive remodelling
 beyond that needs **Stage E plasticity**.
 
-## Not yet built (later stages)
+## Stage D — released cells invade (built)
 
-- **Stage D** — release cell translation/rotation (cell–cell adhesion already implemented as
-  `cell_cell_forces`); expected to produce the swirling that drives a real radial aster + the
-  collective-vs-single-cell transition.
-- **Stage E** — matrix plasticity (crosslink rupture/reform) so the aster persists.
+`run_organoid_invasion(cfg)` releases the cells: each cell translates (overdamped, speed-capped) under
+the **reaction of its own grip-and-reel traction** (`per_cell_reaction`) — reeling gripped collagen
+inward pulls the cell *toward* the ECM, i.e. **outward invasion** — plus cell–cell adhesion. Demo (500 s,
+37 cells): the organoid spreads 38 → 44 µm, cells invade **+5.8 µm** mean. Adhesion strength is the
+collective-vs-escape knob (low `cc_adhesion` → larger max single-cell displacement). `build_demo` /
+`visualize.animate_invasion` render a clearer GIF: **moving cell disks + outward trails + a plain
+"cells invaded outward: +X µm" readout**.
+
+Still elastic and speed-capped, so invasion saturates; progressive, persistent invasion needs Stage E.
+
+## Not yet built
+
+- **Stage E** — matrix plasticity (crosslink rupture/reform) so deformation and invasion persist
+  (irreversible), matching the multi-hour experimental window instead of an elastic plateau.
+- Sharper **swirling** / true radial aster (may need a tangential motility bias or higher traction).
 
 ## Status
 

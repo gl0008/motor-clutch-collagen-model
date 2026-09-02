@@ -103,5 +103,16 @@ class StageBAlignment(unittest.TestCase):
         self.assertGreater(out["frames"][-1]["rms_bead_disp"], 1e-3)
 
 
+class StageDInvasion(unittest.TestCase):
+    def test_released_cells_invade_outward(self):
+        """Stage D: grip-reel reaction pushes released cells outward into the matrix."""
+        from generations.g5_organoid.model import run_organoid_invasion
+        out = run_organoid_invasion(SMALL, seed=23)
+        last = out["frames"][-1]
+        self.assertTrue(np.all(np.isfinite(out["centers_final"])))
+        self.assertGreater(last["max_cell_disp"], 1e-3)          # cells actually moved
+        self.assertGreater(last["mean_cell_radial_disp"], 0.0)   # net outward = invasion
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -116,6 +116,52 @@ def animate(snapshots, edges, centers, out_path, *, crosslinks=None, cell_radius
     return out_path
 
 
+def animate_invasion(bead_snaps, cell_snaps, edges, out_path, *, cell_radius=9.0,
+                     span=None, fps=6, crosslinks=None,
+                     title="G5 Stage D: organoid cells invade collagen"):
+    """Clearer Stage-D GIF: moving cells (bright) + trails + collagen by radial order.
+
+    The headline is CELL MOTION: disks move outward (invasion) leaving trails, while
+    the collagen they drag is coloured blue (tangential) -> red (radial).  A plain
+    readout reports how far the cells have invaded.
+    """
+    from matplotlib.animation import FuncAnimation, PillowWriter
+
+    bead_snaps = np.asarray(bead_snaps)
+    cell_snaps = np.asarray(cell_snaps)
+    c0 = cell_snaps[0]
+    center = np.zeros(2)
+    if span is None:
+        span = float(np.max(np.abs(bead_snaps[0]))) * 1.02
+    fig, ax = plt.subplots(figsize=(6.6, 6.6))
+
+    def draw(k):
+        ax.clear()
+        pos = bead_snaps[k]
+        order = _order(pos, edges, center)
+        segs = np.stack([pos[edges[:, 0]], pos[edges[:, 1]]], axis=1)
+        lc = LineCollection(segs, cmap="coolwarm", norm=plt.Normalize(-1, 1),
+                            linewidths=0.6, alpha=0.85)
+        lc.set_array(order)
+        ax.add_collection(lc)
+        # cell trails (start -> current)
+        cells = cell_snaps[k]
+        trails = np.stack([c0, cells], axis=1)
+        ax.add_collection(LineCollection(trails, colors="#111", linewidths=0.6, alpha=0.35))
+        for c in cells:
+            ax.add_patch(plt.Circle(c, cell_radius, color="#2c7fb8", alpha=0.85, lw=0))
+        invaded = float(np.mean(np.linalg.norm(cells, axis=1) - np.linalg.norm(c0, axis=1)))
+        ax.set_xlim(-span, span); ax.set_ylim(-span, span)
+        ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+        ax.set_title("%s\nframe %d/%d   cells invaded outward: %+.1f um   (blue tangential -> red radial)"
+                     % (title, k + 1, len(bead_snaps), invaded), fontsize=9)
+
+    anim = FuncAnimation(fig, draw, frames=len(bead_snaps), interval=1000 / fps)
+    anim.save(out_path, writer=PillowWriter(fps=fps))
+    plt.close(fig)
+    return out_path
+
+
 if __name__ == "__main__":
     src = sys.argv[1] if len(sys.argv) > 1 else "output/g5_fullscale_seed23.npz"
     print("wrote", render(src))

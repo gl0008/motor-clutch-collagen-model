@@ -94,6 +94,13 @@ class OrganoidConfig(CollagenConfig):
     cc_adhesion: float = 6.0             # nN/um, short-range cohesion (surface tension)
     cc_adhesion_range: float = 6.0       # um, how far past contact adhesion reaches
 
+    # --- Stage D: released rigid cells (translation under overdamped dynamics) ---
+    # Each cell feels the reaction of the traction it applies to collagen (grip-and-
+    # reel pulls the cell toward the ECM = outward invasion) plus cell-cell adhesion.
+    # Adhesion strength sets collective (front stays cohesive) vs single-cell escape.
+    cell_drag: float = 400.0             # nN*s/um, cell body drag
+    max_cell_speed: float = 0.02         # um/s, biological guard on cell speed
+
     # --- collagen network (scaled up from the 99-fibre / 180 um G2 baseline) ---
     # Softened, lightly crosslinked collagen so the pull can visibly reorganise the
     # near-field into a radial aster (same prof-requested softening as G3/G4:
@@ -400,24 +407,16 @@ def cell_cell_forces(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
     """
 
     centers = np.asarray(centers, dtype=float)
-    m = len(centers)
-    forces = np.zeros((m, 2))
     d_eq = cfg.cell_spacing
     cutoff = d_eq + cfg.cc_adhesion_range
-    for a in range(m):
-        for b in range(a + 1, m):
-            delta = centers[b] - centers[a]
-            dist = float(np.hypot(delta[0], delta[1]))
-            if dist < 1e-9 or dist >= cutoff:
-                continue
-            unit = delta / dist
-            if dist < d_eq:
-                mag = cfg.cc_repulsion * (d_eq - dist)      # >0 -> push apart
-            else:
-                mag = -cfg.cc_adhesion * (dist - d_eq)      # <0 -> pull together
-            forces[a] -= mag * unit
-            forces[b] += mag * unit
-    return forces
+    d = centers[None, :, :] - centers[:, None, :]          # d[a,b] = c_b - c_a
+    dist = np.linalg.norm(d, axis=2)
+    safe = np.maximum(dist, 1e-12)
+    unit = d / safe[:, :, None]
+    mag = np.where(dist < d_eq, cfg.cc_repulsion * (d_eq - dist),
+                   np.where(dist < cutoff, -cfg.cc_adhesion * (dist - d_eq), 0.0))
+    mag[dist < 1e-9] = 0.0                                  # self / coincident
+    return -np.sum(mag[:, :, None] * unit, axis=1)         # F_a = -sum_b mag*unit
 
 
 # =================================================================================
@@ -827,6 +826,113 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
         "cell_cell_rest_force_max": float(
             np.max(np.linalg.norm(cell_cell_forces(centers, cfg), axis=1))
         ),
+    }
+
+
+# =================================================================================
+# Stage D driver: released cells (grip-reel reaction -> invasion; adhesion sets mode)
+# =================================================================================
+def per_cell_reaction(per_cell: list, total_force: float) -> np.ndarray:
+    """Reaction force on each cell = -(traction it applies to collagen).
+
+    A cell reels its gripped fibres inward, so the reaction points OUTWARD toward the
+    ECM it grips -- a grappling pull that drives the cell into the matrix (invasion).
+    """
+
+    reac = np.zeros((len(per_cell), 2))
+    for c, patches in enumerate(per_cell):
+        for p in patches:
+            reac[c] -= total_force * p.weight * p.normal_in
+    return reac
+
+
+def run_organoid_invasion(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
+                          snapshots: bool = False) -> dict:
+    """Stage D: release the cells.  Each cell translates under the reaction of its own
+    grip-and-reel traction (pulls it toward the ECM = outward invasion) plus cell-cell
+    adhesion.  Strong adhesion -> the front stays cohesive (collective); weak adhesion
+    -> cells escape singly.  Returns invasion metrics + optional bead/cell snapshots.
+    """
+
+    network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
+    centers = centers.copy()
+    centers0 = centers.copy()
+    organoid_center = np.zeros(2)
+    stepper = OrganoidStepper(network, centers)
+    reach = cfg.cell_radius + cfg.contact_width + 2.0
+
+    nsteps = int(round(cfg.duration / cfg.dt))
+    every = max(1, int(round(cfg.sample_interval / cfg.dt)))
+    contact_every = max(1, int(round(cfg.contact_update_interval / cfg.dt)))
+
+    def refresh():
+        cand = cell_candidate_fibers(network, centers, reach)
+        active_full, per_cell = organoid_active_forces(
+            network, centers, cfg.total_pull_force, candidates=cand)
+        return active_full, per_cell, per_cell_reaction(per_cell, cfg.total_pull_force)
+
+    active_full, per_cell, reaction = refresh()
+    frames: list[dict] = []
+    bead_snaps: list[np.ndarray] = []
+    cell_snaps: list[np.ndarray] = []
+
+    for step in range(nsteps + 1):
+        time = step * cfg.dt
+        ramp = min(1.0, time / cfg.force_ramp_time) if cfg.force_ramp_time else 1.0
+        if step and step % contact_every == 0:
+            active_full, per_cell, reaction = refresh()
+        active = active_full * ramp
+
+        if step % every == 0:
+            prof = radial_alignment_profile(network, organoid_center)
+            radial_disp = float(np.mean(
+                np.linalg.norm(centers, axis=1) - np.linalg.norm(centers0, axis=1)))
+            spread = float(np.mean(np.linalg.norm(centers - organoid_center, axis=1)))
+            frames.append({
+                "time": time,
+                "global_radial_order": prof["global_radial_order"],
+                "shells": prof["shells"],
+                "n_gripping_cells": int(sum(1 for p in per_cell if p)),
+                "mean_cell_radial_disp": radial_disp,   # >0 = outward invasion
+                "cell_spread": spread,
+                "max_cell_disp": float(np.max(np.linalg.norm(centers - centers0, axis=1))),
+            })
+            if snapshots:
+                bead_snaps.append(network.r.copy())
+                cell_snaps.append(centers.copy())
+
+        if step == nsteps:
+            break
+
+        # move cells: reaction (grip-reel) + cell-cell adhesion, overdamped + capped
+        f_cell = reaction * ramp + cell_cell_forces(centers, cfg)
+        v_cell = f_cell / cfg.cell_drag
+        speed = np.linalg.norm(v_cell, axis=1)
+        over = speed > cfg.max_cell_speed
+        if np.any(over):
+            v_cell[over] *= (cfg.max_cell_speed / speed[over])[:, None]
+        centers += cfg.dt * v_cell
+        stepper.centers[:] = centers          # repulsion follows the moved cells
+
+        stepper.step(active, cfg.dt)
+
+    return {
+        "config": asdict(cfg),
+        "centers0": centers0,
+        "centers_final": centers,
+        "organoid_center": organoid_center,
+        "connectivity": report,
+        "n_cells": len(centers),
+        "n_beads": len(network.r),
+        "n_fibers": len(network.fibers),
+        "frames": frames,
+        "bead_snapshots": np.asarray(bead_snaps) if snapshots else None,
+        "cell_snapshots": np.asarray(cell_snaps) if snapshots else None,
+        "final_positions": network.r.copy(),
+        "initial_positions": network.r0.copy(),
+        "edges": network.edges.copy(),
+        "crosslinks": [(int(x.edge_a), float(x.alpha_a), int(x.edge_b), float(x.alpha_b))
+                       for x in network.crosslinks],
     }
 
 
