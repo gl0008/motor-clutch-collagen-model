@@ -33,11 +33,27 @@ Full architecture, scale, parameters, validation targets and ablation design:
 - **Foundation:** reuses `g2_corrected/common/model.py` unchanged (`Network`, `contact_patches`,
   bead-spring energies). Does **not** extend g4_v2's `run_clutch` monolith.
 
+## Performance (done)
+
+All three walls from plan §6 are addressed, so a full-scale organoid (43 cells, ~24k beads, 420
+fibres, 2400 steps) runs in **~8 s** (was ~300 s):
+
+- **Numba integrator** (`_advance_organoid_numba` / `OrganoidStepper`) — the g4_v2 kernel generalised
+  so the repulsion loop sums over M cell centres. Bit-identical to the NumPy force law (0.0 diff).
+- **O(E) spatial-grid crosslinker** (`build_crosslinks_grid`) replaces g2's O(F²) fibre-pair build
+  (nf=520 builds in <1 s, conn 0.92).
+- **Cached candidate contacts** (`cell_candidate_fibers`) — fixed cells have a stable set of grippable
+  near fibres, so contact detection skips the O(M·F) sweep.
+
+`python generations/g5_organoid/visualize.py output/<run>.npz` renders a before/after radial-order
+figure.
+
 ## Not yet built (later stages)
 
-Cell translation/rotation (**Stage D**, collective vs single-cell), strain-stiffening (**C**), matrix
-plasticity / persistent aster (**E**), a Numba integrator + spatial neighbour grid (perf — the network
-build and per-step scatter are the known walls; see plan §6).
+Cell translation/rotation (**Stage D**, collective vs single-cell), strain-stiffening (**C**, to
+propagate the pull further and sharpen the aster), matrix plasticity / persistent aster (**E**). The
+current near-field alignment is real but modest (sparse corona → only surface cells grip); Stage C and
+a denser corona are the levers to a dramatic aster.
 
 ## Status
 

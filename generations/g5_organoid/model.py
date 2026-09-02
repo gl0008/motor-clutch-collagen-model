@@ -56,6 +56,11 @@ from common.model import (  # noqa: E402
     _curved_segment,
 )
 
+try:  # Numba accelerates the per-step force balance; NumPy is the fallback.
+    from numba import njit
+except Exception:  # pragma: no cover
+    njit = None
+
 
 # =================================================================================
 # Configuration
@@ -70,7 +75,7 @@ class OrganoidConfig(CollagenConfig):
     """
 
     # --- domain (large enough for the ~organoid + ~200 um remodelling halo) ---
-    domain_size: float = 480.0
+    domain_size: float = 440.0
 
     # --- single cell ---
     cell_radius: float = 9.0             # one tumour cell (movies: ~15-20 um dia)
@@ -79,7 +84,7 @@ class OrganoidConfig(CollagenConfig):
     organoid_radius: float = 63.0        # target radius for cell CENTRES (core)
     cell_spacing: float = 18.0           # hex lattice pitch (= 2*cell_radius touch)
     gap: float = 1.5                     # fibre-free ring beyond the organoid at t=0
-    n_corona_fibers: int = 60            # short fibres hugging the organoid (grippable collagen)
+    n_corona_fibers: int = 90            # short fibres hugging the organoid (grippable collagen)
     corona_band: float = 12.0            # radial thickness of the near-field corona
 
     # --- simplified cell-cell interaction (piecewise-linear soft adhesive disk) ---
@@ -95,17 +100,17 @@ class OrganoidConfig(CollagenConfig):
     # 3 MPa modulus, 10 nN/um links).  Not the stiff 32 MPa G2 default.
     collagen_modulus_mpa: float = 3.0
     crosslink_stiffness: float = 10.0
-    n_fibers: int = 260
+    n_fibers: int = 420
     crosslink_fraction: float = 0.85     # keep most auto-generated links (connectivity)
-    boundary_width: float = 5.0          # anchoring band; wider -> better boundary percolation
+    boundary_width: float = 6.0          # anchoring band; wider -> better boundary percolation
     contact_width: float = 8.0           # grip shell so surface cells reach the corona
     total_pull_force: float = 12.0       # nN, per cell (tens-of-nN traction scale)
 
     # --- integration / output ---
-    dt: float = 0.02
+    dt: float = 0.05
     duration: float = 120.0
     sample_interval: float = 2.0
-    contact_update_interval: float = 0.5
+    contact_update_interval: float = 4.0  # cells are fixed -> contacts drift slowly
     force_ramp_time: float = 5.0
     required_connected_fraction: float = 0.55
     generation_attempts: int = 25
@@ -259,6 +264,62 @@ def _assemble_organoid_spec(cfg: OrganoidConfig, rng, gap_radius: float, seed_us
     return NetworkSpec(np.asarray(positions), fibers, np.asarray(fixed), contact_fibers, seed_used)
 
 
+def build_crosslinks_grid(network: Network) -> list:
+    """O(E) spatial-grid crosslinker: intersections of edges on DIFFERENT fibres.
+
+    Replaces the G2 O(F^2) fibre-pair double loop.  Edges (bead-to-bead segments,
+    ~bead_spacing long) are binned by midpoint; only edges in the same / adjacent
+    bins are intersection-tested.  Produces the same permanent hinged links joining
+    coincident material points on different fibres, deduplicated by proximity.
+    """
+
+    from common.model import Crosslink  # local import to avoid cycle at top
+
+    r = network.r
+    edges = network.edges
+    efib = network.edge_fiber
+    p = r[edges[:, 0]]
+    d = r[edges[:, 1]] - p
+    mid = p + 0.5 * d
+    bin_size = max(2.0, 2.0 * float(network.cfg.bead_spacing))
+    keys = np.floor(mid / bin_size).astype(np.int64)
+
+    grid: dict = {}
+    for e in range(len(edges)):
+        grid.setdefault((keys[e, 0], keys[e, 1]), []).append(e)
+
+    stiffness = network.cfg.crosslink_stiffness
+    links: list = []
+    seen: set = set()
+    neigh = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)]
+    for (bx, by), es in grid.items():
+        cand: list = []
+        for dx, dy in neigh:
+            cand.extend(grid.get((bx + dx, by + dy), ()))
+        for e in es:
+            pe = p[e]; de = d[e]; fe = efib[e]
+            for f in cand:
+                if f <= e or efib[f] == fe:
+                    continue
+                pf = p[f]; df = d[f]
+                den = de[0] * df[1] - de[1] * df[0]
+                if abs(den) < 1e-10:
+                    continue
+                qp = pf - pe
+                ta = (qp[0] * df[1] - qp[1] * df[0]) / den
+                tb = (qp[0] * de[1] - qp[1] * de[0]) / den
+                if not (1e-5 < ta < 1.0 - 1e-5 and 1e-5 < tb < 1.0 - 1e-5):
+                    continue
+                point = pe + ta * de
+                fa, fb = (fe, efib[f]) if fe < efib[f] else (efib[f], fe)
+                key = (int(fa), int(fb), int(round(point[0] / 0.6)), int(round(point[1] / 0.6)))
+                if key in seen:
+                    continue
+                seen.add(key)
+                links.append(Crosslink(int(e), float(ta), int(f), float(tb), np.zeros(2), stiffness))
+    return links
+
+
 def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
     """Pack the cells and build a crosslinked, boundary-anchored collagen network.
 
@@ -279,7 +340,9 @@ def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
         spec = _assemble_organoid_spec(
             cfg, np.random.default_rng(seed_used), gap_radius, seed_used
         )
-        network = Network(spec, cfg)  # crosslinks auto-built in __init__
+        network = Network(spec, cfg, crosslinks=[])  # skip G2 O(F^2) auto-build
+        network.crosslinks = build_crosslinks_grid(network)  # O(E) grid crosslinker
+        network.refresh_crosslink_arrays()
         if cfg.crosslink_fraction < 1.0 and network.crosslinks:
             rng = np.random.default_rng(seed_used + 101)
             keep = rng.random(len(network.crosslinks)) < cfg.crosslink_fraction
@@ -336,6 +399,139 @@ def cell_cell_forces(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
 
 
 # =================================================================================
+# Numba per-step integrator (generalised to M cell centres)
+# =================================================================================
+if njit is not None:
+
+    @njit(cache=True)
+    def _advance_organoid_numba(
+        r, r0, fixed, edges, l0, k_tension, k_compression,
+        triplets, curvature0, bend_coefficient,
+        link_edge_a, link_edge_b, link_alpha_a, link_alpha_b,
+        link_rest, link_stiffness, active, centers,
+        cell_radius, cell_clearance, repulsion_stiffness,
+        bead_drag, dt, velocity, total,
+    ):
+        """Allocation-free G2 force balance with repulsion summed over M disks.
+
+        Identical stretch / bend / crosslink law to the G2 ``elastic_forces``
+        (lifted from g4_v2 ``_advance_numba``); the only generalisation is the
+        repulsion loop, which sums soft no-penetration over every cell centre.
+        """
+
+        total[:, :] = 0.0
+        for e in range(edges.shape[0]):
+            i = edges[e, 0]
+            j = edges[e, 1]
+            dx = r[j, 0] - r[i, 0]
+            dy = r[j, 1] - r[i, 1]
+            length = math.sqrt(dx * dx + dy * dy)
+            if length < 1e-12:
+                length = 1e-12
+            extension = length - l0[e]
+            stiffness = k_tension[e] if extension >= 0.0 else k_compression[e]
+            scale = stiffness * extension / length
+            fx = scale * dx
+            fy = scale * dy
+            total[i, 0] += fx
+            total[i, 1] += fy
+            total[j, 0] -= fx
+            total[j, 1] -= fy
+
+        for t in range(triplets.shape[0]):
+            a = triplets[t, 0]
+            b = triplets[t, 1]
+            c = triplets[t, 2]
+            qx = r[a, 0] - 2.0 * r[b, 0] + r[c, 0] - curvature0[t, 0]
+            qy = r[a, 1] - 2.0 * r[b, 1] + r[c, 1] - curvature0[t, 1]
+            fx = bend_coefficient * qx
+            fy = bend_coefficient * qy
+            total[a, 0] -= fx
+            total[a, 1] -= fy
+            total[b, 0] += 2.0 * fx
+            total[b, 1] += 2.0 * fy
+            total[c, 0] -= fx
+            total[c, 1] -= fy
+
+        for x in range(link_edge_a.shape[0]):
+            ea = link_edge_a[x]
+            eb = link_edge_b[x]
+            ia = edges[ea, 0]
+            ja = edges[ea, 1]
+            ib = edges[eb, 0]
+            jb = edges[eb, 1]
+            aa = link_alpha_a[x]
+            ab = link_alpha_b[x]
+            pax = (1.0 - aa) * r[ia, 0] + aa * r[ja, 0]
+            pay = (1.0 - aa) * r[ia, 1] + aa * r[ja, 1]
+            pbx = (1.0 - ab) * r[ib, 0] + ab * r[jb, 0]
+            pby = (1.0 - ab) * r[ib, 1] + ab * r[jb, 1]
+            fx = link_stiffness[x] * (pbx - pax - link_rest[x, 0])
+            fy = link_stiffness[x] * (pby - pay - link_rest[x, 1])
+            total[ia, 0] += (1.0 - aa) * fx
+            total[ia, 1] += (1.0 - aa) * fy
+            total[ja, 0] += aa * fx
+            total[ja, 1] += aa * fy
+            total[ib, 0] -= (1.0 - ab) * fx
+            total[ib, 1] -= (1.0 - ab) * fy
+            total[jb, 0] -= ab * fx
+            total[jb, 1] -= ab * fy
+
+        min_radius = cell_radius + cell_clearance
+        for i in range(r.shape[0]):
+            for c in range(centers.shape[0]):
+                dx = r[i, 0] - centers[c, 0]
+                dy = r[i, 1] - centers[c, 1]
+                radius = math.sqrt(dx * dx + dy * dy)
+                if radius < min_radius:
+                    safe = radius if radius > 1e-12 else 1e-12
+                    force = repulsion_stiffness * (min_radius - radius) / safe
+                    total[i, 0] += force * dx
+                    total[i, 1] += force * dy
+            total[i, 0] += active[i, 0]
+            total[i, 1] += active[i, 1]
+            if fixed[i]:
+                velocity[i, 0] = 0.0
+                velocity[i, 1] = 0.0
+                r[i, 0] = r0[i, 0]
+                r[i, 1] = r0[i, 1]
+            else:
+                velocity[i, 0] = total[i, 0] / bead_drag
+                velocity[i, 1] = total[i, 1] / bead_drag
+                r[i, 0] += dt * velocity[i, 0]
+                r[i, 1] += dt * velocity[i, 1]
+
+
+class OrganoidStepper:
+    """Preallocated overdamped integrator (Numba if available, else NumPy)."""
+
+    def __init__(self, network: Network, centers: np.ndarray):
+        self.n = network
+        self.centers = np.ascontiguousarray(centers, dtype=float)
+        self.velocity = np.zeros_like(network.r)
+        self.total = np.zeros_like(network.r)
+
+    def step(self, active: np.ndarray, dt: float) -> None:
+        n = self.n
+        if njit is not None:
+            _advance_organoid_numba(
+                n.r, n.r0, n.fixed, n.edges, n.l0, n.k_tension, n.k_compression,
+                n.triplets, n.curvature0, n.bend_coefficient,
+                n.link_edge_a, n.link_edge_b, n.link_alpha_a, n.link_alpha_b,
+                n.link_rest, n.link_stiffness, active, self.centers,
+                n.cfg.cell_radius, n.cfg.cell_clearance, n.cfg.repulsion_stiffness,
+                n.cfg.bead_drag, dt, self.velocity, self.total,
+            )
+        else:  # pragma: no cover - exercised only without Numba
+            fs, fb, fx, _, _, _ = n.elastic_forces(True)
+            total = fs + fb + fx + multi_cell_repulsion(n, self.centers) + active
+            total[n.fixed] = 0.0
+            n.r[~n.fixed] += dt * (total[~n.fixed] / n.cfg.bead_drag)
+        if not np.all(np.isfinite(n.r)):
+            raise FloatingPointError("non-finite bead position; reduce dt")
+
+
+# =================================================================================
 # Multi-cell coupling to the collagen network
 # =================================================================================
 def multi_cell_repulsion(network: Network, centers: np.ndarray) -> np.ndarray:
@@ -358,24 +554,87 @@ def multi_cell_repulsion(network: Network, centers: np.ndarray) -> np.ndarray:
     return force
 
 
-def organoid_active_forces(network: Network, centers: np.ndarray, total_force: float):
+def cell_candidate_fibers(network: Network, centers: np.ndarray, reach: float) -> list:
+    """Fibres with any bead within ``reach`` of each cell centre (computed once).
+
+    Cells are fixed in Stage B, so this list is stable and lets the contact search
+    skip the O(M*F) sweep over every fibre -- only these few near fibres can be
+    gripped.
+    """
+
+    fiber_of_bead = np.empty(len(network.r), dtype=np.int64)
+    for fid, ids in enumerate(network.fibers):
+        fiber_of_bead[ids] = fid
+    out: list = []
+    for center in centers:
+        dist = np.linalg.norm(network.r - center, axis=1)
+        out.append(np.unique(fiber_of_bead[dist < reach]))
+    return out
+
+
+def _cell_patches(network: Network, center: np.ndarray, fiber_ids) -> list:
+    """G2 hard-contact + Gaussian weighting, restricted to candidate fibres."""
+
+    from common.model import ContactPatch  # local import
+
+    cfg = network.cfg
+    candidates: list = []
+    for fid in fiber_ids:
+        edge_ids = np.flatnonzero(network.edge_fiber == fid)
+        if not len(edge_ids):
+            continue
+        pairs = network.edges[edge_ids]
+        a = network.r[pairs[:, 0]]
+        d = network.r[pairs[:, 1]] - a
+        alpha = np.clip(
+            np.sum((center - a) * d, axis=1) / np.maximum(np.sum(d * d, axis=1), 1e-12),
+            0.0, 1.0,
+        )
+        point = a + alpha[:, None] * d
+        radial = point - center
+        radius = np.linalg.norm(radial, axis=1)
+        surface = radius - cfg.cell_radius
+        eligible = (surface >= 0.0) & (surface <= cfg.contact_width)
+        if np.any(eligible):
+            local = int(np.flatnonzero(eligible)[np.argmin(surface[eligible])])
+            candidates.append(
+                ContactPatch(
+                    int(fid), int(edge_ids[local]), float(alpha[local]),
+                    point[local].copy(), float(surface[local]), 0.0,
+                    -radial[local] / max(float(radius[local]), 1e-12),
+                )
+            )
+    if not candidates:
+        return []
+    raw = np.exp(-np.square([x.surface_distance for x in candidates]) / cfg.gaussian_sigma**2)
+    raw /= np.sum(raw)
+    for patch, weight in zip(candidates, raw):
+        patch.weight = float(weight)
+    return candidates
+
+
+def organoid_active_forces(network: Network, centers: np.ndarray, total_force: float,
+                           candidates: list | None = None):
     """Every cell grips nearby fibres all-around and reels them inward.
 
-    Reuses the G2 Gaussian contact kernel per cell (full 360 deg sector).  Only
-    cells whose contact shell overlaps a fibre contribute -- i.e. the organoid
-    SURFACE cells -- so the collective effect is an inward radial pull on the
-    surrounding matrix.  Returns ``(nodal_force, per_cell_patches)``.
+    Reuses the G2 Gaussian contact kernel per cell.  Only cells whose contact shell
+    overlaps a fibre contribute -- the organoid SURFACE cells -- so the collective
+    effect is an inward radial pull on the surrounding matrix.  ``candidates`` is a
+    per-cell list of near-fibre ids (see :func:`cell_candidate_fibers`); when given,
+    the contact search skips the full-fibre sweep.  Returns ``(nodal, per_cell)``.
     """
 
     nodal = np.zeros_like(network.r)
     per_cell: list[list] = []
-    for center in centers:
-        patches = contact_patches(network, center, angle_deg=0.0, half_width_deg=180.0)
+    for c, center in enumerate(centers):
+        if candidates is not None:
+            patches = _cell_patches(network, center, candidates[c])
+        else:
+            patches = contact_patches(network, center, angle_deg=0.0, half_width_deg=180.0)
         per_cell.append(patches)
-        if not patches:
-            continue
-        f, _ = forces_from_patches(network, patches, total_force)
-        nodal += f
+        if patches:
+            f, _ = forces_from_patches(network, patches, total_force)
+            nodal += f
     nodal[network.fixed] = 0.0
     return nodal, per_cell
 
@@ -442,7 +701,11 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict
 
     network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
     organoid_center = np.zeros(2)
-    drag = cfg.bead_drag
+    stepper = OrganoidStepper(network, centers)
+    # Fixed cells -> the set of grippable near fibres is stable; cache it once so the
+    # contact search skips the O(M*F) full-fibre sweep.
+    reach = cfg.cell_radius + cfg.contact_width + 2.0
+    candidates = cell_candidate_fibers(network, centers, reach)
 
     nsteps = int(round(cfg.duration / cfg.dt))
     every = max(1, int(round(cfg.sample_interval / cfg.dt)))
@@ -452,14 +715,16 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict
     # ``active_full`` is the nodal pull at full magnitude for the current material
     # contacts; forces_from_patches is linear in the force, so each step just scales
     # it by the ramp -- no per-step per-cell loop.  Refreshed only on contact update.
-    active_full, per_cell = organoid_active_forces(network, centers, cfg.total_pull_force)
+    active_full, per_cell = organoid_active_forces(
+        network, centers, cfg.total_pull_force, candidates=candidates
+    )
 
     for step in range(nsteps + 1):
         time = step * cfg.dt
         ramp = min(1.0, time / cfg.force_ramp_time) if cfg.force_ramp_time else 1.0
         if step and step % contact_every == 0:
             active_full, per_cell = organoid_active_forces(
-                network, centers, cfg.total_pull_force
+                network, centers, cfg.total_pull_force, candidates=candidates
             )
         active = active_full * ramp
 
@@ -480,12 +745,7 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None) -> dict
         if step == nsteps:
             break
 
-        fs, fb, fx, energy, strain, link_force = network.elastic_forces(True)
-        total = fs + fb + fx + multi_cell_repulsion(network, centers) + active
-        total[network.fixed] = 0.0
-        network.r[~network.fixed] += cfg.dt * (total[~network.fixed] / drag)
-        if not np.all(np.isfinite(network.r)):
-            raise FloatingPointError("non-finite bead position; reduce dt")
+        stepper.step(active, cfg.dt)
 
     return {
         "config": asdict(cfg),
