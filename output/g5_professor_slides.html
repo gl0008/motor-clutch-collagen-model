@@ -313,6 +313,26 @@ tr:hover td{background:var(--paper2)}
   <div class="src"><span class="caveat">personal testing</span> · fixed cells · corona network · seed 23</div>
 </section>
 
+<!-- 8b G5-0C -->
+<section class="slide">
+  <div class="kicker"><span class="step">STEP 4 · G5-0C</span> motility control — adhesion still OFF</div>
+  <h2>Release the cells, but don't let them stick</h2>
+  <div class="body">
+    <div class="col wide"><div class="figwrap"><img class="fig" src="g5_0C_vs_g5_2h.gif" alt="G5-0C vs G5"></div>
+      <div class="figcap">Left: <strong>G5-0C</strong> — cells released, adhesion OFF → disperse. Right: <strong>G5</strong> — same, adhesion ON → cohesive front. Only <em>k_adh</em> differs.</div></div>
+    <div class="col narrow scroll">
+      <p class="ask">If we add motility but no cohesion, what happens?</p>
+      <p><strong>They disperse</strong> — cells invade independently (68 µm), no front. This is the pure single-cell baseline.</p>
+      <p>Turning adhesion back <strong>ON</strong> (→ G5) gives a cohesive collective front at the same traction. So <span class="hi">Δ(0C → G5) = the adhesion effect</span> — isolated, at last, as the final ingredient.</p>
+      <div class="two-num">
+        <div class="card"><div class="eqlabel">0C · adhesion off</div><div class="num">68</div>µm · disperses</div>
+        <div class="card"><div class="eqlabel">G5 · adhesion on</div><div class="num">25</div>µm · cohesive</div>
+      </div>
+    </div>
+  </div>
+  <div class="src"><span class="caveat">personal testing</span> · molecular clutch baseline · seed 23, 7200 s</div>
+</section>
+
 <!-- 9 G5 CELL-CELL -->
 <section class="slide">
   <div class="kicker"><span class="step">STEP 4 · G5</span> the one new physics</div>
@@ -371,24 +391,27 @@ tr:hover td{background:var(--paper2)}
 
 <!-- 11 RESULT: ablation -->
 <section class="slide">
-  <div class="kicker"><span class="step">G5 RESULT</span> which knob matters?</div>
+  <div class="kicker"><span class="step">G5 RESULT</span> which knob matters? — one change per panel</div>
   <h2>Ablation — attribute, don't just observe</h2>
   <div class="body">
-    <div class="col scroll">
+    <div class="col wide"><div class="figwrap"><img class="fig" src="ablation/g5_ablation_clutch_2h.gif" alt="ablation grid"></div>
+      <div class="figcap">8 panels, 2 h each; baseline = molecular clutch (adh 8); one mechanism changed per panel. Red = leader.</div></div>
+    <div class="col narrow scroll">
       <table>
-        <tr><th>Ablation</th><th>Effect on invasion</th><th>Reads as</th></tr>
-        <tr><td><strong>Clutch + slip</strong> vs constant pull</td><td class="mono">20 µm → 3 µm</td><td class="hi">biggest lever (soft regime)</td></tr>
-        <tr><td><strong>Remove crosslinks</strong></td><td class="mono">≈ no change in cell speed</td><td>connectivity ≠ cell speed here</td></tr>
-        <tr><td><strong>Raise adhesion / lower pull</strong></td><td class="mono">→ stuck (~3 µm)</td><td>cohesion holds the pack</td></tr>
-        <tr><td><strong>Lower adhesion</strong> (EMT-like)</td><td class="mono">→ 72 µm, disperses</td><td>unjamming → single-cell</td></tr>
+        <tr><th>Change</th><th>Inv.</th><th>Coh</th></tr>
+        <tr><td><strong>BASELINE</strong> (clutch)</td><td class="mono">25 µm</td><td class="mono">1.02</td></tr>
+        <tr><td><span class="hi">− clutch</span> (const pull)</td><td class="mono">4.7 µm</td><td class="mono">1.11</td></tr>
+        <tr><td><span class="hi">− adhesion</span> (=0C)</td><td class="mono">68 µm</td><td class="mono">1.91</td></tr>
+        <tr><td><span class="hi">− crosslinks</span></td><td class="mono">7.7 µm</td><td class="mono">1.02</td></tr>
+        <tr><td>+ strain-stiffening</td><td class="mono">24 µm</td><td class="mono">1.01</td></tr>
+        <tr><td>+ plasticity</td><td class="mono">25 µm</td><td class="mono">1.02</td></tr>
+        <tr><td>+ leaders (EMT)</td><td class="mono">60 µm</td><td class="mono">1.14</td></tr>
+        <tr><td>high adhesion</td><td class="mono">22 µm</td><td class="mono">1.00</td></tr>
       </table>
-      <p style="margin-top:12px">On soft matrix, <span class="hi">clutch slippage</span> gates how much force reaches the ECM; <strong>adhesion</strong> then decides collective vs single — consistent with G5-0B (traction doesn't amplify; adhesion does the work).</p>
-    </div>
-    <div class="col narrow center" style="justify-content:center">
-      <div class="card" style="width:100%"><div class="eqlabel">Design logic</div><p style="font-size:15px">Flip one mechanism, compare one metric — isolating each term in the force balance, the same discipline as the G5-0A/0B controls.</p></div>
+      <p style="font-size:13.5px"><strong>Three real levers:</strong> <span class="hi">clutch</span> drives invasion (25→4.7), <span class="hi">adhesion</span> is the cohesion switch (68 µm &amp; scatters when off), <span class="hi">crosslinks</span> transmit the pull (25→7.7). Stiffening / plasticity ≈ no effect; leaders → single-cell escape.</p>
     </div>
   </div>
-  <div class="src"><span class="caveat">personal testing</span> · molecular clutch baseline · seed 23, 7200 s</div>
+  <div class="src"><span class="caveat">personal testing</span> · molecular clutch baseline · seed 23, 7200 s · <span class="mono">output/ablation/</span></div>
 </section>
 
 
