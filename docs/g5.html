@@ -56,6 +56,8 @@ canvas#stage{width:100%;max-width:640px;height:auto;aspect-ratio:1/1;display:blo
 .regimeGrid article:first-child{border-color:#88939a;background:#f0f1f1}.regimeGrid article:last-child{border-color:var(--orange);background:#faece6}
 .regimeGrid b{display:block;margin-bottom:4px}.regimeGrid p{margin:0;color:var(--muted);font-size:14px}
 .evidenceStrip{border-left:5px solid var(--orange);background:#faece6;padding:12px 14px;border-radius:8px;font-size:14px}
+.archiveBlock{margin-top:18px;border:1px solid var(--line);border-radius:10px;background:#f4f0e7;padding:0 14px}
+.archiveBlock summary{cursor:pointer;font-weight:750;padding:14px 2px}.archiveBlock p{color:var(--muted)}
 .refs li{margin:6px 0;color:var(--muted);font-size:14px}
 footer{text-align:center;padding:28px;color:var(--muted)}
 @media(max-width:820px){.grid,.regimeGrid,.updateMedia{grid-template-columns:1fr}}
@@ -71,7 +73,7 @@ footer{text-align:center;padding:28px;color:var(--muted)}
   shared collagen network. It asks how the collective pull of many cells remodels the matrix and how the
   cells invade — grounded in Kolade/Gloria's 4MOSC1 organoid movies (~200 µm organoid, radial collagen,
   collective + occasional single-cell escape).</p>
-  <div class="facts"><span><b>43</b> cells / organoid</span><span><b>~200 µm</b> organoid scale</span><span><b>0A–0B</b> lineage controls</span><span><b>A–E + D v2/v3</b> staged build</span></div>
+  <div class="facts"><span><b>43</b> cells / organoid</span><span><b>~200 µm</b> organoid scale</span><span><b>0A–0C</b> lineage controls</span><span><b>8</b> one-factor ablations</span></div>
 </header>
 
 <main>
@@ -104,58 +106,88 @@ footer{text-align:center;padding:28px;color:var(--muted)}
     </div>
   </section>
 
+  <section class="latestUpdate" id="clutch-baseline">
+    <span class="latestBadge">Newest G5 result · 3 September 2026, 5:52 PM ET · clutch ablation</span>
+    <h2>Clutch drives motion; adhesion decides whether cells stay together</h2>
+    <p class="updateIntro">The current biological G5 baseline now inherits the <b>molecular clutch</b> from G4 instead of using a constant pull. Eight matched two-hour runs remove or add one mechanism at a time, so the storyline is causal rather than a collection of unrelated versions.</p>
+    <div class="updateMedia">
+      <figure>
+        <img src="g5-clutch-ablation-2h.gif" loading="lazy" alt="Eight-panel G5 molecular-clutch ablation at two hours">
+        <figcaption><b>One-factor ablation:</b> baseline clutch, no clutch, no adhesion, no crosslinks, strain-stiffening, plasticity, leaders and high adhesion. Every panel uses seed 23 and the same two-hour observation window.</figcaption>
+      </figure>
+      <figure>
+        <img src="g5-clutch-contract-2h.gif" loading="lazy" alt="Fixed G5 organoid contracting collagen through molecular clutches for two hours">
+        <figcaption><b>Fixed contraction:</b> the molecular clutch produces about 114 nN emergent traction and reorganises nearby collagen radially.</figcaption>
+      </figure>
+      <figure>
+        <img src="g5-clutch-invade-2h.gif" loading="lazy" alt="Released G5 organoid invading collagen through molecular clutches for two hours">
+        <figcaption><b>Released baseline:</b> identical adhesive cells move as a cohesive front rather than being assigned a leader in advance.</figcaption>
+      </figure>
+    </div>
+    <div class="regimeGrid">
+      <article><b>Remove clutch</b><p>Invasion falls from about 25 µm to 4.7 µm. The clutch is the main driver of motion in this baseline.</p></article>
+      <article><b>Remove adhesion</b><p>Invasion rises to 68 µm, but cohesion worsens from 1.02 to 1.91. Adhesion is the cohesion switch, not the motor.</p></article>
+      <article><b>Remove crosslinks</b><p>Invasion falls to 7.7 µm. Connected collagen is needed to transmit the clutch pull.</p></article>
+    </div>
+    <div class="evidenceStrip"><b>Evidence boundary.</b> These are seed-23, two-hour personal simulation tests, not experimentally validated findings. Stiffening and plasticity change invasion little in this particular clutch baseline; that does not replace the earlier matrix-alignment sweep, which measured a different outcome.</div>
+  </section>
+
   <section class="latestUpdate" id="lineage-controls">
-    <span class="latestBadge">Newest G5 update · 3 September 2026, 2:14 PM ET · G5-0B</span>
-    <h2>First isolate scale transfer, then change cell number</h2>
-    <p class="updateIntro">The G4→G5 audit found that drag, bead spacing, cell mobility, pull, cell radius, contact width and fibre density had changed alongside cell number. The new controls freeze the non-multicellular parameters to G4 so “multicellularity” is no longer mixed with silent recalibration.</p>
+    <span class="latestBadge">G5 lineage controls · 0A scale → 0B cell number → 0C adhesion</span>
+    <h2>Separate scale, cell number, motility and adhesion</h2>
+    <p class="updateIntro">The G4→G5 audit found that several parameters had changed alongside cell number. The 0A–0C controls now freeze the G4 clutch physics, restore near-cell fibre coverage with a corona network, and finally compare released cells with adhesion off versus on.</p>
     <div class="updateMedia compactMedia">
       <figure>
         <img src="g5-0a-scale-transfer.gif" loading="lazy" alt="G5-0A single-cell scale-transfer control with G4-frozen parameters">
         <figcaption><b>G5-0A:</b> per-active-sector traction transfers within 15% of G4. Lower total traction comes from only 3/12 sectors finding fibres, not changed clutch physics.</figcaption>
       </figure>
       <figure>
-        <img src="g5-0b-cell-number.gif" loading="lazy" alt="G5-0B cell-number-only control across one to 37 cells">
-        <figcaption><b>G5-0B:</b> per-active-sector traction stays about 4.2–5.5 nN from 1 to 37 cells. Cell number does not amplify an individual clutch.</figcaption>
+        <img src="g5-0b-cell-number.gif" loading="lazy" alt="G5-0B cell-number-only control across one to 19 cells on a corona collagen network">
+        <figcaption><b>G5-0B v2:</b> the corona network restores contact around the cells. Per-active-sector traction stays about 4.40–4.51 nN from 1 to 19 cells, so cell number does not amplify an individual clutch.</figcaption>
+      </figure>
+      <figure>
+        <img src="g5-0c-adhesion-control.gif" loading="lazy" alt="G5-0C comparison of released cells with cell-cell adhesion off and on">
+        <figcaption><b>G5-0C:</b> with the same clutch traction, adhesion-off cells move 68 µm and disperse; adhesion-on G5 cells move 25 µm as a cohesive front.</figcaption>
       </figure>
     </div>
     <div class="regimeGrid">
       <article><b>What transfers</b><p>Per-sector motor–clutch traction is consistent between G4 and the larger G5 domain.</p></article>
-      <article><b>What does not amplify</b><p>Adding cells does not make each active sector pull harder; current collective behaviour comes from cell–cell mechanics.</p></article>
-      <article><b>What needs repair</b><p>Angular fibre coverage is extremely sparse. The next clean fix is geometric coverage, not wider hidden contact.</p></article>
+      <article><b>What does not amplify</b><p>Adding cells does not make each active clutch pull harder: 4.50, 4.46, 4.51 and 4.40 nN for M=1, 7, 13 and 19.</p></article>
+      <article><b>What adhesion adds</b><p>The clutch can move individual cells without adhesion; adhesion converts that motion into a cohesive multicellular front.</p></article>
     </div>
-    <div class="evidenceStrip"><b>Interpretation boundary.</b> These are lineage controls, not a new biological phenotype. They identify which G4 physics transfers and which G5 geometry must be corrected before collective invasion is attributed confidently.</div>
+    <div class="evidenceStrip"><b>Interpretation boundary.</b> These lineage controls identify what each added layer contributes. They support the internal model logic, but the 68 µm versus 25 µm separation still needs calibration against the organoid movies.</div>
   </section>
 
   <section class="latestUpdate" id="leader-update">
-    <span class="latestBadge">G5D refinements · low adhesion v2 → high traction v3</span>
-    <h2>Leader cells expose three regimes—but do not yet drag followers</h2>
-    <p class="updateIntro">G5D v2 marks a small outer fraction as EMT-like leaders with reduced cell–cell adhesion and maps <b>stuck</b>, <b>collective-like</b> and <b>single-cell escape</b> regimes. G5D v3 adds a separate traction multiplier to the same leaders. This is a cleaner test because adhesion and traction are no longer bundled.</p>
+    <span class="latestBadge">Current mode comparison · molecular clutch baseline</span>
+    <h2>Adhesion moves G5 from cohesive to collective to single-cell escape</h2>
+    <p class="updateIntro">The current three-mode comparison keeps the molecular-clutch baseline fixed. Cohesive and collective cases differ only in cell–cell adhesion; the single-cell case combines weak adhesion with a sparse low-adhesion leader population.</p>
     <div class="updateMedia">
       <figure>
-        <img src="g5-leader-strand-2h.gif" loading="lazy" alt="Two-hour G5 comparison testing whether high-traction leader cells drag connected followers">
-        <figcaption>Latest leader–follower test. Higher leader traction produces a fast leader, but followers remain about 6–7 µm behind the leading displacement; the connected strand is not yet recovered.</figcaption>
-      </figure>
-      <figure>
-        <img src="g5-three-modes-v2-2h.gif" loading="lazy" alt="Two-hour G5 simulations comparing stuck, collective-strand and single-cell invasion modes">
-        <figcaption>Two-hour comparison. Red marks low-adhesion leader cells; all three panels use the same model with different adhesion and pull.</figcaption>
-      </figure>
-      <figure>
-        <img src="g5-phase-diagram-3regime.png" loading="lazy" alt="G5 phase diagram across cell-cell adhesion and traction pull">
-        <figcaption>Mechanical phase diagram: adhesion × pull. The collective regime occupies the transition between a cohesive stuck pack and dispersal.</figcaption>
+        <img src="g5-three-modes-clutch-2h.gif" loading="lazy" alt="Two-hour molecular-clutch G5 comparison of cohesive, collective and single-cell invasion">
+        <figcaption>Matched two-hour comparison. Red cells mark the sparse leader population only in the single-cell-escape condition.</figcaption>
       </figure>
     </div>
     <div class="regimeGrid">
-      <article><b>Stuck</b><p>Adhesion 60, pull 6 nN: about 3 µm invasion; the organoid remains cohesive.</p></article>
-      <article><b>Collective strand</b><p>Adhesion 8, pull 45 nN, 12% leaders: about 18 µm invasion while cells remain connected.</p></article>
-      <article><b>Single-cell escape</b><p>Adhesion 1, pull 45 nN, 12% leaders: about 72 µm invasion with strong dispersal.</p></article>
+      <article><b>Cohesive · adhesion 60</b><p>About 22 µm invasion with cohesion 1.00: the pack stays tightly connected.</p></article>
+      <article><b>Collective · adhesion 8</b><p>About 25 µm invasion with cohesion 1.02: cells advance together as a cohesive front.</p></article>
+      <article><b>Single-cell · adhesion 1 + leaders</b><p>About 78 µm invasion with cohesion 1.62: weakly attached cells escape much farther.</p></article>
     </div>
-    <div class="evidenceStrip"><b>Evidence boundary.</b> These are seed-23, two-hour personal simulation tests, not experimentally validated findings. High traction is now implemented, but the displayed factor-1.8 comparison does not improve follower advance. MMP secretion and measured leader phenotypes remain outside the model.</div>
+    <div class="evidenceStrip"><b>Important definition.</b> “Stuck” is no longer produced by high adhesion alone. A genuinely low-motion condition requires weak traction or turning the clutch off, which gives about 4.7 µm movement in the ablation above.</div>
+    <details class="archiveBlock">
+      <summary>Earlier leader-traction experiment and adhesion × constant-pull map</summary>
+      <p>Before the molecular-clutch baseline was adopted, G5D v2/v3 varied prescribed pull and leader adhesion. Extra leader traction made one leader fast but did not pull a connected follower strand. These figures remain part of the evolution record, but they are not the current baseline.</p>
+      <div class="updateMedia">
+        <figure><img src="g5-leader-strand-2h.gif" loading="lazy" alt="Archived leader-traction comparison"><figcaption>Earlier factor-1.8 leader-traction test: followers remained about 6–7 µm behind.</figcaption></figure>
+        <figure><img src="g5-phase-diagram-3regime.png" loading="lazy" alt="Archived adhesion and constant-pull phase diagram"><figcaption>Earlier exploratory adhesion × prescribed-pull map.</figcaption></figure>
+      </div>
+    </details>
   </section>
 
   <section class="latestUpdate" id="stiffness-update">
-    <span class="latestBadge">Updated G5C result · stiffness × strain-stiffening</span>
-    <h2>Three MPa is the current alignment regime</h2>
-    <p class="updateIntro">The newer two-hour sweep changes the earlier “negligible stiffening” conclusion. At E=3 MPa, turning strain-stiffening on gives the largest recorded rise in near-field aster order and the tightest cohesion in this exploratory grid.</p>
+    <span class="latestBadge">Earlier G5C alignment sweep · retained as supporting evidence</span>
+    <h2>Stiffening affects alignment more clearly than invasion</h2>
+    <p class="updateIntro">The earlier two-hour matrix sweep measured <b>near-field aster order</b>: at E=3 MPa, strain-stiffening gave the largest rise. The new clutch ablation measures <b>invasion distance</b> at fixed E and finds little change (24 µm with stiffening versus 25 µm baseline). These are different readouts, so both results remain visible.</p>
     <div class="updateMedia">
       <figure>
         <img src="g5-stiffness-sweep-v2-2h.gif" loading="lazy" alt="Two-hour G5 matrix modulus and strain-stiffening sweep">
@@ -167,22 +199,24 @@ footer{text-align:center;padding:28px;color:var(--muted)}
       <article><b>Current best · E=3</b><p>Stiffening on raises aster order from 0.76 to 0.82 (Δ=+0.06) with cohesion 1.25.</p></article>
       <article><b>Solver boundary · E≥10</b><p>Stiffening-on cases require a smaller time step before they can be interpreted physically.</p></article>
     </div>
-    <div class="evidenceStrip"><b>Evidence boundary.</b> This is a personal simulation sweep at adhesion 4 and pull 55 nN. It updates the internal model conclusion but does not yet validate 3 MPa against a Kolade-lab material measurement.</div>
+    <div class="evidenceStrip"><b>Evidence boundary.</b> The alignment sweep used adhesion 4 and prescribed pull 55 nN; the new invasion ablation uses the molecular clutch. Neither validates 3 MPa against a Kolade-lab material measurement.</div>
   </section>
 
   <section>
     <div class="kicker">What each stage adds</div>
-    <h2>Lineage controls 0A–0B, then staged build A → E</h2>
+    <h2>Lineage controls 0A–0C, staged build A → E, then ablation</h2>
     <div class="grid">
       <article><b>0A · scale transfer</b><p>One cell, G4-frozen parameters and matched fibre density test whether the single-cell physics survives the larger G5 domain.</p></article>
-      <article><b>0B · cell number only</b><p>Vary M=1–37 with fixed cells; per-active-sector traction remains approximately independent of M.</p></article>
+      <article><b>0B · cell number only</b><p>Vary M=1–19 on a corona network; per-active-sector traction remains approximately independent of M.</p></article>
+      <article><b>0C · adhesion control</b><p>Release cells with the molecular clutch on and adhesion off, then compare with matched adhesion-on G5.</p></article>
       <article><b>A · scaffold</b><p>N motor–clutch disks + a soft cell–cell adhesion potential pack into a cohesive, force-balanced organoid.</p></article>
       <article><b>B · contract → radial</b><p>Fixed organoid; each surface cell reels nearby collagen inward. Near-field radial order rises.</p></article>
       <article><b>C · stiffness × stiffening</b><p>The updated sweep finds the strongest aster rise at E=3 MPa with stiffening on; high-E stiffening runs need a smaller time step.</p></article>
-      <article><b>D · release → invade</b><p>Homogeneous cells translate under the reaction of their grip-reel traction; the first version mainly expands collectively.</p></article>
-      <article><b>D v2 · leaders → mode map</b><p>A small outer fraction receives 15% adhesion, exposing stuck, connected-strand and single-cell regimes across adhesion × pull.</p></article>
-      <article><b>D v3 · leader traction</b><p>An independent traction multiplier tests whether high-traction leaders can drag followers; the current two-hour result says not yet.</p></article>
-      <article><b>E · plasticity</b><p>Bell crosslink rupture + re-weld (stress-selective). Rewiring is real; a clean κ is still confounded by slow relaxation.</p></article>
+      <article><b>D · release → invade</b><p>Homogeneous molecular-clutch cells with adhesion advance about 25 µm as a cohesive front over two hours.</p></article>
+      <article><b>D v2 · adhesion modes</b><p>Adhesion 60, 8 and 1 separates cohesive, collective and single-cell escape under a shared clutch baseline.</p></article>
+      <article><b>D v3 · earlier leader traction</b><p>An archived constant-pull test asks whether high-traction leaders drag followers; the current result says not yet.</p></article>
+      <article><b>E · plasticity</b><p>Bell crosslink rupture + re-weld changes topology, but adds little invasion in the current clutch baseline.</p></article>
+      <article><b>Mechanism ablation</b><p>Eight matched runs isolate clutch, adhesion, crosslinks, stiffening, plasticity, leaders and high adhesion.</p></article>
       <article><b>Near-field fix (A+B refinement)</b><p>Grippable fibres are gated to be boundary-connected and seeded as long radial tracts, so the pull reaches the mid-field.</p></article>
     </div>
   </section>
@@ -193,6 +227,7 @@ footer{text-align:center;padding:28px;color:var(--muted)}
     <div class="grid">
       <article><b>Overdamped collagen balance</b><div class="formula">ζ ṙ<sub>i</sub> = F<sub>stretch</sub> + F<sub>bend</sub> + F<sub>crosslink</sub> + F<sub>repulsion</sub> + F<sub>active</sub></div><p>Same bead–spring engine as G2; repulsion now sums over every cell disk.</p></article>
       <article><b>Cell–cell adhesion</b><div class="formula">F<sub>cc</sub>(d): repel d&lt;d₀, adhere d₀≤d&lt;d₀+r</div><p>Soft adhesive disks (tissue surface tension); adhesion strength sets the invasion mode.</p></article>
+      <article><b>Molecular clutch</b><div class="formula">F<sub>c</sub> = k<sub>c</sub>x<sub>c</sub>; &nbsp; k<sub>off</sub> = k<sub>off</sub><sup>0</sup> exp(F<sub>c</sub>/F<sub>b</sub>)</div><p>Each bound clutch loads as actin reels; force-dependent unbinding produces emergent traction rather than a prescribed constant pull.</p></article>
       <article><b>Leader adhesion + traction</b><div class="formula">k<sub>adh</sub><sup>ij</sup> = k<sub>adh</sub> min(s<sub>i</sub>,s<sub>j</sub>); &nbsp; F<sub>leader</sub> = α<sub>pull</sub>F</div><p>Low adhesion and high traction are separate switches applied to the same selected outer cells.</p></article>
       <article><b>Grip-reel reaction → invasion</b><div class="formula">γ<sub>c</sub> ṙ<sub>c</sub> = −Σ F<sub>cell→ECM</sub> + F<sub>cc</sub></div><p>Reeling collagen inward pulls the cell toward the matrix = outward invasion.</p></article>
       <article><b>Radial order</b><div class="formula">S<sub>r</sub> = ⟨2(t̂·r̂)² − 1⟩</div><p>+1 radial (TACS-3-like aster), −1 tangential, 0 isotropic.</p></article>
@@ -202,10 +237,11 @@ footer{text-align:center;padding:28px;color:var(--muted)}
   </section>
 
   <div class="note"><b>Evidence boundary.</b> Own-simulation output is <i>personal testing, not a confirmed finding</i>.
-  G5-0A/0B expose a near-cell coverage problem; Stage-C now shows a positive E=3 MPa stiffening effect;
-  Stage-D v2/v3 mode boundaries and leader tests are exploratory personal results; Stage-E plasticity rewires
-  the network but a clean load–unload κ is confounded by slow large-scale relaxation (a full simulated hour
-  recovers only ~19 %). Collagen is deliberately softened (3 MPa) as in G3/G4 so the pull visibly reorganises the
+  G5-0A–0C establish scale transfer, cell-number independence and the role of adhesion. The current clutch
+  ablation identifies clutch, adhesion and crosslinks as the largest controls of invasion/cohesion in this run.
+  Stage-C alignment, earlier D v2/v3 leader tests and Stage-E topology changes remain exploratory personal results.
+  A clean load–unload κ is still confounded by slow large-scale relaxation. Collagen is deliberately softened
+  (3 MPa) as in G3/G4 so the pull visibly reorganises the
   near field. Not modelled: SLS viscoelasticity, proteolysis, 3D pores/nucleus, deformable cell cortex.</div>
 
   <section>
@@ -231,6 +267,6 @@ footer{text-align:center;padding:28px;color:var(--muted)}
 </dialog>
 <footer>G1–G4 remain preserved · G5 scales up to a multicellular organoid without overwriting them · frames are precomputed in Python.</footer>
 <script src="g5-data.js?v=20260903"></script>
-<script src="g5.js?v=20260903c"></script>
+<script src="g5.js?v=20260903d"></script>
 </body>
 </html>

@@ -195,35 +195,37 @@ single-cell escape) and the plan in [`docs/G5_organoid_plan.md`](docs/G5_organoi
 | Stage | One new question | Status |
 |---|---|---|
 | 0A | Does G4 single-cell clutch physics transfer cleanly to the larger G5 box when parameters and fibre density are frozen? | ✅ built — per-active-sector traction ratio 1.15×; total differs because only 3/12 sectors grip |
-| 0B | Does increasing cell number amplify per-clutch traction? | ✅ built — no; approximately 4.2–5.5 nN per active sector for M=1–37 |
+| 0B | Does increasing cell number amplify per-clutch traction after near-cell fibre coverage is restored? | ✅ corona v2 — no; approximately 4.40–4.51 nN per active sector for M=1–19 |
+| 0C | With the molecular clutch fixed, what does cell–cell adhesion add after cells are released? | ✅ built — adhesion off gives 68 µm dispersed motion; adhesion on gives 25 µm cohesive motion |
 | A | Do N adhesive cells pack into a cohesive, force-balanced organoid? | ✅ built |
 | B | Does the fixed organoid's contractile pull turn near-field collagen radial? | ✅ built (effect real but modest) |
-| C | Does fibre strain-stiffening sharpen/extend the aster? | ✅ built — honest negative in this gentle regime (strains ~1–5 %) |
-| D v1 | When homogeneous cells are released, do they invade outward? | ✅ built (organoid spreads 38→44 µm, invades +5.8 µm) |
-| D v2 | Can low-adhesion leader/EMT-like heterogeneity separate stuck, collective-strand and single-cell regimes? | ✅ built — exploratory adhesion × pull map; personal testing, not experimentally validated |
-| D v3 | Does higher leader traction pull followers into a connected strand? | ✅ mechanism built — current two-hour comparison still leaves followers behind |
-| E | Does Bell crosslink rupture + re-weld make deformation irreversible (plasticity κ)? | ✅ mechanism built + stress-selective; a clean κ is **confounded** and diagnosed |
+| C | Does fibre strain-stiffening sharpen/extend the aster? | ✅ earlier alignment sweep — E=3 MPa raises aster order by 0.06; current clutch invasion ablation changes little (24 vs 25 µm) |
+| D v1 | When homogeneous molecular-clutch cells are released, do they invade outward? | ✅ current baseline — 25 µm with cohesion 1.02 over two hours |
+| D v2 | Can adhesion separate cohesive, collective and single-cell invasion under the same clutch baseline? | ✅ built — 22, 25 and 78 µm respectively |
+| D v3 | Does higher leader traction pull followers into a connected strand? | ✅ earlier constant-pull test preserved — followers still remain behind |
+| E | Does Bell crosslink rupture + re-weld change the current invasion distance? | ✅ mechanism built — 25 µm, approximately the same as the matched clutch baseline; long-term plastic κ remains confounded |
+| Ablation | Which current mechanism drives motion, cohesion and force transmission? | ✅ eight matched runs — clutch, adhesion and crosslinks have the largest effects |
 
 Choices: **softened, lightly crosslinked** collagen (3 MPa, 10 nN/µm links) as in G3/G4 so the pull
 visibly reorganises the near field; the network generator excludes the **union of cell disks** so
 collagen reaches every perimeter cell. Performance: a full-scale run (43 cells, ~24k beads, 2400
 steps) takes ~8 s via a Numba integrator, an O(E) grid crosslinker, and cached contacts.
 
-The 2026-09-03 G5 refinements add `leader_fraction`,
-`leader_adhesion_factor`, and the independently switchable
-`leader_pull_factor`. The outermost selected cells can therefore have lower
-adhesion and higher traction without bundling the two assumptions. Current
-two-hour tests still show the leader running far ahead of followers, so a
-connected strand has not been established. G5-0A/0B additionally freeze the G4
-parameter set and show that per-active-sector clutch traction transfers but is
-not amplified by cell number. These are model outputs awaiting experimental
-calibration; proteolysis remains outside the model.
+The 2026-09-03 G5 refinements make the inherited molecular clutch the current
+biological baseline. G5-0A freezes the G4 parameters for scale transfer; the
+G5-0B corona-network rerun shows that per-active-sector traction is not amplified
+by cell number; and G5-0C isolates adhesion after cells are released. The matched
+eight-condition ablation identifies the clutch as the main motion driver,
+cell–cell adhesion as the cohesion switch, and collagen crosslinks as the
+transmission path in this seed-23, two-hour baseline. Earlier constant-pull
+leader-traction and stiffness/alignment tests remain preserved as historical
+evidence rather than being silently overwritten. These are model outputs awaiting
+experimental calibration; proteolysis remains outside the model.
 
-Honest limits (all recorded in the G5 README): Stage-B alignment is modest and Stage-E κ cannot yet
-be isolated because the grippable **near-field fibres are under-connected to the fixed boundary** — the
-next refinement (a boundary-connected near-field / TACS-3-like radial tracts) is expected to improve
-alignment, force transmission, and κ together. Own-simulation output is *personal testing*, not a
-confirmed finding.
+Honest limits (all recorded in the G5 README): the current mechanism comparisons
+use one 2D seed and parameter set; the earlier high-stiffness stiffening runs need
+a smaller time step; and Stage-E κ cannot yet be isolated from slow elastic
+relaxation. Own-simulation output is *personal testing*, not a confirmed finding.
 
 ## Run and test
 

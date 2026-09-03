@@ -24,8 +24,9 @@ G1 V0  →  G1 V1  →  G1 V2  →  G1 V3  →  G1 V4
                                                                                   └── G4 v2 long-time/multiscale
                                                                                        G4A → G4B → G4C → G4D
                                                                                                       │
-                                                                                                      └── G5-0A → G5-0B → organoid A–E
-                                                                                                                           └── G5D v2 → v3 leaders
+                                                                                                      └── G5-0A → G5-0B → G5-0C → organoid A–E
+                                                                                                                                     ├── G5D v2 → v3
+                                                                                                                                     └── G5 ablation
 ```
 
 Generation 1 is the conceptual mainline: it records how the question developed
@@ -39,12 +40,13 @@ elastic ECM, verify indirect graph transmission, add slippage, then release the
 rigid cell. G4 v1 is the short-time implementation; G4 v2 branches from it and
 adds two-hour observation, multiscale rendering, explicit individual-clutch
 state, a shared-load alternative and fixed/moving/mobile-ECM controls.
-Generation 5 first runs G5-0A scale-transfer and G5-0B cell-number-only controls
-with the non-multicellular G4 parameter set frozen. Its A–E sequence then adds
-the organoid scaffold, collective contraction, strain stiffening, released-cell
-invasion and crosslink plasticity. G5D v2 adds a low-adhesion leader fraction;
-G5D v3 adds high leader traction as a separate switch. Neither overwrites the
-homogeneous G5D result.
+Generation 5 first runs G5-0A scale-transfer, G5-0B cell-number-only and G5-0C
+adhesion controls with the G4 molecular clutch frozen. Its A–E sequence then
+adds the organoid scaffold, collective contraction, strain stiffening,
+released-cell invasion and crosslink plasticity. G5D v2 compares adhesion modes;
+G5D v3 preserves the earlier high-leader-traction test. The newest matched
+ablation changes one mechanism at a time around the molecular-clutch collective
+baseline. None of these versions overwrites the earlier G5 results.
 
 The repository's default Git branch remains `main` because it is the published
 catalogue and GitHub Pages source. It contains both generations so that the
@@ -60,7 +62,7 @@ website can compare them. This does **not** mean that G2 overwrote G1.
 | `codex/g3-emergent-guidance` | Historical G3 construction branch | preserved implementation history |
 | `agent/g4-interactive-calibration` | G4A–D construction/review branch | merge after tests and site validation |
 | `agent/g4-v2-multiscale` | G4 v2 long-time/multiscale construction branch | merge after tests and site validation |
-| `agent/g5-organoid-plan` | G5 lineage controls, organoid A–E and G5D-v2/v3 leader refinements | preserve staged results; merge after review |
+| `agent/g5-organoid-plan` | G5-0A–0C lineage controls, molecular-clutch organoid A–E, mode comparison and ablation | preserve staged results; merge after review |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
 | `g2-v2` … `g2-v4` | Stable pointers to the documented corrected release | immutable tags |
 
@@ -93,9 +95,10 @@ are not scientific model versions.
 | G4 v2 B | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [realignment paths](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#b) | current long-time generation |
 | G4 v2 C | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [clutch failure](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#c) | current long-time generation |
 | G4 v2 D | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [fixed/moving cell](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#d) | current long-time generation |
-| G5-0A / 0B | [`generations/g5_organoid/lineage.py`](generations/g5_organoid/lineage.py) | [scale-transfer and cell-number controls](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#lineage-controls) | latest lineage audit |
+| G5-0A / 0B / 0C | [`generations/g5_organoid/lineage.py`](generations/g5_organoid/lineage.py) | [scale-transfer, cell-number and adhesion controls](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#lineage-controls) | latest lineage audit |
 | G5 A–E | [`generations/g5_organoid/`](generations/g5_organoid/) | [organoid stages](https://gl0008.github.io/motor-clutch-collagen-model/g5.html) | implemented organoid sequence |
-| G5D v2 / v3 | [`generations/g5_organoid/`](generations/g5_organoid/) | [leader adhesion and traction tests](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#leader-update) | latest exploratory refinements |
+| G5D v2 / v3 | [`generations/g5_organoid/`](generations/g5_organoid/) | [current adhesion modes and preserved leader-traction test](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#leader-update) | current mode comparison + earlier ablation |
+| G5 ablation | [`generations/g5_organoid/`](generations/g5_organoid/) | [eight-way mechanism comparison](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#clutch-baseline) | newest G5 result |
 
 ## Rule for adding a future model
 

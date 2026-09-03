@@ -9,7 +9,7 @@
   const list=document.querySelector('#versionList');
   const detail=document.querySelector('#versionDetail');
   let activeGroup='all';
-  let activeVersion='g5-d3';
+  let activeVersion='g5-ablation';
 
   const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const feedbackHtml=feedback=>feedback.length
