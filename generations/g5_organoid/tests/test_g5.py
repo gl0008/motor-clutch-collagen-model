@@ -113,6 +113,17 @@ class StageDInvasion(unittest.TestCase):
         self.assertGreater(last["max_cell_disp"], 1e-3)          # cells actually moved
         self.assertGreater(last["mean_cell_radial_disp"], 0.0)   # net outward = invasion
 
+    def test_high_traction_leader_invades_further(self):
+        """leader_pull_factor>1 (Reffay 2014 high-traction leader) increases the leading
+        edge's invasion vs the adhesion-only leader."""
+        from generations.g5_organoid.model import run_organoid_invasion, parameter_variant
+        lead = parameter_variant(SMALL, leader_fraction=0.2)
+        base = run_organoid_invasion(parameter_variant(lead, leader_pull_factor=1.0), seed=23)
+        boost = run_organoid_invasion(parameter_variant(lead, leader_pull_factor=2.5), seed=23)
+        self.assertTrue(np.all(np.isfinite(boost["centers_final"])))
+        self.assertGreater(boost["frames"][-1]["max_cell_disp"],
+                           base["frames"][-1]["max_cell_disp"])
+
 
 class CellFibreClutch(unittest.TestCase):
     """Stage-B opt-in molecular clutch (Bell slip); constant path stays the default."""
