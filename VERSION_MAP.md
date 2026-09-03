@@ -3,6 +3,10 @@
 This file is the map for reading the repository without confusing a scientific
 model version with a temporary Git working branch.
 
+For a human-readable visual map with the limitation → next-question reasoning,
+equations, parameter provenance, and collapsible professor feedback under every
+version, open the [model evolution notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-evolution.html).
+
 ## The lineage
 
 ```text

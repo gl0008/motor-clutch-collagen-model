@@ -11,6 +11,7 @@ up to a multicellular tumour **organoid** (many motor-clutch cells + cell–cell
 adhesion) that remodels and invades the collagen network.
 
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
+- Human-readable evolution notebook: <https://gl0008.github.io/motor-clutch-collagen-model/model-evolution.html>
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
 
 ## How the repository is organized

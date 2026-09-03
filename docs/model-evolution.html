@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Model evolution · Motor–clutch collagen notebook</title>
+<meta name="description" content="A human-readable map of why every motor–clutch collagen model version changed, with equations, provenance and professor feedback.">
+<meta property="og:title" content="Motor–clutch collagen model evolution">
+<meta property="og:description" content="Follow the reasoning, equations and professor feedback behind every model version.">
+<meta property="og:image" content="https://gl0008.github.io/motor-clutch-collagen-model/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Motor–clutch collagen model evolution">
+<meta name="twitter:description" content="Follow the reasoning, equations and professor feedback behind every model version.">
+<meta name="twitter:image" content="https://gl0008.github.io/motor-clutch-collagen-model/og.png">
+<link rel="stylesheet" href="model-evolution.css?v=20260902">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script defer src="model-notebook-data.js?v=g4-abcd-20260824"></script>
+<script defer src="model-evolution-data.js?v=20260902"></script>
+<script defer src="model-evolution.js?v=20260902"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="index.html">Motor–clutch collagen model</a>
+    <div class="top-links">
+      <a href="index.html">All simulations</a>
+      <a class="current" href="model-evolution.html">Evolution notebook</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">Human-readable research history</div>
+  <h1>Why every model changed</h1>
+  <p>Follow the reasoning from one generation to the next, then open any version for its implemented model, key equation, parameter provenance and recorded professor feedback.</p>
+  <div class="hero-key">
+    <span><b>Map</b> explains why the model evolved</span>
+    <span><b>Library</b> preserves what each version contains</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <aside class="meeting-context">
+    <div>
+      <span class="section-number">Current documentation goal</span>
+      <strong>Make the discussed version and its evidence obvious without navigating GitHub history.</strong>
+    </div>
+    <p>Professor feedback, 1 September 2026: there are too many GitHub versions to efficiently identify the specific data discussed in a meeting. Meeting-specific data format remains to be agreed.</p>
+  </aside>
+
+  <section class="panel map-panel" aria-labelledby="map-title">
+    <div class="section-head">
+      <div>
+        <span class="section-number">01 · Why / 思考上的 flow</span>
+        <h2 id="map-title">Evolution map</h2>
+      </div>
+      <p>Each connection records a limitation and the next question it created.</p>
+    </div>
+    <div class="map-scroll">
+      <div class="map-track" id="generationMap" aria-label="Model generation lineage"></div>
+    </div>
+    <article class="generation-story" id="generationStory" aria-live="polite"></article>
+  </section>
+
+  <section class="panel library-panel" aria-labelledby="library-title">
+    <div class="section-head">
+      <div>
+        <span class="section-number">02 · What / 模型本身</span>
+        <h2 id="library-title">Version library</h2>
+      </div>
+      <p>Select a version to see the actual model record. Expand its feedback row independently.</p>
+    </div>
+    <div class="filter-row" id="generationFilters" aria-label="Filter versions by generation"></div>
+    <div class="library-grid">
+      <div class="version-list" id="versionList" aria-label="All model versions"></div>
+      <article class="version-detail" id="versionDetail" aria-live="polite"></article>
+    </div>
+  </section>
+</main>
+
+<footer>GitHub preserves the executable history · this notebook preserves the scientific reasoning</footer>
+</body>
+</html>
