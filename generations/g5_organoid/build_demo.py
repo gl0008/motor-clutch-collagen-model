@@ -34,8 +34,8 @@ DEMO = OrganoidConfig(
     organoid_radius=63.0,
     domain_size=440.0,
     total_pull_force=20.0,
-    duration=300.0,
-    sample_interval=10.0,     # 31 frames
+    duration=600.0,           # run to ~mechanical equilibrium (elastic plateaus after)
+    sample_interval=20.0,     # 31 frames
     contact_update_interval=4.0,
 )
 

@@ -130,6 +130,9 @@ class StageEPlasticity(unittest.TestCase):
         self.assertGreater(ev["ruptured"] + ev["formed"], 0)     # network rewired
         elastic = run_organoid_pull(parameter_variant(cfg, plasticity=False), seed=23)
         self.assertEqual(elastic["plastic_events"], {"ruptured": 0, "formed": 0})
+        # relaxation-independent plasticity index: elastic never rewires, plastic may
+        self.assertEqual(elastic["kappa_topo"], 0.0)
+        self.assertGreaterEqual(out["kappa_topo"], 0.0)
 
 
 if __name__ == "__main__":

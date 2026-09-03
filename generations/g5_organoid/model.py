@@ -366,12 +366,27 @@ def build_crosslinks_grid(network: Network) -> list:
 
 
 def _link_key(network: Network, link) -> tuple:
-    """Coarse identity of a crosslink by fibre pair + rounded material point."""
+    """Coarse identity of a crosslink by fibre pair + rounded material point.
+
+    Position-based (uses current geometry) -- used for reform de-duplication, where
+    two welds at the same current crossing should count as one.
+    """
     fa = int(network.edge_fiber[link.edge_a])
     fb = int(network.edge_fiber[link.edge_b])
     pt = network.material_point(link.edge_a, link.alpha_a)
     lo, hi = (fa, fb) if fa < fb else (fb, fa)
     return (lo, hi, int(round(pt[0] / 0.6)), int(round(pt[1] / 0.6)))
+
+
+def _link_id(link) -> tuple:
+    """Deformation-INVARIANT identity: which edges + where along them (material points).
+
+    Unlike ``_link_key`` this does not move as the network deforms, so it correctly
+    tracks whether a specific weld survives -- used for the topological plasticity
+    index kappa_topo.
+    """
+    return (int(link.edge_a), int(link.edge_b),
+            round(float(link.alpha_a), 2), round(float(link.alpha_b), 2))
 
 
 def update_plasticity(network: Network, cfg: OrganoidConfig, dt_eff: float, rng) -> tuple:
@@ -832,6 +847,7 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
     plastic_every = max(1, int(round(cfg.plasticity_interval / cfg.dt)))
     rng = np.random.default_rng((cfg.seed if seed is None else int(seed)) + 555)
     load_end = cfg.duration - cfg.unload_time
+    initial_link_ids = {_link_id(x) for x in network.crosslinks}
 
     frames: list[dict] = []
     snaps: list[np.ndarray] = []
@@ -888,10 +904,22 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
 
         stepper.step(active, cfg.dt)
 
-    # plasticity index kappa = residual strain after unload / peak strain under load
+    # --- plasticity indices ---------------------------------------------------
+    # kappa (rms recovery) is CONFOUNDED by slow large-scale elastic relaxation, so
+    # two relaxation-independent measures are reported instead:
+    #   kappa_topo  = fraction of the ORIGINAL crosslinks permanently replaced
+    #                 (elastic = 0; plastic > 0) -- a pure topology-change signal.
+    #   kappa_order = residual of the radial STRUCTURE after unload,
+    #                 (S_final - S_0)/(S_peak - S_0): does the radial pattern persist?
     rms = [fr["rms_bead_disp"] for fr in frames]
     peak = max(rms) if rms else 0.0
     kappa = float(rms[-1] / peak) if (cfg.unload_time > 0 and peak > 0) else None
+    final_ids = {_link_id(x) for x in network.crosslinks}
+    kappa_topo = float(1.0 - len(initial_link_ids & final_ids) / max(len(initial_link_ids), 1))
+    orders = [fr["global_radial_order"] for fr in frames]
+    o0, opk, of = orders[0], max(orders, key=lambda v: abs(v - orders[0])), orders[-1]
+    kappa_order = (float((of - o0) / (opk - o0))
+                   if (cfg.unload_time > 0 and abs(opk - o0) > 1e-6) else None)
 
     return {
         "config": asdict(cfg),
@@ -905,6 +933,8 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
         "n_crosslinks": len(network.crosslinks),
         "plastic_events": plastic_events,
         "kappa": kappa,
+        "kappa_topo": kappa_topo,
+        "kappa_order": kappa_order,
         "frames": frames,
         "snapshots": np.asarray(snaps) if snapshots else None,
         "final_positions": network.r.copy(),

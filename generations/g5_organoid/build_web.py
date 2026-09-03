@@ -46,8 +46,8 @@ WEB = OrganoidConfig(
 
 
 def main(out: str = "docs/g5-data.js") -> None:
-    # --- Stage B: contract -> radial ---
-    cB = OrganoidConfig(**{**WEB.__dict__, "duration": 220.0, "sample_interval": 8.0})
+    # --- Stage B: contract -> radial (run to ~mechanical equilibrium; elastic plateaus) ---
+    cB = OrganoidConfig(**{**WEB.__dict__, "duration": 600.0, "sample_interval": 20.0})
     b = run_organoid_pull(cB, seed=23, snapshots=True)
     initial = b["initial_positions"]
     edges = b["edges"]
@@ -57,7 +57,7 @@ def main(out: str = "docs/g5-data.js") -> None:
     centers = b["centers"]
 
     # --- Stage D: released cells invade ---
-    cD = OrganoidConfig(**{**WEB.__dict__, "duration": 420.0, "sample_interval": 14.0,
+    cD = OrganoidConfig(**{**WEB.__dict__, "duration": 1200.0, "sample_interval": 30.0,
                            "cc_adhesion": 2.0, "max_cell_speed": 0.03,
                            "contact_update_interval": 2.0})
     d = run_organoid_invasion(cD, seed=23, snapshots=True)

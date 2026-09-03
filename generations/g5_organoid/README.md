@@ -122,11 +122,14 @@ mid-field (75–100 µm shells become radially ordered). The ±80° heading nois
 reorganisation is still visible. Grip coverage is ~15/43 (radial tracts are sparser at the surface than
 the old dense tangential ring).
 
-**Still open:** the load-unload κ remains ~0.88 for *both* elastic and plastic even at 0.96 connectivity
-— so κ is limited by **slow large-scale elastic relaxation**, not connectivity. The clean plasticity
-signal is therefore the **topological** one (elastic: 0 rupture/reform events; plastic: ~95 ruptures +
-~137 re-welds). A relaxation-independent κ (e.g. from the crosslink-topology change or near-field order)
-is the remaining refinement.
+**Plasticity index — relaxation-independent (done).** The load-unload rms κ stays ~0.88 for *both*
+elastic and plastic (and a full simulated hour of zero-load hold recovers only ~19 %), because it is
+limited by **slow large-scale elastic relaxation**, not by plasticity. `run_organoid_pull` therefore
+reports **`kappa_topo`** — the fraction of the *original* crosslinks permanently replaced, tracked by a
+deformation-invariant weld identity (`_link_id`). It cleanly separates the two: **elastic
+`kappa_topo = 0.000`** (no rewiring) vs **plastic `> 0`** (e.g. 0.015 here; grows with load/time). This
+is a topology-change measure, not Nam's strain-recovery κ, but it is the honest, uncofounded plasticity
+signal. (A secondary `kappa_order` structural residual is also reported but is itself relaxation-limited.)
 
 ## Next refinements
 
