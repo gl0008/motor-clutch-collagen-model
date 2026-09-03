@@ -38,11 +38,14 @@ per-cell reaction uses the actual summed clutch traction. See `generations/g5_or
 |---|---:|---|
 | `leader_fraction` | default 0; 0.10–0.20 in exploratory sweeps; 0.12 in the three-mode comparison | A deterministic modelling knob: the outermost cells are selected. The range is not calibrated to a measured leader fraction. |
 | `leader_adhesion_factor` | 0.15 | Coarse proxy for partial-EMT adhesion loss. Qualitatively motivated by Kalluri & Weinberg 2009 and Aiello et al. 2018; the numerical multiplier is a personal-test assumption, not a fitted E-cadherin measurement. |
+| `leader_pull_factor` | default 1.0; 1.8 in the displayed two-hour comparison; 2.5 in the regression test | High-traction leader switch, qualitatively motivated by Reffay et al. 2014. The multipliers are exploratory assumptions rather than fitted traction-force microscopy values. |
 | ordinary `cc_adhesion` in the three-mode comparison | 60 / 8 / 1 nN/µm | Stuck / collective / single-cell demonstration settings. They map a model phase space and are not direct cadherin-force measurements. |
 | total pull in the three-mode comparison | 6 / 45 / 45 nN | Stuck / collective / single-cell demonstration settings. Own-simulation inputs, not yet calibrated to the Kolade-lab organoid movies. |
 
 For a pair of cells, adhesion is scaled by the weaker member:
 `k_adh,ij = cc_adhesion × min(s_i, s_j)`, where `s_i = 0.15` for a
 selected leader and `1` otherwise. Repulsion is unchanged. A current leader has
-lower adhesion only; increased leader traction, MMP secretion, and a continuous
-EMT phenotype remain outside this version.
+lower adhesion and may independently use
+`F_active,leader = leader_pull_factor × F_active`. The current two-hour result
+does not show added traction dragging followers into a connected strand. MMP
+secretion and a continuous EMT phenotype remain outside this version.

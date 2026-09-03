@@ -194,11 +194,14 @@ single-cell escape) and the plan in [`docs/G5_organoid_plan.md`](docs/G5_organoi
 
 | Stage | One new question | Status |
 |---|---|---|
+| 0A | Does G4 single-cell clutch physics transfer cleanly to the larger G5 box when parameters and fibre density are frozen? | ✅ built — per-active-sector traction ratio 1.15×; total differs because only 3/12 sectors grip |
+| 0B | Does increasing cell number amplify per-clutch traction? | ✅ built — no; approximately 4.2–5.5 nN per active sector for M=1–37 |
 | A | Do N adhesive cells pack into a cohesive, force-balanced organoid? | ✅ built |
 | B | Does the fixed organoid's contractile pull turn near-field collagen radial? | ✅ built (effect real but modest) |
 | C | Does fibre strain-stiffening sharpen/extend the aster? | ✅ built — honest negative in this gentle regime (strains ~1–5 %) |
 | D v1 | When homogeneous cells are released, do they invade outward? | ✅ built (organoid spreads 38→44 µm, invades +5.8 µm) |
 | D v2 | Can low-adhesion leader/EMT-like heterogeneity separate stuck, collective-strand and single-cell regimes? | ✅ built — exploratory adhesion × pull map; personal testing, not experimentally validated |
+| D v3 | Does higher leader traction pull followers into a connected strand? | ✅ mechanism built — current two-hour comparison still leaves followers behind |
 | E | Does Bell crosslink rupture + re-weld make deformation irreversible (plasticity κ)? | ✅ mechanism built + stress-selective; a clean κ is **confounded** and diagnosed |
 
 Choices: **softened, lightly crosslinked** collagen (3 MPa, 10 nN/µm links) as in G3/G4 so the pull
@@ -206,13 +209,15 @@ visibly reorganises the near field; the network generator excludes the **union o
 collagen reaches every perimeter cell. Performance: a full-scale run (43 cells, ~24k beads, 2400
 steps) takes ~8 s via a Numba integrator, an O(E) grid crosslinker, and cached contacts.
 
-The 2026-09-03 G5D-v2 refinement adds `leader_fraction` and
-`leader_adhesion_factor`. The outermost selected cells use 15% of the ordinary
-adhesion strength. In the seed-23, two-hour personal-test comparison, high
-adhesion/low pull is stuck, intermediate adhesion/high pull forms a connected
-leader–follower strand, and low adhesion/high pull disperses as single cells.
-These regimes are model outputs awaiting experimental calibration; a current
-leader does not yet have elevated traction or proteolysis.
+The 2026-09-03 G5 refinements add `leader_fraction`,
+`leader_adhesion_factor`, and the independently switchable
+`leader_pull_factor`. The outermost selected cells can therefore have lower
+adhesion and higher traction without bundling the two assumptions. Current
+two-hour tests still show the leader running far ahead of followers, so a
+connected strand has not been established. G5-0A/0B additionally freeze the G4
+parameter set and show that per-active-sector clutch traction transfers but is
+not amplified by cell number. These are model outputs awaiting experimental
+calibration; proteolysis remains outside the model.
 
 Honest limits (all recorded in the G5 README): Stage-B alignment is modest and Stage-E κ cannot yet
 be isolated because the grippable **near-field fibres are under-connected to the fixed boundary** — the

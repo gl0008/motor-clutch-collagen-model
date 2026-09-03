@@ -12,13 +12,13 @@
 <meta name="twitter:title" content="Motor–clutch collagen model evolution">
 <meta name="twitter:description" content="Follow the reasoning, equations and professor feedback behind every model version.">
 <meta name="twitter:image" content="https://gl0008.github.io/motor-clutch-collagen-model/og.png">
-<link rel="stylesheet" href="model-evolution.css?v=20260902">
+<link rel="stylesheet" href="model-evolution.css?v=20260903b">
 <script>
 window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
 </script>
 <script defer src="model-notebook-data.js?v=g4-abcd-20260824"></script>
-<script defer src="model-evolution-data.js?v=20260902"></script>
-<script defer src="model-evolution.js?v=20260902"></script>
+<script defer src="model-evolution-data.js?v=20260903b"></script>
+<script defer src="model-evolution.js?v=20260903b"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
@@ -35,7 +35,7 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},opt
 <header class="hero">
   <div class="eyebrow">Human-readable research history</div>
   <h1>Why every model changed</h1>
-  <p>Follow the reasoning from one generation to the next, then open any version for its implemented model, key equation, parameter provenance and recorded professor feedback.</p>
+  <p>Follow the reasoning from one generation to the next. Select a generation to reveal its internal version path, then select a version for the implemented model, key equation, parameter provenance and recorded professor feedback.</p>
   <div class="hero-key">
     <span><b>Map</b> explains why the model evolved</span>
     <span><b>Library</b> preserves what each version contains</span>
@@ -43,32 +43,25 @@ window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},opt
 </header>
 
 <main class="wrap">
-  <aside class="meeting-context">
-    <div>
-      <span class="section-number">Current documentation goal</span>
-      <strong>Make the discussed version and its evidence obvious without navigating GitHub history.</strong>
-    </div>
-    <p>Professor feedback, 1 September 2026: there are too many GitHub versions to efficiently identify the specific data discussed in a meeting. Meeting-specific data format remains to be agreed.</p>
-  </aside>
-
   <section class="panel map-panel" aria-labelledby="map-title">
     <div class="section-head">
       <div>
-        <span class="section-number">01 · Why / 思考上的 flow</span>
+        <span class="section-number">01 · Why the model evolved</span>
         <h2 id="map-title">Evolution map</h2>
       </div>
-      <p>Each connection records a limitation and the next question it created.</p>
+      <p>Overview arrows explain why one generation led to the next. Select a generation to see the version-by-version storyline.</p>
     </div>
     <div class="map-scroll">
       <div class="map-track" id="generationMap" aria-label="Model generation lineage"></div>
     </div>
     <article class="generation-story" id="generationStory" aria-live="polite"></article>
+    <section class="version-evolution" id="versionEvolution" aria-label="Evolution within the selected generation" aria-live="polite"></section>
   </section>
 
   <section class="panel library-panel" aria-labelledby="library-title">
     <div class="section-head">
       <div>
-        <span class="section-number">02 · What / 模型本身</span>
+        <span class="section-number">02 · What each version contains</span>
         <h2 id="library-title">Version library</h2>
       </div>
       <p>Select a version to see the actual model record. Expand its feedback row independently.</p>

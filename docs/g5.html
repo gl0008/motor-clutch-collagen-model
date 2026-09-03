@@ -40,6 +40,7 @@ canvas#stage{width:100%;max-width:640px;height:auto;aspect-ratio:1/1;display:blo
 .updateMedia{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0}
 .updateMedia figure{margin:0;background:#f4f0e7;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .updateMedia figure:first-child{grid-column:1/-1}
+.updateMedia.compactMedia figure:first-child{grid-column:auto}
 .updateMedia img{display:block;width:100%;height:auto}
 .updateMedia figcaption{padding:9px 12px;color:var(--muted);font-size:13px}
 .regimeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
@@ -62,7 +63,7 @@ footer{text-align:center;padding:28px;color:var(--muted)}
   shared collagen network. It asks how the collective pull of many cells remodels the matrix and how the
   cells invade — grounded in Kolade/Gloria's 4MOSC1 organoid movies (~200 µm organoid, radial collagen,
   collective + occasional single-cell escape).</p>
-  <div class="facts"><span><b>43</b> cells / organoid</span><span><b>~200 µm</b> organoid scale</span><span><b>~8 s</b> full run (Numba)</span><span><b>A–E + D v2</b> staged build</span></div>
+  <div class="facts"><span><b>43</b> cells / organoid</span><span><b>~200 µm</b> organoid scale</span><span><b>0A–0B</b> lineage controls</span><span><b>A–E + D v2/v3</b> staged build</span></div>
 </header>
 
 <main>
@@ -95,11 +96,37 @@ footer{text-align:center;padding:28px;color:var(--muted)}
     </div>
   </section>
 
+  <section class="latestUpdate" id="lineage-controls">
+    <span class="latestBadge">Newest G5 update · 3 September 2026, 2:14 PM ET · G5-0B</span>
+    <h2>First isolate scale transfer, then change cell number</h2>
+    <p class="updateIntro">The G4→G5 audit found that drag, bead spacing, cell mobility, pull, cell radius, contact width and fibre density had changed alongside cell number. The new controls freeze the non-multicellular parameters to G4 so “multicellularity” is no longer mixed with silent recalibration.</p>
+    <div class="updateMedia compactMedia">
+      <figure>
+        <img src="g5-0a-scale-transfer.gif" loading="lazy" alt="G5-0A single-cell scale-transfer control with G4-frozen parameters">
+        <figcaption><b>G5-0A:</b> per-active-sector traction transfers within 15% of G4. Lower total traction comes from only 3/12 sectors finding fibres, not changed clutch physics.</figcaption>
+      </figure>
+      <figure>
+        <img src="g5-0b-cell-number.gif" loading="lazy" alt="G5-0B cell-number-only control across one to 37 cells">
+        <figcaption><b>G5-0B:</b> per-active-sector traction stays about 4.2–5.5 nN from 1 to 37 cells. Cell number does not amplify an individual clutch.</figcaption>
+      </figure>
+    </div>
+    <div class="regimeGrid">
+      <article><b>What transfers</b><p>Per-sector motor–clutch traction is consistent between G4 and the larger G5 domain.</p></article>
+      <article><b>What does not amplify</b><p>Adding cells does not make each active sector pull harder; current collective behaviour comes from cell–cell mechanics.</p></article>
+      <article><b>What needs repair</b><p>Angular fibre coverage is extremely sparse. The next clean fix is geometric coverage, not wider hidden contact.</p></article>
+    </div>
+    <div class="evidenceStrip"><b>Interpretation boundary.</b> These are lineage controls, not a new biological phenotype. They identify which G4 physics transfers and which G5 geometry must be corrected before collective invasion is attributed confidently.</div>
+  </section>
+
   <section class="latestUpdate" id="leader-update">
-    <span class="latestBadge">Latest G5 update · 3 September 2026 · G5D v2</span>
-    <h2>Leader-cell heterogeneity separates three invasion regimes</h2>
-    <p class="updateIntro">The original released-cell model used homogeneous cells and mainly produced collective radial expansion. The new refinement marks a small outer fraction as EMT-like leaders whose cell–cell adhesion is reduced to 15%. Sweeping adhesion against pull now produces <b>stuck</b>, <b>collective strand</b> and <b>single-cell escape</b> regimes.</p>
+    <span class="latestBadge">G5D refinements · low adhesion v2 → high traction v3</span>
+    <h2>Leader cells expose three regimes—but do not yet drag followers</h2>
+    <p class="updateIntro">G5D v2 marks a small outer fraction as EMT-like leaders with reduced cell–cell adhesion and maps <b>stuck</b>, <b>collective-like</b> and <b>single-cell escape</b> regimes. G5D v3 adds a separate traction multiplier to the same leaders. This is a cleaner test because adhesion and traction are no longer bundled.</p>
     <div class="updateMedia">
+      <figure>
+        <img src="g5-leader-strand-2h.gif" loading="lazy" alt="Two-hour G5 comparison testing whether high-traction leader cells drag connected followers">
+        <figcaption>Latest leader–follower test. Higher leader traction produces a fast leader, but followers remain about 6–7 µm behind the leading displacement; the connected strand is not yet recovered.</figcaption>
+      </figure>
       <figure>
         <img src="g5-three-modes-v2-2h.gif" loading="lazy" alt="Two-hour G5 simulations comparing stuck, collective-strand and single-cell invasion modes">
         <figcaption>Two-hour comparison. Red marks low-adhesion leader cells; all three panels use the same model with different adhesion and pull.</figcaption>
@@ -108,28 +135,45 @@ footer{text-align:center;padding:28px;color:var(--muted)}
         <img src="g5-phase-diagram-3regime.png" loading="lazy" alt="G5 phase diagram across cell-cell adhesion and traction pull">
         <figcaption>Mechanical phase diagram: adhesion × pull. The collective regime occupies the transition between a cohesive stuck pack and dispersal.</figcaption>
       </figure>
-      <figure>
-        <img src="g5-phase-diagram-leaders.png" loading="lazy" alt="G5 invasion-mode phase diagram with low-adhesion leader cells">
-        <figcaption>Leader-present sweep: heterogeneity changes which parameter combinations produce a connected leader–follower strand.</figcaption>
-      </figure>
     </div>
     <div class="regimeGrid">
       <article><b>Stuck</b><p>Adhesion 60, pull 6 nN: about 3 µm invasion; the organoid remains cohesive.</p></article>
       <article><b>Collective strand</b><p>Adhesion 8, pull 45 nN, 12% leaders: about 18 µm invasion while cells remain connected.</p></article>
       <article><b>Single-cell escape</b><p>Adhesion 1, pull 45 nN, 12% leaders: about 72 µm invasion with strong dispersal.</p></article>
     </div>
-    <div class="evidenceStrip"><b>Evidence boundary.</b> These numbers are seed-23, two-hour personal simulation tests, not experimentally validated findings. The current “leader” differs only by reduced adhesion—not higher traction or MMP secretion. The next clean test is to add higher leader traction as a separate ablation and compare against quantified Kolade-lab movies.</div>
+    <div class="evidenceStrip"><b>Evidence boundary.</b> These are seed-23, two-hour personal simulation tests, not experimentally validated findings. High traction is now implemented, but the displayed factor-1.8 comparison does not improve follower advance. MMP secretion and measured leader phenotypes remain outside the model.</div>
+  </section>
+
+  <section class="latestUpdate" id="stiffness-update">
+    <span class="latestBadge">Updated G5C result · stiffness × strain-stiffening</span>
+    <h2>Three MPa is the current alignment regime</h2>
+    <p class="updateIntro">The newer two-hour sweep changes the earlier “negligible stiffening” conclusion. At E=3 MPa, turning strain-stiffening on gives the largest recorded rise in near-field aster order and the tightest cohesion in this exploratory grid.</p>
+    <div class="updateMedia">
+      <figure>
+        <img src="g5-stiffness-sweep-v2-2h.gif" loading="lazy" alt="Two-hour G5 matrix modulus and strain-stiffening sweep">
+        <figcaption>Columns: E=1, 3, 10 and 30 MPa. Rows: strain-stiffening off/on. The E=10 and 30 MPa stiffening-on runs are marked unstable at the current time step.</figcaption>
+      </figure>
+    </div>
+    <div class="regimeGrid">
+      <article><b>Too soft · E=1</b><p>Aster order falls from 0.76 to 0.67 without stiffening: cells disrupt rather than align the network.</p></article>
+      <article><b>Current best · E=3</b><p>Stiffening on raises aster order from 0.76 to 0.82 (Δ=+0.06) with cohesion 1.25.</p></article>
+      <article><b>Solver boundary · E≥10</b><p>Stiffening-on cases require a smaller time step before they can be interpreted physically.</p></article>
+    </div>
+    <div class="evidenceStrip"><b>Evidence boundary.</b> This is a personal simulation sweep at adhesion 4 and pull 55 nN. It updates the internal model conclusion but does not yet validate 3 MPa against a Kolade-lab material measurement.</div>
   </section>
 
   <section>
     <div class="kicker">What each stage adds</div>
-    <h2>Staged build A → E</h2>
+    <h2>Lineage controls 0A–0B, then staged build A → E</h2>
     <div class="grid">
+      <article><b>0A · scale transfer</b><p>One cell, G4-frozen parameters and matched fibre density test whether the single-cell physics survives the larger G5 domain.</p></article>
+      <article><b>0B · cell number only</b><p>Vary M=1–37 with fixed cells; per-active-sector traction remains approximately independent of M.</p></article>
       <article><b>A · scaffold</b><p>N motor–clutch disks + a soft cell–cell adhesion potential pack into a cohesive, force-balanced organoid.</p></article>
       <article><b>B · contract → radial</b><p>Fixed organoid; each surface cell reels nearby collagen inward. Near-field radial order rises.</p></article>
-      <article><b>C · strain-stiffening</b><p>Nonlinear fibre tension (ablation flag). Honest result: negligible in this gentle-strain regime.</p></article>
+      <article><b>C · stiffness × stiffening</b><p>The updated sweep finds the strongest aster rise at E=3 MPa with stiffening on; high-E stiffening runs need a smaller time step.</p></article>
       <article><b>D · release → invade</b><p>Homogeneous cells translate under the reaction of their grip-reel traction; the first version mainly expands collectively.</p></article>
       <article><b>D v2 · leaders → mode map</b><p>A small outer fraction receives 15% adhesion, exposing stuck, connected-strand and single-cell regimes across adhesion × pull.</p></article>
+      <article><b>D v3 · leader traction</b><p>An independent traction multiplier tests whether high-traction leaders can drag followers; the current two-hour result says not yet.</p></article>
       <article><b>E · plasticity</b><p>Bell crosslink rupture + re-weld (stress-selective). Rewiring is real; a clean κ is still confounded by slow relaxation.</p></article>
       <article><b>Near-field fix (A+B refinement)</b><p>Grippable fibres are gated to be boundary-connected and seeded as long radial tracts, so the pull reaches the mid-field.</p></article>
     </div>
@@ -141,7 +185,7 @@ footer{text-align:center;padding:28px;color:var(--muted)}
     <div class="grid">
       <article><b>Overdamped collagen balance</b><div class="formula">ζ ṙ<sub>i</sub> = F<sub>stretch</sub> + F<sub>bend</sub> + F<sub>crosslink</sub> + F<sub>repulsion</sub> + F<sub>active</sub></div><p>Same bead–spring engine as G2; repulsion now sums over every cell disk.</p></article>
       <article><b>Cell–cell adhesion</b><div class="formula">F<sub>cc</sub>(d): repel d&lt;d₀, adhere d₀≤d&lt;d₀+r</div><p>Soft adhesive disks (tissue surface tension); adhesion strength sets the invasion mode.</p></article>
-      <article><b>Leader / EMT-like adhesion</b><div class="formula">k<sub>adh</sub><sup>ij</sup> = k<sub>adh</sub> min(s<sub>i</sub>,s<sub>j</sub>), &nbsp; s<sub>leader</sub> = 0.15</div><p>The weakest cell sets each pair bond; only a selected outer fraction receives the reduced multiplier.</p></article>
+      <article><b>Leader adhesion + traction</b><div class="formula">k<sub>adh</sub><sup>ij</sup> = k<sub>adh</sub> min(s<sub>i</sub>,s<sub>j</sub>); &nbsp; F<sub>leader</sub> = α<sub>pull</sub>F</div><p>Low adhesion and high traction are separate switches applied to the same selected outer cells.</p></article>
       <article><b>Grip-reel reaction → invasion</b><div class="formula">γ<sub>c</sub> ṙ<sub>c</sub> = −Σ F<sub>cell→ECM</sub> + F<sub>cc</sub></div><p>Reeling collagen inward pulls the cell toward the matrix = outward invasion.</p></article>
       <article><b>Radial order</b><div class="formula">S<sub>r</sub> = ⟨2(t̂·r̂)² − 1⟩</div><p>+1 radial (TACS-3-like aster), −1 tangential, 0 isotropic.</p></article>
       <article><b>Bell crosslink plasticity</b><div class="formula">k<sub>off</sub> = k<sub>off</sub><sup>0</sup> exp(F/F<sub>b</sub>)</div><p>Loaded welds rupture; fibres re-weld at their current crossings (topological remodelling).</p></article>
@@ -150,8 +194,8 @@ footer{text-align:center;padding:28px;color:var(--muted)}
   </section>
 
   <div class="note"><b>Evidence boundary.</b> Own-simulation output is <i>personal testing, not a confirmed finding</i>.
-  Stage-B alignment is real but modest; Stage-C strain-stiffening is negligible here; Stage-D v2 mode boundaries
-  are exploratory personal tests; Stage-E plasticity rewires
+  G5-0A/0B expose a near-cell coverage problem; Stage-C now shows a positive E=3 MPa stiffening effect;
+  Stage-D v2/v3 mode boundaries and leader tests are exploratory personal results; Stage-E plasticity rewires
   the network but a clean load–unload κ is confounded by slow large-scale relaxation (a full simulated hour
   recovers only ~19 %). Collagen is deliberately softened (3 MPa) as in G3/G4 so the pull visibly reorganises the
   near field. Not modelled: SLS viscoelasticity, proteolysis, 3D pores/nucleus, deformable cell cortex.</div>
