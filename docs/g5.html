@@ -37,12 +37,20 @@ canvas#stage{width:100%;max-width:640px;height:auto;aspect-ratio:1/1;display:blo
 .latestUpdate{margin:34px 0;padding:24px;background:#fffefa;border:2px solid #2c7fb8;border-radius:16px;box-shadow:0 12px 34px rgba(22,40,50,.08)}
 .latestBadge{display:inline-block;background:#ddecf5;color:#1c5d86;border-radius:999px;padding:5px 9px;margin-bottom:8px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .updateIntro{max-width:880px;color:var(--muted);font-size:16px}
-.updateMedia{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:18px 0}
-.updateMedia figure{margin:0;background:#f4f0e7;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.updateMedia figure:first-child{grid-column:1/-1}
-.updateMedia.compactMedia figure:first-child{grid-column:auto}
-.updateMedia img{display:block;width:100%;height:auto}
+.updateMedia{display:grid;grid-template-columns:1fr;gap:18px;margin:18px 0}
+.updateMedia figure{position:relative;margin:0;background:#f4f0e7;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.updateMedia figure::after{content:"Click to enlarge";position:absolute;top:10px;right:10px;padding:5px 8px;border-radius:999px;background:rgba(22,40,50,.88);color:white;font-size:11px;font-weight:750;pointer-events:none}
+.updateMedia img{display:block;width:100%;height:auto;cursor:zoom-in}
+.updateMedia img:focus-visible{outline:4px solid var(--orange);outline-offset:-4px}
 .updateMedia figcaption{padding:9px 12px;color:var(--muted);font-size:13px}
+.imageViewer{width:96vw;max-width:1800px;height:94vh;max-height:94vh;padding:0;border:0;border-radius:14px;background:#f4f0e7;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.imageViewer::backdrop{background:rgba(12,22,27,.82)}
+.viewerBar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:10px 12px;background:#162832;color:white}
+.viewerBar strong{margin-right:auto;font-size:14px}.viewerBar button{padding:7px 11px;border:1px solid #61737c;border-radius:7px;background:white;color:var(--ink);cursor:pointer}
+.viewerCanvas{height:calc(94vh - 52px);overflow:auto;display:grid;place-items:start center;padding:12px}
+.viewerCanvas img{display:block;width:100%;height:auto;max-width:1600px}
+.imageViewer.actual .viewerCanvas{display:block}
+.imageViewer.actual .viewerCanvas img{width:auto;max-width:none}
 .regimeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
 .regimeGrid article{padding:14px;border-top:4px solid var(--teal);background:#eef6f4;border-radius:8px}
 .regimeGrid article:first-child{border-color:#88939a;background:#f0f1f1}.regimeGrid article:last-child{border-color:var(--orange);background:#faece6}
@@ -213,8 +221,16 @@ footer{text-align:center;padding:28px;color:var(--muted)}
     </ul>
   </section>
 </main>
+<dialog class="imageViewer" id="imageViewer" aria-labelledby="viewerTitle">
+  <div class="viewerBar">
+    <strong id="viewerTitle">Result figure</strong>
+    <button type="button" id="viewerSize">Actual size</button>
+    <button type="button" id="viewerClose">Close</button>
+  </div>
+  <div class="viewerCanvas"><img id="viewerImage" alt=""></div>
+</dialog>
 <footer>G1–G4 remain preserved · G5 scales up to a multicellular organoid without overwriting them · frames are precomputed in Python.</footer>
 <script src="g5-data.js?v=20260903"></script>
-<script src="g5.js?v=20260903"></script>
+<script src="g5.js?v=20260903c"></script>
 </body>
 </html>

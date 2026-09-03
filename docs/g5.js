@@ -2,6 +2,32 @@
   'use strict';
   const D = window.G5_DATA;
   const $ = q => document.querySelector(q);
+
+  const viewer = $('#imageViewer'), viewerImage = $('#viewerImage'), viewerTitle = $('#viewerTitle'), viewerSize = $('#viewerSize');
+  function openViewer(image) {
+    viewer.classList.remove('actual');
+    viewerImage.src = image.currentSrc || image.src;
+    viewerImage.alt = image.alt;
+    viewerTitle.textContent = image.closest('figure')?.querySelector('figcaption')?.textContent.trim() || image.alt || 'Result figure';
+    viewerSize.textContent = 'Actual size';
+    viewer.showModal();
+  }
+  document.querySelectorAll('.updateMedia img').forEach(image => {
+    image.tabIndex = 0;
+    image.setAttribute('role', 'button');
+    image.setAttribute('aria-label', `${image.alt}. Open a larger view.`);
+    image.addEventListener('click', () => openViewer(image));
+    image.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openViewer(image); }
+    });
+  });
+  $('#viewerClose').onclick = () => viewer.close();
+  viewerSize.onclick = () => {
+    const actual = viewer.classList.toggle('actual');
+    viewerSize.textContent = actual ? 'Fit to screen' : 'Actual size';
+  };
+  viewer.addEventListener('click', event => { if (event.target === viewer) viewer.close(); });
+
   if (!D) { $('#loadState').textContent = 'G5 data missing (run build_web.py).'; return; }
 
   const state = { mode: 'contract', frame: 0, playing: true, last: 0, view: 'full', links: false };
