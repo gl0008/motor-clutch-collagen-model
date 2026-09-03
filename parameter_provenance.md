@@ -218,5 +218,10 @@ per-clutch collective amplification**; clutches act independently.  So in the cu
 model "multicellularity" produces collective behaviour *only through cell-cell adhesion
 mechanics* (cohesion / surface tension), not through cells pulling harder together --
 Delta_multicell(per-clutch traction) approximately 0.  The tiny active-sector counts
-(1-5 of hundreds) also confirm the coverage problem for packed cells in a uniform
-network, which is why the corona construct was added.  Output `g5_0B_cell_number.gif`.
+(1-5 of hundreds) reflect the coverage problem for packed cells in a *uniform* network.
+
+**Corona re-run (v2).** Repeated on the same corona network as G5-0C/G5 (so cells
+actually grip): a single cell now grips 12/12 sectors, and per-sector traction is still
+flat -- 4.50 / 4.46 / 4.51 / 4.40 nN for M = 1 / 7 / 13 / 19 -- confirming the same
+conclusion on a believable network.  Output `g5_0B_cell_number_v2.gif` (the uniform-net
+original is archived under `output/archive/`).

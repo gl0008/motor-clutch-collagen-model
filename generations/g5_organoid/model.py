@@ -1216,6 +1216,7 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
     stepper = OrganoidStepper(network, centers)
     reach = cfg.cell_radius + cfg.contact_width + 2.0
     n_sec = cfg.n_contact_sectors
+    adh_scale = leader_adhesion_scale(centers0, cfg)   # low-adhesion leaders (EMT) also in the clutch path
     candidates = cell_candidate_fibers(network, centers, reach)
     patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
     S = len(patches)
@@ -1263,7 +1264,7 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
         if step == nsteps:
             break
         # move cells under clutch reaction + cell-cell adhesion (overdamped, capped)
-        f_cell = reaction + cell_cell_forces(centers, cfg)
+        f_cell = reaction + cell_cell_forces(centers, cfg, adh_scale)
         v_cell = f_cell / cfg.cell_drag
         speed = np.linalg.norm(v_cell, axis=1)
         over = speed > cfg.max_cell_speed
