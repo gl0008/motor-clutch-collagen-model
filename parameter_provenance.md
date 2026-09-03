@@ -128,3 +128,75 @@ as passed.
 The Saraswathibhatla, Lee, Picu, Stein, and Licup values in this document are
 research references supplied for model comparison.  They are not automatically
 active G2 inputs unless explicitly listed as a current G2 setting above.
+
+---
+
+## G4 → G5 parameter lineage (audit, 2026-09)
+
+**Purpose.** G5 scaled the model from one cell to an M-cell organoid.  To claim a
+G4→G5 difference is *multicellularity* (and not a silent recalibration), the
+non-multicellular parameters must be inherited unchanged from G4.  The table below
+audits every parameter against the code (`g4_interactive_calibration/model.py` vs
+`g5_organoid/model.py` and its parent `g2_corrected/common/model.py`).  Values were
+verified by direct read, not from memory.
+
+| Parameter | G4 | G5 default | Category | Action |
+|-----------|----|-----------|---------|--------|
+| `bead_drag` | 180.0 | **120.0** | collagen relaxation timescale | freeze |
+| `bead_spacing` | 1.0 | **0.75** | fibre discretisation | freeze |
+| `cell_drag` | 600.0 | **400.0** | cell mobility | freeze |
+| `max_cell_speed` | 0.012 | **0.02** | cell mobility | freeze |
+| `total_pull_force` | 24.0 | **12.0** | per-cell traction (constant-pull) | freeze (control) |
+| `cell_radius` | 10.0 | **9.0** | geometry | freeze or justify (18 µm dia) |
+| `contact_width` | 3.0 | **8.0** | contact geometry | fix corona, not width |
+| crosslink retain | 0.35 `probability` | 0.85 `fraction` | **different mechanism** | match by density |
+| `domain_size` | 180 | 440 | scale (necessary) | match fibre *density* |
+| `n_fibers` | 99 | 420 | scale (necessary) | 420 is **sparser** than G4 |
+| `gaussian_sigma` | 1.5 | 1.5 | contact | consistent |
+| `collagen_modulus_mpa` | 3.0 | 3.0 | collagen | consistent |
+| `crosslink_stiffness` | 10.0 | 10.0 | crosslink | consistent |
+| `compression_ratio` | 0.10 | 0.10 | collagen (microbuckling) | consistent |
+| clutch set (N_c,k_c,k_on,k_off0,F_b,v0,F_stall) | -- | == | per-cell clutch | consistent (Adebowale 2021 SI T4) |
+
+**Fibre density.** G4 = 99/180^2 = **3.06e-3 um^-2**; G5 default = 420/440^2 =
+**2.17e-3 um^-2** -> G5 is ~30% *sparser*.  To match G4 density in the 440 um box
+requires **~592 fibres**.  Compare networks by density, never by raw count.
+
+**Resolution (non-destructive).** The exploratory G5 defaults are kept as-is
+(version-preservation).  `generations/g5_organoid/lineage.py` adds:
+- `g4_frozen_config(**overrides)` -- an `OrganoidConfig` with every non-multicellular
+  parameter pinned to its G4 value (the frozen rows above).
+- `fiber_density` / `matched_fiber_count` -- density-based network comparison.
+- Transfer controls: **G5-0A** (G5 box + 1 cell + all-G4 params -> must reproduce G4
+  single-cell result) and **G5-0B** (fixed cells, vary M, G4 params -> pure
+  collective-traction effect Delta_multicell = Y(M) - Y(1)).
+
+The biological G5 should use **clutch-generated** traction (`clutch_dynamics=True`);
+constant pull (`total_pull_force`) is a control only, which removes the 24-vs-12
+ambiguity.  Any deviation from the frozen set must be an *explicit, separately-labelled
+ablation*, not bundled with the 1->M change.
+
+### G5-0A scale-transfer result (2026-09)
+
+One cell, all G4-frozen params, density matched (592 fibres in the 440 um box),
+`clutch_dynamics=True`, 1200 s.  Compared to G4 `run_clutch` single cell:
+
+| quantity | G4 | G5-0A | ratio |
+|----------|----|-------|-------|
+| total traction | 55.9 nN | 16.1 nN | 0.29 |
+| sectors gripping | 12/12 (forced) | **3/12** | -- |
+| **per-sector traction** | 4.66 nN | **5.37 nN** | **1.15** |
+
+**Interpretation.** The per-clutch physics transfers cleanly (per-sector within 15 %);
+the 0.29 total is almost entirely **geometric** -- a single cell in G5's uniform-random
+network finds a fibre in only 3 of 12 angular sectors, whereas G4's generator guarantees
+all 12.  So enlarging the box does not change the clutch physics; it changes near-cell
+fibre coverage.
+
+**Consequence for the lineage.** G5's `contact_width` 3->8 and the `n_corona_fibers`
+construct exist precisely to restore this coverage in the sparse bulk network.  The clean
+fix is to guarantee near-cell/near-surface angular fibre coverage *geometrically* (as G4
+does), then `contact_width` can return to 3 and the corona hack can be dropped.  Until
+then, compare organoid results by **per-active-sector** traction, not raw totals.
+Reproduce: `generations/g5_organoid/lineage.py` + the G5-0A driver (output
+`g5_0A_scale_transfer.gif`).
