@@ -8,12 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
-    svg: { fontCache: 'global' }
-  };
+  window.MathJax = { tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$']]}, svg:{fontCache:'global'} };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
 :root{
   --paper:#F4EFE6; --paper2:#ECE4D4; --ink:#181510; --ink-soft:#4A443A;
@@ -22,28 +19,14 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
-body{
-  background:var(--paper); color:var(--ink);
-  font-family:'Instrument Sans',sans-serif; font-size:17px; line-height:1.5;
-  overflow:hidden;
-}
-/* deck */
+body{background:var(--paper);color:var(--ink);font-family:'Instrument Sans',sans-serif;font-size:17px;line-height:1.5;overflow:hidden}
 .deck{position:fixed;inset:0}
-.slide{
-  position:absolute;inset:0; padding:48px 64px 64px;
-  display:none; flex-direction:column;
-  opacity:0; transition:opacity .45s ease;
-  overflow:hidden;
-}
+.slide{position:absolute;inset:0;padding:48px 64px 64px;display:none;flex-direction:column;opacity:0;transition:opacity .45s ease;overflow:hidden}
 .slide.active{display:flex;opacity:1;animation:rise .55s cubic-bezier(.2,.7,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-/* kicker / titles */
-.kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;
-  text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:14px}
-h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(38px,6vw,84px);
-  line-height:1.02;letter-spacing:-.02em}
-h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(30px,3.6vw,50px);
-  line-height:1.05;letter-spacing:-.015em;margin-bottom:6px}
+.kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:14px}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(38px,6vw,84px);line-height:1.02;letter-spacing:-.02em}
+h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(30px,3.6vw,50px);line-height:1.05;letter-spacing:-.015em;margin-bottom:6px}
 h3{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-bottom:4px}
 .lede{font-size:20px;color:var(--ink-soft);max-width:56ch;margin-top:8px}
 p{margin-bottom:10px}
@@ -51,95 +34,66 @@ em{font-style:italic;color:var(--crimson)}
 strong{font-weight:700}
 .mono{font-family:'JetBrains Mono',monospace}
 .hi{color:var(--crimson);font-weight:700}
-/* layout helpers */
 .body{flex:1;display:flex;gap:40px;min-height:0;margin-top:18px}
 .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
-.col.narrow{flex:.8}
+.col.narrow{flex:.85}
+.col.wide{flex:1.4}
 .scroll{overflow:auto;padding-right:8px}
-.center{align-items:center;justify-content:center;text-align:center}
-.grow{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
-/* cards */
-.card{background:var(--paper2);border:1px solid var(--line);border-radius:14px;
-  padding:18px 20px;position:relative}
-.card h3{color:var(--ink)}
+.card{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;position:relative}
 .card .num{font-family:'Fraunces',serif;font-size:40px;font-weight:600;color:var(--crimson);line-height:1}
-.eq{background:#fff;border:1px solid var(--line);border-left:4px solid var(--crimson);
-  border-radius:10px;padding:12px 18px;margin:6px 0;overflow-x:auto}
-.eqlabel{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);
-  text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px}
-img.fig{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;
-  border:1px solid var(--line);background:#fff}
-.figwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;background:#fff;
-  border:1px solid var(--line);border-radius:12px;padding:8px}
+.eqlabel{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px}
+.eq{background:#fff;border:1px solid var(--line);border-left:4px solid var(--crimson);border-radius:10px;padding:12px 18px;margin:6px 0;overflow-x:auto}
+img.fig{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:#fff}
+.figwrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
 .figcap{font-size:13px;color:var(--ink-soft);margin-top:6px;font-style:italic}
 ul{list-style:none;display:flex;flex-direction:column;gap:9px}
 li{padding-left:22px;position:relative}
-li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;
-  background:var(--crimson);border-radius:2px;transform:rotate(45deg)}
+li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;background:var(--crimson);border-radius:2px;transform:rotate(45deg)}
 li.ok::before{background:var(--sage)}
 li.no::before{background:var(--line);border:1px solid var(--clay)}
-/* tables */
 table{width:100%;border-collapse:collapse;font-size:14.5px}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
-th{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;
-  letter-spacing:.1em;color:var(--ink-soft)}
+th{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft)}
 td.mono{font-family:'JetBrains Mono',monospace}
 tr:hover td{background:var(--paper2)}
-.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;
-  padding:2px 8px;border-radius:20px;background:var(--paper);border:1px solid var(--line);
-  color:var(--ink-soft);letter-spacing:.06em}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:2px 8px;border-radius:20px;background:var(--paper);border:1px solid var(--line);color:var(--ink-soft);letter-spacing:.06em}
 .tag.bio{border-color:var(--sage);color:var(--sage)}
 .tag.phys{border-color:var(--compress);color:var(--compress)}
-.pipe{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
-.step{flex:1;min-width:150px;background:var(--paper2);border:1px solid var(--line);
-  padding:14px 16px;position:relative}
+.pipe{display:flex;gap:0;flex-wrap:wrap}
+.step{flex:1;min-width:150px;background:var(--paper2);border:1px solid var(--line);padding:16px 18px;position:relative}
 .step:first-child{border-radius:12px 0 0 12px}
 .step:last-child{border-radius:0 12px 12px 0}
 .step .n{font-family:'JetBrains Mono',monospace;color:var(--crimson);font-size:12px;font-weight:700}
-.step .t{font-family:'Fraunces',serif;font-weight:600;font-size:18px;margin:4px 0}
-.step .d{font-size:13px;color:var(--ink-soft)}
-.step .arrow{position:absolute;right:-11px;top:50%;transform:translateY(-50%);z-index:2;
-  color:var(--crimson);font-size:20px;font-weight:700}
-/* source footer */
-.src{position:absolute;left:64px;right:64px;bottom:20px;font-family:'JetBrains Mono',monospace;
-  font-size:11px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:8px;
-  display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.step .t{font-family:'Fraunces',serif;font-weight:600;font-size:19px;margin:5px 0}
+.step .d{font-size:13.5px;color:var(--ink-soft)}
+.step .arrow{position:absolute;right:-11px;top:50%;transform:translateY(-50%);z-index:2;color:var(--crimson);font-size:20px;font-weight:700}
+.src{position:absolute;left:64px;right:64px;bottom:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:8px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
 .src b{color:var(--crimson);font-weight:700;letter-spacing:.1em;flex-shrink:0}
-.caveat{display:inline-block;background:#F7E9C9;border:1px solid var(--gold);color:#7A5A12;
-  font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 10px;border-radius:6px;
-  letter-spacing:.04em}
-/* progress + nav */
-.hud{position:fixed;bottom:18px;right:24px;z-index:50;font-family:'JetBrains Mono',monospace;
-  font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:14px}
+.caveat{display:inline-block;background:#F7E9C9;border:1px solid var(--gold);color:#7A5A12;font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 10px;border-radius:6px;letter-spacing:.04em}
+.hud{position:fixed;bottom:18px;right:24px;z-index:50;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);display:flex;align-items:center;gap:14px}
 .hud .count b{color:var(--crimson)}
 .nav{display:flex;gap:6px}
-.nav button{background:var(--paper2);border:1px solid var(--line);color:var(--ink);
-  width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;transition:.15s}
+.nav button{background:var(--paper2);border:1px solid var(--line);color:var(--ink);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;transition:.15s}
 .nav button:hover{background:var(--crimson);color:#fff;border-color:var(--crimson)}
 .pbar{position:fixed;top:0;left:0;height:3px;background:var(--crimson);z-index:60;transition:width .4s}
-.dots{position:fixed;bottom:20px;left:24px;z-index:50;display:flex;gap:6px;max-width:60vw;flex-wrap:wrap}
+.dots{position:fixed;bottom:20px;left:24px;z-index:50;display:flex;gap:6px;flex-wrap:wrap;max-width:55vw}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--line);cursor:pointer;transition:.2s}
 .dot.on{background:var(--crimson);transform:scale(1.3)}
-/* title slide flourish */
 .title-slide{justify-content:center}
-.title-slide .grid-bg{position:absolute;inset:0;opacity:.5;z-index:0;
-  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-  background-size:44px 44px;mask-image:radial-gradient(circle at 30% 40%,#000,transparent 75%)}
+.title-slide .grid-bg{position:absolute;inset:0;opacity:.5;z-index:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at 30% 40%,#000,transparent 75%)}
 .title-slide>*{position:relative;z-index:1}
 .aster{position:absolute;right:6%;top:50%;transform:translateY(-50%);width:34vw;height:34vw;z-index:0;opacity:.9}
-.badge{display:inline-flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;
-  font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:30px;padding:6px 14px;margin-bottom:20px}
+.badge{display:inline-flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);border:1px solid var(--line);border-radius:30px;padding:6px 14px;margin-bottom:20px}
 .badge .d{width:8px;height:8px;border-radius:50%;background:var(--crimson)}
 .who{display:flex;gap:28px;margin-top:26px;flex-wrap:wrap}
 .who div{font-size:14px}
 .who .r{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--crimson);text-transform:uppercase;letter-spacing:.1em}
 .two-num{display:flex;gap:16px}
 .two-num .card{flex:1}
-.legend{display:flex;gap:16px;font-size:13px;color:var(--ink-soft);flex-wrap:wrap}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--ink-soft);flex-wrap:wrap;margin-top:4px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:14px;height:6px;border-radius:3px;display:inline-block}
-.hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:50;
-  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);opacity:.7}
+.hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:50;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);opacity:.7}
 @media(max-width:900px){.body{flex-direction:column}.slide{padding:32px 28px 60px}.src{left:28px;right:28px}}
 </style>
 </head>
@@ -151,190 +105,139 @@ tr:hover td{background:var(--paper2)}
 <section class="slide title-slide">
   <div class="grid-bg"></div>
   <svg class="aster" viewBox="-100 -100 200 200" fill="none">
-    <g stroke="#A8321E" stroke-width="1.1" opacity="0.85">
-      <!-- radial aster fibers -->
-      <g id="rays"></g>
-    </g>
+    <g stroke="#A8321E" stroke-width="1.1" opacity="0.85"><g id="rays"></g></g>
     <circle r="26" fill="#ECE4D4" stroke="#A8321E" stroke-width="1.5"/>
-    <g fill="#35618A" opacity="0.9">
-      <circle cx="-7" cy="-6" r="5"/><circle cx="8" cy="-8" r="5"/><circle cx="-9" cy="7" r="5"/>
-      <circle cx="9" cy="8" r="5"/><circle cx="0" cy="0" r="5"/><circle cx="-13" cy="0" r="4"/><circle cx="13" cy="1" r="4"/>
-    </g>
-    <circle cx="20" cy="-14" r="5" fill="#A8321E"/>
+    <g fill="#35618A" opacity="0.9"><circle cx="-7" cy="-6" r="5"/><circle cx="8" cy="-8" r="5"/><circle cx="-9" cy="7" r="5"/><circle cx="9" cy="8" r="5"/><circle cx="0" cy="0" r="5"/><circle cx="-13" cy="0" r="4"/><circle cx="13" cy="1" r="4"/></g>
   </svg>
   <div class="badge"><span class="d"></span> Generation 5 · Mechanics-first · <span class="mono">2026-09</span></div>
   <h1>A tumor organoid that<br>grips, pulls &amp; remodels<br>its collagen.</h1>
-  <p class="lede">A multicellular motor–clutch organoid coupled to a discrete bead–spring collagen network — built to ask when invasion is <em>collective</em>, <em>single-cell</em>, or <em>stuck</em>.</p>
+  <p class="lede">A multicellular motor–clutch organoid on a discrete bead–spring collagen network — built to ask when invasion is <em>collective</em>, <em>single-cell</em>, or <em>stuck</em>, and how matrix stiffness tunes it.</p>
   <div class="who">
     <div><div class="r">Modelling</div>Minnie Tsai</div>
     <div><div class="r">Bead-based coupling</div>Prof. Hongbo Zhao</div>
-    <div><div class="r">ECM viscoelasticity / clutch</div>Prof. Kolade Adebowale</div>
+    <div><div class="r">ECM mechanics / clutch</div>Prof. Kolade Adebowale</div>
     <div><div class="r">Wet-lab · PDAC/OSCC</div>Gloria Liu</div>
   </div>
 </section>
 
-<!-- 2 BIOLOGICAL QUESTION -->
+<!-- 2 QUESTION -->
 <section class="slide">
   <div class="kicker">The question</div>
   <h2>What decides how a tumor escapes its matrix?</h2>
   <div class="body">
     <div class="col">
-      <p>A ~200 µm tumor organoid sits in reconstituted collagen-I. Over days it does three things we can measure in the wet lab:</p>
+      <p>A ~200 µm tumor organoid sits in collagen-I. Over days the wet lab sees it:</p>
       <ul>
-        <li><strong>Grips &amp; pulls</strong> collagen — leader protrusions generate traction.</li>
-        <li><strong>Reorganizes fibers into radial alignment</strong> (aster / TACS-3-like), with clearance zones.</li>
-        <li>Shows <strong>collective strands</strong> and occasional <strong>single-cell escape</strong>.</li>
+        <li><strong>Grip &amp; pull</strong> collagen — cells generate traction.</li>
+        <li><strong>Reorganize fibers into radial alignment</strong> (aster / TACS-3-like).</li>
+        <li>Switch between <strong>collective strands</strong> and <strong>single-cell escape</strong>.</li>
       </ul>
-      <p class="lede" style="font-size:18px">Goal: a <em>mechanical phase diagram</em> — given ECM mechanics + cell adhesion, predict the invasion mode.</p>
-      <div class="two-num">
-        <div class="card"><div class="eqlabel">Organoid</div><div class="num">~200</div>µm diameter, ~15–20 µm cells</div>
-        <div class="card"><div class="eqlabel">Alignment rises</div><div class="num">0.5→0.75</div>near the invading front</div>
-      </div>
+      <p class="lede" style="font-size:18px">Goal — a <em>mechanical phase diagram</em>: given ECM mechanics + cell adhesion, predict the invasion mode.</p>
     </div>
     <div class="col narrow">
       <div class="figwrap"><img class="fig" src="kolade_alignment_vs_distance.png" alt="alignment vs distance"></div>
-      <div class="figcap">Collagen alignment index vs distance from an invading front (validation target).</div>
+      <div class="figcap">Validation target: collagen alignment rises (~0.5→0.75) toward the invading front.</div>
     </div>
   </div>
-  <div class="src"><b>SOURCES</b> Provenzano 2006 <span class="mono">BMC Med</span> (TACS) · Saraswathibhatla 2025 <span class="mono">bioRxiv</span> (alignment 0.5→0.75; n_r≈1.2, n_t≈2.2) · Adebowale/Liu wet-lab (PDAC &amp; 4MOSC1 OSCC organoids, personal communication)</div>
+  <div class="src"><b>SOURCES</b> Provenzano 2006 <span class="mono">BMC Med</span> (TACS) · Saraswathibhatla 2025 <span class="mono">bioRxiv</span> (alignment 0.5→0.75) · Adebowale/Liu wet-lab (PDAC &amp; 4MOSC1 OSCC, pers. comm.)</div>
 </section>
 
 <!-- 3 PIPELINE -->
 <section class="slide">
-  <div class="kicker">How the model works — one loop, every timestep</div>
+  <div class="kicker">The whole model is one loop, every timestep</div>
   <h2>Grip → pull → fiber moves → cells move</h2>
-  <div class="body" style="flex-direction:column;gap:22px">
+  <div class="body" style="flex-direction:column;gap:26px">
     <div class="pipe">
-      <div class="step"><div class="n">01 · GRIP</div><div class="t">Molecular clutch</div><div class="d">Cell-surface clutches bind nearby fibers; a motor loads them (force builds).</div><div class="arrow">→</div></div>
-      <div class="step"><div class="n">02 · PULL</div><div class="t">Traction on ECM</div><div class="d">Loaded clutch force is projected onto the attached beads (Gaussian kernel).</div><div class="arrow">→</div></div>
-      <div class="step"><div class="n">03 · FIBER MOVES</div><div class="t">Overdamped network</div><div class="d">Beads relax under stretch + bend + crosslink forces → fibers align radially.</div><div class="arrow">→</div></div>
+      <div class="step"><div class="n">01 · GRIP</div><div class="t">Molecular clutch</div><div class="d">Cell-surface clutches bind nearby fibers; a motor loads them until force builds.</div><div class="arrow">→</div></div>
+      <div class="step"><div class="n">02 · PULL</div><div class="t">Traction on ECM</div><div class="d">Loaded clutch force is projected onto the attached fiber's beads.</div><div class="arrow">→</div></div>
+      <div class="step"><div class="n">03 · FIBER MOVES</div><div class="t">Overdamped network</div><div class="d">Beads relax under stretch + bend + crosslinks; fibers pull straight &amp; align.</div><div class="arrow">→</div></div>
       <div class="step"><div class="n">04 · CELLS MOVE</div><div class="t">Reaction + cohesion</div><div class="d">Newton's 3rd law reels each cell outward; cell–cell adhesion holds the pack.</div></div>
     </div>
-    <div class="body" style="margin-top:0">
-      <div class="col">
-        <p>Three modules, one coupled system. Each cell is a <strong>motor–clutch</strong>; the ECM is a <strong>discrete bead–spring network</strong>; the two talk through a <strong>Gaussian projection kernel</strong> (a representational tool, <em>not</em> a spring).</p>
-        <p>Clutches can <strong>slip</strong> (Bell unbinding) → traction load-and-fails, exactly as in single-cell motor-clutch theory — now scaled to a whole organoid.</p>
-      </div>
-      <div class="col narrow">
-        <div class="figwrap"><img class="fig" src="g5_model_anatomy.png" alt="model anatomy"></div>
-        <div class="figcap">G5 anatomy: cells (blue), leader (red), collagen colored by tension/compression, crosslinks.</div>
-      </div>
+    <div class="col" style="flex:none">
+      <p style="font-size:19px;max-width:80ch">Three modules — a <strong>motor–clutch cell</strong>, a <strong>bead–spring ECM</strong>, and a <strong>projection kernel</strong> between them — solved together. Clutches can <strong>slip</strong> (Bell unbinding), so traction load-and-fails exactly as in single-cell theory, now scaled to a whole organoid.</p>
     </div>
   </div>
-  <div class="src"><b>ARCHITECTURE</b> Motor-clutch: Chan &amp; Odde 2008 <span class="mono">Science</span> · Bead-spring ECM: Lee 2014 <span class="mono">PLoS ONE</span> · Eulerian–Lagrangian coupling: Zhao/Zhang 2025 <span class="mono">bioRxiv</span></div>
+  <div class="src"><b>ARCHITECTURE</b> Motor-clutch: Chan &amp; Odde 2008 <span class="mono">Science</span> · Bead-spring ECM: Lee 2014 <span class="mono">PLoS ONE</span> · Cell–bead coupling: Zhao/Zhang 2025 <span class="mono">bioRxiv</span></div>
 </section>
 
-<!-- 4 ECM: bead-spring -->
+<!-- 4 THEORY: ECM + crosslinks -->
 <section class="slide">
-  <div class="kicker">Module 1 — the ECM itself</div>
-  <h2>Collagen as a discrete bead–spring network</h2>
+  <div class="kicker">Theory · the ECM itself</div>
+  <h2>Collagen = beads, springs, crosslinks</h2>
   <div class="body">
     <div class="col scroll">
-      <p>Fibers are chains of beads; crosslinks weld crossings. Every bead is <strong>overdamped</strong> (inertia-free) — velocity ∝ net force:</p>
+      <p>Fibers are bead chains; <strong>crosslinks weld crossings</strong>, so pulling one fiber drags its neighbors. Every bead is <strong>overdamped</strong> — velocity ∝ net force:</p>
       <div class="eq"><div class="eqlabel">Overdamped bead dynamics</div>$$\zeta\,\frac{d\mathbf{r}_i}{dt}=\mathbf{F}^{\text{stretch}}_i+\mathbf{F}^{\text{bend}}_i+\mathbf{F}^{\text{xl}}_i+\mathbf{F}^{\text{rep}}_i+\mathbf{F}^{\text{active}}_i$$</div>
-      <div class="eq"><div class="eqlabel">Axial spring — tension stiff, compression soft (microbuckling)</div>$$\mathbf{F}^{\text{stretch}}=k_s\,(|\mathbf{r}_{ij}|-\ell_0)\,\hat{\mathbf{r}}_{ij},\quad k_s=\tfrac{EA}{\ell_0}\ \text{(tension)},\ \ k_s^{\text{comp}}=0.1\,\tfrac{EA}{\ell_0}$$</div>
-      <div class="eq"><div class="eqlabel">Harmonic bending + optional strain-stiffening</div>$$E_{\text{bend}}=\tfrac{\kappa_b}{2}\,\theta^2,\qquad k_s^{\text{tension}}\to k_s\,\exp\!\big(\varepsilon/\varepsilon_{\text{ref}}\big),\ \ \varepsilon=\tfrac{\Delta\ell}{\ell_0}$$</div>
+      <div class="eq"><div class="eqlabel">Axial spring — tension stiff, compression soft (microbuckling)</div>$$\mathbf{F}^{\text{stretch}}=k_s\,(|\mathbf{r}_{ij}|-\ell_0)\,\hat{\mathbf{r}}_{ij},\qquad k_s^{\text{comp}}=0.1\,k_s$$</div>
+      <div class="eq"><div class="eqlabel">Harmonic bending</div>$$E_{\text{bend}}=\tfrac{\kappa_b}{2}\,\theta^2$$</div>
     </div>
     <div class="col narrow">
-      <div class="figwrap"><img class="fig" src="g5_fullscale_seed23.png" alt="full network"></div>
-      <div class="figcap">Baseline network: fibers (tension red / compression blue), crosslinks, boundary-anchored.</div>
-      <div class="legend">
-        <span><span class="sw" style="background:#B23A28"></span>tension</span>
-        <span><span class="sw" style="background:#35618A"></span>compression</span>
-      </div>
+      <div class="figwrap"><img class="fig" src="g5_clutch_contract_2h.gif" alt="crosslink coupling"></div>
+      <div class="figcap">Live: cells contract the matrix — watch a <em>crosslink drag the fiber it's welded to</em>. Red=tension, blue=compression, gold=crosslinks.</div>
     </div>
   </div>
-  <div class="src"><b>SOURCES</b> Lee 2014 <span class="mono">PLoS ONE</span> (bead-spring lineage) · Saraswathibhatla 2025 <span class="mono">SI Table 2</span> (k_s=4×10⁻³ N/m, κ_b=8.27×10⁻²⁰ N·m, ℓ₀=1 µm) · Strain-stiffening: Steinwachs 2016 <span class="mono">Nat Methods</span>, Mark 2020 <span class="mono">eLife</span>, Shenoy 2014</div>
+  <div class="src"><b>SOURCES</b> Lee 2014 <span class="mono">PLoS ONE</span> · Saraswathibhatla 2025 <span class="mono">SI Table 2</span> (k_s=4×10⁻³ N/m, κ_b=8.27×10⁻²⁰ N·m, ℓ₀=1 µm, k_xl=2×10⁻³ N/m)</div>
 </section>
 
-<!-- 5 CELL-ECM I: clutch -->
+<!-- 5 THEORY: clutch -->
 <section class="slide">
-  <div class="kicker">Module 2 — cell ↔ ECM (part 1 of 2)</div>
+  <div class="kicker">Theory · cell ↔ ECM</div>
   <h2>The molecular clutch, with slippage</h2>
   <div class="body">
     <div class="col scroll">
-      <p>At each of 12 grip sites per cell, a <strong>motor</strong> pulls actin and <strong>clutches</strong> transmit that pull to a fiber. Fast clutches build force; when force is high they unbind faster (Bell) → the bond <em>slips</em> and traction resets.</p>
-      <div class="eq"><div class="eqlabel">Motor force–velocity (actin retrograde flow)</div>$$v=v_0\left(1-\frac{F}{F_{\text{stall}}}\right)$$</div>
-      <div class="eq"><div class="eqlabel">Clutch as a linear bond</div>$$F_c=k_c\,x_c$$</div>
-      <div class="eq"><div class="eqlabel">Bell's law — force-accelerated unbinding (slippage)</div>$$k_{\text{off}}=k_{\text{off}}^{0}\,\exp\!\big(F_c/F_b\big)$$</div>
-      <p style="font-size:14.5px;color:var(--ink-soft)">Biphasic traction–stiffness follows automatically: too soft → no load; too stiff → constant slipping; an optimum in between.</p>
+      <p>At each of 12 grip sites, a <strong>motor</strong> pulls actin and <strong>clutches</strong> transmit the pull to a fiber. Force builds; when it's high, clutches unbind faster (Bell) → the bond <em>slips</em> and traction resets.</p>
+      <div class="eq"><div class="eqlabel">Motor force–velocity (actin retrograde flow)</div>$$v=v_0\!\left(1-\tfrac{F}{F_{\text{stall}}}\right)$$</div>
+      <div class="eq"><div class="eqlabel">Clutch bond · Bell force-accelerated unbinding (slip)</div>$$F_c=k_c\,x_c,\qquad k_{\text{off}}=k_{\text{off}}^{0}\,\exp\!\big(F_c/F_b\big)$$</div>
+      <p style="font-size:14.5px;color:var(--ink-soft)">Biphasic traction–stiffness follows for free: too soft → no load; too stiff → constant slipping; optimum between. Emergent organoid traction ≈ <span class="hi">114 nN</span>.</p>
     </div>
     <div class="col narrow">
       <div class="figwrap"><img class="fig" src="g5_clutch_invade_2h.gif" alt="clutch invasion"></div>
-      <div class="figcap">Live clutch dynamics over 2 h — grip sites load, slip, and reel the cell outward.</div>
+      <div class="figcap">Live clutch dynamics (2 h): grip sites load, slip, and reel cells outward.</div>
     </div>
   </div>
-  <div class="src"><b>SOURCES</b> Chan &amp; Odde 2008 <span class="mono">Science</span> (motor-clutch, force-velocity) · Bell 1978 <span class="mono">Science</span> (k_off) · Bangasser 2017 <span class="mono">Nat Commun</span> (biphasic) · Params: Adebowale 2021 <span class="mono">Nat Mater SI Table 4</span> (k_c=2 nN/µm, k_on=0.055/s, k_off⁰=0.018/s, F_b=1.5 nN, v₀≈24 nm/s)</div>
+  <div class="src"><b>SOURCES</b> Chan &amp; Odde 2008 <span class="mono">Science</span> · Bell 1978 <span class="mono">Science</span> · Bangasser 2017 <span class="mono">Nat Commun</span> (biphasic) · Params: Adebowale 2021 <span class="mono">Nat Mater SI Table 4</span> (k_c=2 nN/µm, k_on=0.055/s, k_off⁰=0.018/s, F_b=1.5 nN, v₀≈24 nm/s)</div>
 </section>
 
-<!-- 6 CELL-ECM II: gaussian kernel -->
+<!-- 6 THEORY: coupling + cell-cell -->
 <section class="slide">
-  <div class="kicker">Module 2 — cell ↔ ECM (part 2 of 2)</div>
-  <h2>Projecting the pull onto fibers</h2>
+  <div class="kicker">Theory · projection &amp; cohesion</div>
+  <h2>How the pull reaches fibers — and holds cells together</h2>
   <div class="body">
     <div class="col scroll">
-      <p>A grip site is a point on the cell surface; the fiber is made of discrete beads. A normalized <strong>Gaussian kernel</strong> spreads each clutch's point force onto nearby beads of the attached fiber — preserving total force and its first moment.</p>
-      <div class="eq"><div class="eqlabel">Gaussian projection weight (shell at cell radius R)</div>$$w_i=\exp\!\left(-\frac{\big(|\mathbf{r}_i-\mathbf{r}_c|-R\big)^2}{\sigma^2}\right)$$</div>
-      <div class="eq"><div class="eqlabel">Force on cell = reaction of traction on ECM (Newton III)</div>$$\zeta_{\text{cell}}\,\frac{d\mathbf{r}_c}{dt}=-\sum_i \mathbf{F}^{\text{active}}_i+\mathbf{F}^{\text{cell-cell}}$$</div>
-      <p><span class="tag phys">important</span> The kernel is a <em>representational projection tool</em>, not a mechanical crosslinker — it never adds elastic energy. (Hongbo-approved, 8/7.)</p>
+      <p><strong>Cell → fiber.</strong> A normalized <strong>Gaussian kernel</strong> spreads each clutch's point force onto nearby beads of its fiber (a representational tool, <em>not</em> an elastic spring). The reaction reels the cell.</p>
+      <div class="eq"><div class="eqlabel">Gaussian projection weight (shell at cell radius R)</div>$$w_i=\exp\!\left(-\frac{(|\mathbf{r}_i-\mathbf{r}_c|-R)^2}{\sigma^2}\right),\qquad \zeta_{\text{cell}}\dot{\mathbf{r}}_c=-\!\sum_i \mathbf{F}^{\text{active}}_i+\mathbf{F}^{\text{cc}}$$</div>
     </div>
-    <div class="col narrow">
-      <div class="figwrap"><img class="fig" src="g5_demo_beforeafter.png" alt="before after pull"></div>
-      <div class="figcap">Before / after: the cell's pull reorganizes the near-field into a radial aster.</div>
-    </div>
-  </div>
-  <div class="src"><b>SOURCES</b> Zhao/Zhang 2025 <span class="mono">bioRxiv</span> (Eulerian–Lagrangian point-to-bead coupling) · kernel width σ≈2 µm, R≈10 µm (baseline, to be validated) · Advisor decision (Hongbo, 2026-08-07)</div>
-</section>
-
-<!-- 7 CELL-CELL -->
-<section class="slide">
-  <div class="kicker">Module 3 — cell ↔ cell</div>
-  <h2>Adhesion sets cohesion — the collective/single switch</h2>
-  <div class="body">
     <div class="col scroll">
-      <p>Cells are soft adhesive disks. Below the equilibrium spacing they <strong>repel</strong> (volume exclusion); just above it they <strong>adhere</strong> (E-cadherin-like surface tension); far apart they feel nothing.</p>
-      <div class="eq"><div class="eqlabel">Piecewise-linear cell–cell force (separation d, spacing d₀)</div>$$f(d)=\begin{cases}-k_{\text{rep}}(d_0-d) & d<d_0\ \text{(repel)}\\[2pt]+k_{\text{adh}}(d-d_0) & d_0\le d\le d_0+\delta\ \text{(adhere)}\\[2pt]0 & d>d_0+\delta\end{cases}$$</div>
-      <p>This single parameter, <span class="hi">k_adh</span>, tunes tissue surface tension: high → cohesive pack (jammed), low → cells unjam and disperse.</p>
-      <div class="two-num">
-        <div class="card"><div class="eqlabel">Repulsion</div><div class="num">40</div>nN/µm (exclusion)</div>
-        <div class="card"><div class="eqlabel">Adhesion (baseline)</div><div class="num">6</div>nN/µm, range 6 µm</div>
-      </div>
-    </div>
-    <div class="col narrow">
-      <div class="figwrap"><img class="fig" src="g5_collective_vs_single_2h.gif" alt="collective vs single"></div>
-      <div class="figcap">Same pull, different adhesion → cohesive collective vs dispersing single cells.</div>
+      <p><strong>Cell ↔ cell.</strong> Cells are soft adhesive disks: repel when overlapping, adhere (E-cadherin-like surface tension) just past contact. One knob, <span class="hi">k_adh</span>, sets tissue cohesion → the collective/single switch.</p>
+      <div class="eq"><div class="eqlabel">Piecewise-linear cell–cell force</div>$$f(d)=\begin{cases}-k_{\text{rep}}(d_0-d)&d<d_0\\ +k_{\text{adh}}(d-d_0)&d_0\le d\le d_0+\delta\\ 0&d>d_0+\delta\end{cases}$$</div>
     </div>
   </div>
-  <div class="src"><b>SOURCES</b> Tissue surface tension / jamming: Ilina 2020 <span class="mono">Nat Cell Biol</span> · Cell-cell adhesion (E-cadherin) framing: Friedl &amp; Gilmour 2009 <span class="mono">Nat Rev Mol Cell Biol</span> · Piecewise-linear disk = modelling simplification (this work)</div>
+  <div class="src"><b>SOURCES</b> Gaussian coupling: Zhao/Zhang 2025 <span class="mono">bioRxiv</span> (advisor-approved, 2026-08-07) · Cohesion/jamming: Ilina 2020 <span class="mono">Nat Cell Biol</span> · piecewise disk = this work</div>
 </section>
 
-<!-- 8 BIOLOGY MAPPING -->
+<!-- 7 BIOLOGY MAPPING -->
 <section class="slide">
-  <div class="kicker">What the parameters mean biologically</div>
-  <h2>Traction · Leader · EMT · MMP · Protrusion</h2>
+  <div class="kicker">What the mechanics mean biologically</div>
+  <h2>Traction · EMT · protrusion · MMP</h2>
   <div class="body">
-    <div class="col scroll" style="flex:1.25">
+    <div class="col scroll" style="flex:1.3">
       <table>
         <tr><th>Biology</th><th>In the model</th><th>Source</th></tr>
-        <tr><td><strong>Traction</strong><br><span class="tag bio">force on ECM</span></td><td class="mono">clutch F_c projected onto beads; reaction reels the cell</td><td>Chan&amp;Odde 2008</td></tr>
-        <tr><td><strong>Leader cell</strong><br><span class="tag bio">front, opens path</span></td><td class="mono">outermost fraction with reduced adhesion (breaks symmetry, leads a strand)</td><td>Friedl&amp;Gilmour 2009; Cheung 2013</td></tr>
-        <tr><td><strong>EMT</strong><br><span class="tag bio">↓E-cadherin</span></td><td class="mono">leader_adhesion_factor = 0.15 (adhesion cut to 15%)</td><td>Kalluri&amp;Weinberg 2009; Aiello 2018 (partial EMT)</td></tr>
-        <tr><td><strong>Protrusion</strong><br><span class="tag bio">reaches, grips</span></td><td class="mono">12 angular grip sites per cell surface</td><td>(coarse proxy)</td></tr>
-        <tr><td><strong>MMP proteolysis</strong><br><span class="tag no">not yet</span></td><td class="mono">— fibers can be pulled/pushed, not cut</td><td>Wolf&amp;Friedl 2011 (gap in model)</td></tr>
+        <tr><td><strong>Traction</strong> <span class="tag bio">force on ECM</span></td><td class="mono">clutch F_c projected to beads; reaction reels the cell</td><td>Chan&amp;Odde 2008</td></tr>
+        <tr><td><strong>Cell–cell adhesion / EMT</strong> <span class="tag bio">↓E-cadherin</span></td><td class="mono">k_adh sets cohesion; lowering it = EMT → unjamming</td><td>Kalluri&amp;Weinberg 2009; Ilina 2020</td></tr>
+        <tr><td><strong>Protrusion</strong> <span class="tag bio">reaches, grips</span></td><td class="mono">12 angular grip sites per cell surface (coarse proxy)</td><td>Friedl&amp;Gilmour 2009</td></tr>
+        <tr><td><strong>MMP proteolysis</strong> <span class="tag no">not yet</span></td><td class="mono">— fibers can be pulled/pushed, not cut/degraded</td><td>Wolf&amp;Friedl 2011 (gap)</td></tr>
       </table>
-      <p style="font-size:14.5px;color:var(--ink-soft);margin-top:12px">A leader today = "low adhesion" only. Real leaders also pull <em>harder</em> and secrete MMPs — both are honest next steps (see limitations).</p>
     </div>
-    <div class="col narrow center">
-      <div class="card" style="width:100%">
-        <div class="eqlabel">Current leader definition</div>
-        <p style="font-size:15px;margin-top:6px">The outermost <span class="hi">leader_fraction</span> of cells get adhesion ×0.15. Everything else identical. That alone is enough to switch collective → single-cell escape.</p>
-      </div>
+    <div class="col narrow center" style="justify-content:center">
+      <div class="card" style="width:100%"><div class="eqlabel">One honest sentence</div>
+        <p style="font-size:16px;margin-top:6px">Every phenotype maps to a <em>force term</em>, not a fitted rule — so we can attribute behavior to mechanics. The clearest gap is <strong>MMP degradation</strong>: our cells remodel by pulling, not cutting.</p></div>
     </div>
   </div>
-  <div class="src"><b>SOURCES</b> Friedl &amp; Gilmour 2009 · Cheung 2013 <span class="mono">Cell</span> (K14+ leaders) · Kalluri &amp; Weinberg 2009 <span class="mono">JCI</span> · Aiello 2018 <span class="mono">Dev Cell</span> (partial EMT) · Wolf &amp; Friedl 2011 <span class="mono">Curr Opin Cell Biol</span> (proteolysis)</div>
+  <div class="src"><b>SOURCES</b> Friedl &amp; Gilmour 2009 <span class="mono">Nat Rev MCB</span> · Kalluri &amp; Weinberg 2009 <span class="mono">JCI</span> (EMT) · Ilina 2020 <span class="mono">Nat Cell Biol</span> (jamming) · Wolf &amp; Friedl 2011 (proteolysis)</div>
 </section>
 
-<!-- 9 PARAMETERS -->
+<!-- 8 PARAMETERS -->
 <section class="slide">
   <div class="kicker">Baseline — every value traces to a paper</div>
   <h2>Parameter provenance</h2>
@@ -344,7 +247,7 @@ tr:hover td{background:var(--paper2)}
         <tr><th>Symbol</th><th>Value</th><th>Meaning</th><th>Source</th></tr>
         <tr><td class="mono">k_s</td><td class="mono">4×10⁻³ N/m</td><td>fiber stretch</td><td>Saraswath. SI T2</td></tr>
         <tr><td class="mono">κ_b</td><td class="mono">8.27×10⁻²⁰ N·m</td><td>bending</td><td>Saraswath. SI T2</td></tr>
-        <tr><td class="mono">E</td><td class="mono">3 MPa</td><td>fiber modulus (softened)</td><td>G3/G4 (prof request)</td></tr>
+        <tr><td class="mono">E</td><td class="mono">3 MPa</td><td>fiber modulus (softened)</td><td>advisor request</td></tr>
         <tr><td class="mono">k_xl</td><td class="mono">10 nN/µm</td><td>crosslink</td><td>Saraswath. SI T2</td></tr>
         <tr><td class="mono">k_c</td><td class="mono">2 nN/µm</td><td>clutch stiffness</td><td>Adebowale 2021 T4</td></tr>
         <tr><td class="mono">k_on / k_off⁰</td><td class="mono">0.055 / 0.018 s⁻¹</td><td>clutch kinetics</td><td>Adebowale 2021 T4</td></tr>
@@ -353,182 +256,112 @@ tr:hover td{background:var(--paper2)}
         <tr><td class="mono">R / σ</td><td class="mono">10 / 2 µm</td><td>cell radius / kernel</td><td>typical / to validate</td></tr>
       </table>
     </div>
-    <div class="col narrow">
-      <div class="card"><div class="eqlabel">Discipline</div>
-        <p style="font-size:15px">Every equation and parameter cites a specific paper + equation/table number. No "as is standard." Softening to 3 MPa is the one deliberate, advisor-requested choice — flagged, not hidden.</p></div>
+    <div class="col narrow" style="justify-content:center">
+      <div class="card"><div class="eqlabel">Discipline</div><p style="font-size:15px">Every equation + parameter cites a specific paper + table/eq number. Softening to 3 MPa is the one deliberate, advisor-requested choice — flagged, not hidden.</p></div>
       <div class="card"><span class="caveat">⚠ own-sim numbers = personal testing, not validated findings until matched to a literature target</span></div>
     </div>
   </div>
-  <div class="src"><b>SOURCES</b> Saraswathibhatla 2025 SI Table 2 · Adebowale 2021 Nat Mater SI Table 4 · Bell 1978 · full log in <span class="mono">docs/parameter_provenance.md</span></div>
+  <div class="src"><b>SOURCES</b> Saraswathibhatla 2025 SI Table 2 · Adebowale 2021 Nat Mater SI Table 4 · Bell 1978 · log: <span class="mono">docs/parameter_provenance.md</span></div>
 </section>
 
-<!-- 10 RESULT: three modes -->
+<!-- 9 RESULT: three modes -->
 <section class="slide">
-  <div class="kicker">Result 1 — three invasion regimes</div>
-  <h2>Stuck · Collective strand · Single-cell</h2>
+  <div class="kicker">Result 1 — the phase diagram, seen directly</div>
+  <h2>Stuck · Collective · Single-cell</h2>
   <div class="body">
-    <div class="col" style="flex:1.4">
-      <div class="figwrap"><img class="fig" src="g5_three_modes_v2_2h.gif" alt="three modes"></div>
-      <div class="figcap">2 h simulations; parameters labeled per panel; red = leader/EMT cell.</div>
-    </div>
+    <div class="col wide"><div class="figwrap"><img class="fig" src="g5_three_modes_v2_2h.gif" alt="three modes"></div>
+      <div class="figcap">2 h runs; parameters labeled per panel; red = low-adhesion (EMT-like) cell.</div></div>
     <div class="col narrow scroll">
       <table>
         <tr><th>Mode</th><th>Params</th><th>Inv.</th><th>Cohesion</th></tr>
         <tr><td><strong>Stuck</strong></td><td class="mono">adh 60, pull 6</td><td class="mono">3 µm</td><td class="mono">1.00</td></tr>
-        <tr><td><strong>Collective</strong></td><td class="mono">adh 8, pull 45, 12% lead</td><td class="mono">18 µm</td><td class="mono">1.45</td></tr>
-        <tr><td><strong>Single-cell</strong></td><td class="mono">adh 1, pull 45, 12% lead</td><td class="mono">72 µm</td><td class="mono">1.86</td></tr>
+        <tr><td><strong>Collective</strong></td><td class="mono">adh 8, pull 45</td><td class="mono">18 µm</td><td class="mono">1.45</td></tr>
+        <tr><td><strong>Single-cell</strong></td><td class="mono">adh 1, pull 45</td><td class="mono">72 µm</td><td class="mono">1.86</td></tr>
       </table>
-      <p style="font-size:15px">Cohesion (nearest-neighbor / spacing) climbs <span class="hi">1.00 → 1.45 → 1.86</span>: glued &amp; still → connected &amp; advancing → far &amp; scattered. All three regimes emerge from the <em>same</em> model, only adhesion &amp; pull change.</p>
+      <p style="font-size:15px">Cohesion climbs <span class="hi">1.00 → 1.45 → 1.86</span>: glued &amp; still → connected &amp; advancing → far &amp; scattered. All three emerge from the <em>same</em> model — only adhesion &amp; pull change.</p>
     </div>
   </div>
-  <div class="src"><b>OWN SIMULATION</b> <span class="caveat">personal testing, not a validated finding</span> · seed 23, 7200 s · file <span class="mono">g5_three_modes_v2_2h.gif</span></div>
+  <div class="src"><b>OWN SIMULATION</b> <span class="caveat">personal testing, not a validated finding</span> · seed 23, 7200 s · <span class="mono">g5_three_modes_v2_2h.gif</span></div>
 </section>
 
-<!-- 11 RESULT: phase diagram -->
+<!-- 10 ABLATION -->
 <section class="slide">
-  <div class="kicker">Result 2 — the mechanical phase diagram</div>
-  <h2>Adhesion × pull maps the regimes</h2>
-  <div class="body">
-    <div class="col narrow">
-      <div class="figwrap"><img class="fig" src="g5_phase_diagram_3regime.png" alt="phase diagram"></div>
-      <div class="figcap">Median cell displacement over adhesion (rows) × pull (cols).</div>
-    </div>
-    <div class="col scroll">
-      <p>Two axes reproduce the intuition:</p>
-      <ul>
-        <li><strong>High adhesion (≥40)</strong> → cells stay cohesive, barely move (~2–3 µm) = <em>stuck</em> at every pull.</li>
-        <li><strong>Low adhesion + high pull</strong> → large displacement (50+ µm) but the pack breaks apart = <em>dispersal / single-cell</em>.</li>
-        <li>The <strong>collective strand</strong> lives in the narrow band between — enough cohesion to stay connected, enough pull to advance.</li>
-      </ul>
-      <p style="font-size:14px;color:var(--ink-soft)">Median displacement (µm): adh2 → 3.3/7.7/52/53 · adh10 → 1.5/2.3/9.7/10 · adh40 → 1.7–2.9 · adh100 → 1.7–3.3, across pull 4/12/28/50.</p>
-    </div>
-  </div>
-  <div class="src"><b>OWN SIMULATION</b> <span class="caveat">personal testing</span> · 16-cell sweep, 2 h each · file <span class="mono">g5_phase_diagram_3regime.png</span></div>
-</section>
-
-<!-- 12 RESULT: leader strand -->
-<section class="slide">
-  <div class="kicker">Result 3 — what makes it truly collective</div>
-  <h2>A leader drags a connected strand</h2>
-  <div class="body">
-    <div class="col scroll">
-      <p>Homogeneous cells only expand radially or disperse. <strong>Heterogeneity</strong> (a few low-adhesion leaders) produces the real leader–follower strand: the leader runs ahead, followers advance behind it and <em>stay connected</em>.</p>
-      <table>
-        <tr><th>Config</th><th>Leader</th><th>Follower</th><th>Cohesion</th></tr>
-        <tr><td class="mono">lf .10 · adh6 · pull45</td><td class="mono">39 µm</td><td class="mono">20 µm</td><td class="mono">1.18</td></tr>
-        <tr><td class="mono">lf .15 · adh8 · pull45</td><td class="mono">38 µm</td><td class="mono">9 µm</td><td class="mono">1.23</td></tr>
-        <tr><td class="mono">lf .20 · adh10 · pull50</td><td class="mono">38 µm</td><td class="mono">9 µm</td><td class="mono">1.31</td></tr>
-      </table>
-      <p>The leader advances ~2× the followers while cohesion stays low (~1.2) — a strand, not a scatter. This is the model's answer to "collective vs single-cell."</p>
-    </div>
-    <div class="col narrow">
-      <div class="figwrap"><img class="fig" src="g5_phase_diagram_leaders.png" alt="leader phase diagram"></div>
-      <div class="figcap">Mode map <em>with</em> leaders present (adhesion × pull).</div>
-    </div>
-  </div>
-  <div class="src"><b>OWN SIMULATION</b> <span class="caveat">personal testing</span> · Biology: Reffay 2014 <span class="mono">Nat Cell Biol</span> (leaders exert higher traction), Cheung 2013 (K14+ leader strands)</div>
-</section>
-
-<!-- 13 ABLATION -->
-<section class="slide">
-  <div class="kicker">Result 4 — turn each mechanism off</div>
+  <div class="kicker">Result 2 — turn each mechanism off</div>
   <h2>Ablation: which knob actually matters?</h2>
   <div class="body">
     <div class="col scroll">
       <table>
         <tr><th>Ablation</th><th>Effect on invasion</th><th>Reads as</th></tr>
-        <tr><td><strong>Remove leaders</strong> (homogeneous)</td><td class="mono">invasion ≈ halved</td><td>heterogeneity ≈ 2× lever</td></tr>
-        <tr><td><strong>Clutch + slip on</strong> vs constant pull</td><td class="mono">20 µm → 3 µm</td><td class="hi">biggest lever (soft regime)</td></tr>
-        <tr><td><strong>Remove crosslinks</strong></td><td class="mono">≈ no change in cell speed</td><td>connectivity ≠ speed here</td></tr>
+        <tr><td><strong>Clutch + slip</strong> on vs constant pull</td><td class="mono">20 µm → 3 µm</td><td class="hi">biggest lever (soft regime)</td></tr>
+        <tr><td><strong>Remove crosslinks</strong></td><td class="mono">≈ no change in cell speed</td><td>connectivity ≠ cell speed here</td></tr>
         <tr><td><strong>Raise adhesion / lower pull</strong></td><td class="mono">→ stuck (~3 µm)</td><td>cohesion holds the pack</td></tr>
+        <tr><td><strong>Lower adhesion</strong> (EMT-like)</td><td class="mono">→ 72 µm, disperses</td><td>unjamming → single-cell</td></tr>
       </table>
-      <p style="margin-top:12px">Take-home: on soft matrix, <span class="hi">clutch slippage</span> gates how much force ever reaches the ECM — it dominates over network crosslinking. Heterogeneity then decides collective vs single.</p>
+      <p style="margin-top:12px">Take-home: on soft matrix, <span class="hi">clutch slippage</span> gates how much force ever reaches the ECM — it dominates over network crosslinking. Adhesion then decides collective vs single.</p>
     </div>
-    <div class="col narrow center">
-      <div class="card" style="width:100%"><div class="eqlabel">Design logic</div>
-        <p style="font-size:15px">An ablation = flip one mechanism, compare one metric. Each row isolates a term in the force balance so we can attribute the phenotype, not just observe it.</p></div>
+    <div class="col narrow center" style="justify-content:center">
+      <div class="card" style="width:100%"><div class="eqlabel">Design logic</div><p style="font-size:15px">An ablation flips one mechanism and compares one metric — isolating each term in the force balance, so we <em>attribute</em> the phenotype rather than just observe it.</p></div>
     </div>
   </div>
   <div class="src"><b>OWN SIMULATION</b> <span class="caveat">personal testing, not validated findings</span> · ablation grid, 2 h runs, seed 23</div>
 </section>
 
-<!-- 14 STIFFNESS SWEEP -->
+<!-- 11 SWEEP (focus) -->
 <section class="slide">
-  <div class="kicker">Result 5 — matrix stiffness (in progress)</div>
-  <h2>How soft is "too soft"? Does strain-stiffening bite?</h2>
+  <div class="kicker">Result 3 — the current focus</div>
+  <h2>Matrix stiffness × strain-stiffening</h2>
   <div class="body">
-    <div class="col" style="flex:1.4">
-      <div class="figwrap"><img class="fig" src="g5_stiffness_sweep_v2_2h.gif" alt="stiffness sweep (rendering)"
-        onerror="this.style.display='none';this.parentNode.innerHTML='<div style=&quot;color:#7A5A12;font-family:JetBrains Mono,monospace;font-size:14px;text-align:center&quot;>⏳ g5_stiffness_sweep_v2_2h.gif<br>still rendering — 8 runs × 2 h<br>(modulus 1/3/10/30 MPa × stiffening off/ON)</div>'"></div>
-      <div class="figcap">Columns: modulus 1/3/10/30 MPa · rows: strain-stiffening off / ON.</div>
-    </div>
+    <div class="col wide"><div class="figwrap"><img class="fig" src="g5_stiffness_sweep_v2_2h.gif" alt="stiffness sweep"
+        onerror="this.style.display='none';this.parentNode.innerHTML='<div style=&quot;color:#7A5A12;font-family:JetBrains Mono,monospace;font-size:14px;text-align:center&quot;>⏳ g5_stiffness_sweep_v2_2h.gif<br>rendering — 8 runs × 2 h<br>(E = 1/3/10/30 MPa × stiffening off / ON)</div>'"></div>
+      <div class="figcap">Columns: modulus 1/3/10/30 MPa · rows: strain-stiffening off / ON.</div></div>
     <div class="col narrow scroll">
-      <p><strong>Setup so far:</strong> baseline is deliberately soft (<span class="hi">E = 3 MPa</span>, softened from 32 MPa so the pull can visibly reorganize fibers).</p>
-      <ul>
-        <li>At <strong>strong pull</strong>, soft matrix (E=1) → cells invade far (~119 µm) but the network is <em>disrupted</em>, not aligned (aster 0.76→0.67).</li>
-        <li><strong>Strain-stiffening exists but sleeps:</strong> at current strains (~1–5% vs 6% ref) it barely engages — a known limitation, now being tested head-on.</li>
-        <li>Compression softening (microbuckling) is always on.</li>
-      </ul>
-      <p style="font-size:13px;color:var(--ink-soft)">Numbers + GIF will complete the panel; sweep answers "too soft?" and "does stiffening matter?" directly.</p>
+      <p><strong>Q1 — is 3 MPa too soft?</strong> At strong pull, very soft matrix (E=1) lets cells invade far (~119 µm) but <em>scatters</em> the network (aster 0.76→0.67). At E=3 the pull instead <strong>aligns</strong> fibers into an aster (0.76→0.79). Softness trades alignment for raw displacement.</p>
+      <p><strong>Q2 — does strain-stiffening bite?</strong> Yes — strongest at the baseline: <span class="hi">ON at E=3</span> gives the largest aster rise (+0.06 vs +0.03) <em>and</em> the tightest cohesion (1.25 vs 1.61). Taut radial fibers stiffen → transmit the pull → align the near-field and hold the pack together.</p>
+      <table>
+        <tr><th>E</th><th>stiffen</th><th>aster Δ</th><th>coh</th></tr>
+        <tr><td class="mono">1</td><td>off</td><td class="mono">−0.10</td><td class="mono">1.83</td></tr>
+        <tr><td class="mono">1</td><td class="hi">ON</td><td class="mono">−0.04</td><td class="mono">1.42</td></tr>
+        <tr><td class="mono">3</td><td>off</td><td class="mono">+0.03</td><td class="mono">1.61</td></tr>
+        <tr><td class="mono">3</td><td class="hi">ON</td><td class="mono">+0.06</td><td class="mono">1.25</td></tr>
+        <tr><td class="mono">10</td><td>off</td><td class="mono">−0.06</td><td class="mono">1.69</td></tr>
+        <tr><td class="mono">30</td><td>off</td><td class="mono">−0.03</td><td class="mono">1.52</td></tr>
+      </table>
+      <p style="font-size:12.5px;color:var(--ink-soft)">⚠ stiffening ON at E≥10 was numerically unstable (12× stiffened bonds need a smaller dt) — a solver limit, not a physics result.</p>
     </div>
   </div>
-  <div class="src"><b>OWN SIMULATION</b> <span class="caveat">in progress</span> · Strain-stiffening physics: Steinwachs 2016, Mark 2020 <span class="mono">eLife</span>, Licup/Shenoy 2015 <span class="mono">PNAS</span></div>
+  <div class="src"><b>OWN SIMULATION</b> <span class="caveat">in progress</span> · Strain-stiffening physics: Steinwachs 2016 <span class="mono">Nat Methods</span>, Mark 2020 <span class="mono">eLife</span>, Licup/Shenoy 2015 <span class="mono">PNAS</span></div>
 </section>
 
-<!-- 15 LIMITATIONS / NEXT -->
+<!-- 12 LIMITATIONS + REFS -->
 <section class="slide">
-  <div class="kicker">Honest gaps &amp; next steps</div>
-  <h2>What's missing — and what we test next</h2>
+  <div class="kicker">Honest gaps &amp; where every claim comes from</div>
+  <h2>Limitations &amp; references</h2>
   <div class="body">
     <div class="col">
       <h3>Not yet in the model</h3>
       <ul>
-        <li class="no"><strong>MMP proteolysis</strong> — cells cannot cut/degrade fibers, only pull them.</li>
-        <li class="no"><strong>High-traction leaders</strong> — leaders differ only by adhesion, not force.</li>
+        <li class="no"><strong>MMP proteolysis</strong> — cells pull fibers, can't cut them.</li>
         <li class="no"><strong>Proliferation / internal pressure</strong> in the organoid.</li>
-        <li class="no"><strong>Viscoelasticity / plasticity persistence</strong> (SLS deferred; Bell-crosslink plasticity is opt-in).</li>
+        <li class="no"><strong>Viscoelastic persistence</strong> (SLS deferred; Bell-crosslink plasticity opt-in).</li>
       </ul>
-    </div>
-    <div class="col">
-      <h3>On deck</h3>
+      <h3 style="margin-top:10px">On deck</h3>
       <ul>
-        <li class="ok"><strong>Matrix stiffness × strain-stiffening</strong> sweep (running now).</li>
-        <li class="ok"><strong>Leader = low adhesion + high traction</strong> (Reffay 2014) — as a new, non-overlapping run.</li>
-        <li class="ok">Validate alignment rise (0.5→0.75) &amp; displacement scaling against Saraswathibhatla / Kolade data.</li>
+        <li class="ok">Finish stiffness × strain-stiffening sweep (running).</li>
+        <li class="ok">Validate alignment rise (0.5→0.75) vs Saraswathibhatla / Kolade data.</li>
       </ul>
-      <p style="margin-top:6px"><span class="tag phys">caveat</span> Swirling (Saraswathibhatla, breast) is <em>not</em> observed in Kolade's system — G5 does not assume it; radial alignment here is direct contraction.</p>
-    </div>
-  </div>
-  <div class="src"><b>SOURCES</b> Wolf &amp; Friedl 2011 (MMP) · Reffay 2014 <span class="mono">Nat Cell Biol</span> (leader traction) · Nam 2016 <span class="mono">Biophys J</span> (plasticity κ) · Kim/Ahn 2019 (HNSCC direct contraction, no swirling)</div>
-</section>
-
-<!-- 16 REFERENCES -->
-<section class="slide">
-  <div class="kicker">References</div>
-  <h2>Where every claim comes from</h2>
-  <div class="body">
-    <div class="col scroll">
-      <table>
-        <tr><th>Paper</th><th>Role in G5</th></tr>
-        <tr><td>Chan &amp; Odde 2008, <em>Science</em></td><td>Motor-clutch origin; force-velocity</td></tr>
-        <tr><td>Bell 1978, <em>Science</em></td><td>Force-dependent bond off-rate (slippage)</td></tr>
-        <tr><td>Bangasser 2017, <em>Nat Commun</em></td><td>Biphasic traction–stiffness</td></tr>
-        <tr><td>Adebowale 2021, <em>Nat Mater</em></td><td>Clutch params (SI Table 4); SLS + motor-clutch</td></tr>
-        <tr><td>Lee 2014, <em>PLoS ONE</em></td><td>Bead-spring collagen lineage</td></tr>
-        <tr><td>Saraswathibhatla 2025, <em>bioRxiv</em></td><td>Geometry; SI Table 2 params; alignment target</td></tr>
-        <tr><td>Zhao/Zhang 2025, <em>bioRxiv</em></td><td>Eulerian–Lagrangian cell–bead coupling</td></tr>
-      </table>
+      <p style="margin-top:6px;font-size:13.5px"><span class="tag phys">caveat</span> Swirling (Saraswathibhatla, breast) is <em>not</em> seen in Kolade's system — G5 does not assume it; radial alignment here is direct contraction.</p>
     </div>
     <div class="col scroll">
       <table>
-        <tr><th>Paper</th><th>Role in G5</th></tr>
-        <tr><td>Provenzano 2006, <em>BMC Med</em></td><td>TACS radial alignment signatures</td></tr>
-        <tr><td>Friedl &amp; Gilmour 2009, <em>Nat Rev MCB</em></td><td>Collective vs single migration; leaders</td></tr>
-        <tr><td>Cheung 2013, <em>Cell</em></td><td>K14+ leader cells in collective invasion</td></tr>
-        <tr><td>Reffay 2014, <em>Nat Cell Biol</em></td><td>Leaders exert higher traction (TFM)</td></tr>
-        <tr><td>Kalluri &amp; Weinberg 2009 · Aiello 2018</td><td>EMT / partial EMT (adhesion loss)</td></tr>
-        <tr><td>Wolf &amp; Friedl 2011</td><td>MMP proteolysis (gap)</td></tr>
-        <tr><td>Steinwachs 2016 · Mark 2020 · Nam 2016</td><td>Strain-stiffening; plasticity κ</td></tr>
+        <tr><th>Paper</th><th>Role</th></tr>
+        <tr><td>Chan &amp; Odde 2008 · Bell 1978</td><td>Motor-clutch; force-dependent slip</td></tr>
+        <tr><td>Bangasser 2017</td><td>Biphasic traction–stiffness</td></tr>
+        <tr><td>Adebowale 2021 <em>Nat Mater</em></td><td>Clutch params (SI T4)</td></tr>
+        <tr><td>Lee 2014 · Saraswathibhatla 2025</td><td>Bead-spring ECM; params; targets</td></tr>
+        <tr><td>Zhao/Zhang 2025</td><td>Cell–bead coupling</td></tr>
+        <tr><td>Provenzano 2006 · Ilina 2020</td><td>TACS alignment; jamming</td></tr>
+        <tr><td>Steinwachs 2016 · Mark 2020</td><td>Strain-stiffening</td></tr>
+        <tr><td>Kalluri&amp;Weinberg 2009 · Wolf&amp;Friedl 2011</td><td>EMT; MMP (gap)</td></tr>
       </table>
     </div>
   </div>
@@ -537,10 +370,8 @@ tr:hover td{background:var(--paper2)}
 
 </div>
 
-<div class="hud">
-  <span class="count">SLIDE <b id="cur">1</b> / <span id="tot">16</span></span>
-  <span class="nav"><button onclick="go(-1)">‹</button><button onclick="go(1)">›</button></span>
-</div>
+<div class="hud"><span class="count">SLIDE <b id="cur">1</b> / <span id="tot">12</span></span>
+  <span class="nav"><button onclick="go(-1)">‹</button><button onclick="go(1)">›</button></span></div>
 <div class="dots" id="dots"></div>
 <div class="hint">← → arrows · F fullscreen</div>
 
@@ -566,7 +397,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
   if(e.key==='Home')show(0); if(e.key==='End')show(tot-1);
 });
-// draw title aster rays
 const rays=document.getElementById('rays');
 if(rays){let s='';for(let a=0;a<36;a++){const th=a*10*Math.PI/180,r0=27,r1=95+(a%3)*4;
   s+=`<line x1="${Math.cos(th)*r0}" y1="${Math.sin(th)*r0}" x2="${Math.cos(th)*r1}" y2="${Math.sin(th)*r1}"/>`;}
