@@ -105,6 +105,10 @@ class OrganoidConfig(CollagenConfig):
     cc_repulsion: float = 40.0           # nN/um, overlap stiffness (keeps disks apart)
     cc_adhesion: float = 6.0             # nN/um, short-range cohesion (surface tension)
     cc_adhesion_range: float = 6.0       # um, how far past contact adhesion reaches
+    # --- cell heterogeneity (EMT / leader cells): a fraction of cells have weak
+    #     adhesion, letting them break from the pack = single-cell escape ---
+    leader_fraction: float = 0.0         # fraction of cells that are low-adhesion leaders
+    leader_adhesion_factor: float = 0.15 # leaders' adhesion multiplier (EMT-like)
 
     # --- Stage D: released rigid cells (translation under overdamped dynamics) ---
     # Each cell feels the reaction of the traction it applies to collagen (grip-and-
@@ -500,7 +504,8 @@ def make_organoid(cfg: OrganoidConfig = OrganoidConfig(), seed=None):
 # =================================================================================
 # Simplified cell-cell interaction (Stage A scaffold; drives motion in Stage D)
 # =================================================================================
-def cell_cell_forces(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
+def cell_cell_forces(centers: np.ndarray, cfg: OrganoidConfig,
+                     adhesion_scale: np.ndarray | None = None) -> np.ndarray:
     """Pairwise soft adhesive-disk force on each cell centre.
 
     Piecewise-linear in the centre separation ``d`` with equilibrium at
@@ -512,7 +517,9 @@ def cell_cell_forces(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
 
     A hex packing at pitch ``d_eq`` is therefore force-balanced at rest, and a
     displaced cell feels a restoring force (cohesion / tissue surface tension).
-    Returns an ``(M, 2)`` net force per cell.
+    ``adhesion_scale`` (M,) optionally scales each cell's adhesion (repulsion is
+    unchanged); a pair's adhesion uses ``min(scale_a, scale_b)`` so a weak (leader /
+    EMT) cell weakens its own bonds and can break from the pack.  Returns ``(M, 2)``.
     """
 
     centers = np.asarray(centers, dtype=float)
@@ -522,10 +529,26 @@ def cell_cell_forces(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
     dist = np.linalg.norm(d, axis=2)
     safe = np.maximum(dist, 1e-12)
     unit = d / safe[:, :, None]
-    mag = np.where(dist < d_eq, cfg.cc_repulsion * (d_eq - dist),
-                   np.where(dist < cutoff, -cfg.cc_adhesion * (dist - d_eq), 0.0))
+    rep = np.where(dist < d_eq, cfg.cc_repulsion * (d_eq - dist), 0.0)
+    adh = np.where((dist >= d_eq) & (dist < cutoff), cfg.cc_adhesion * (dist - d_eq), 0.0)
+    if adhesion_scale is not None:
+        s = np.asarray(adhesion_scale, dtype=float)
+        adh = adh * np.minimum(s[:, None], s[None, :])     # weakest cell sets the bond
+    mag = rep - adh
     mag[dist < 1e-9] = 0.0                                  # self / coincident
     return -np.sum(mag[:, :, None] * unit, axis=1)         # F_a = -sum_b mag*unit
+
+
+def leader_adhesion_scale(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
+    """Per-cell adhesion multiplier: the outermost ``leader_fraction`` are low-adhesion
+    leaders (EMT-like), the rest are 1.  Deterministic (outermost cells are picked)."""
+    m = len(centers)
+    scale = np.ones(m)
+    n_lead = int(round(cfg.leader_fraction * m))
+    if n_lead > 0:
+        outer = np.argsort(-np.linalg.norm(centers, axis=1))[:n_lead]
+        scale[outer] = cfg.leader_adhesion_factor
+    return scale
 
 
 # =================================================================================
@@ -1300,6 +1323,7 @@ def run_organoid_invasion(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
         return active_full, per_cell, per_cell_reaction(per_cell, cfg.total_pull_force)
 
     active_full, per_cell, reaction = refresh()
+    adh_scale = leader_adhesion_scale(centers0, cfg)   # low-adhesion leaders (EMT), fixed
     frames: list[dict] = []
     bead_snaps: list[np.ndarray] = []
     cell_snaps: list[np.ndarray] = []
@@ -1333,7 +1357,7 @@ def run_organoid_invasion(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
             break
 
         # move cells: reaction (grip-reel) + cell-cell adhesion, overdamped + capped
-        f_cell = reaction * ramp + cell_cell_forces(centers, cfg)
+        f_cell = reaction * ramp + cell_cell_forces(centers, cfg, adh_scale)
         v_cell = f_cell / cfg.cell_drag
         speed = np.linalg.norm(v_cell, axis=1)
         over = speed > cfg.max_cell_speed
