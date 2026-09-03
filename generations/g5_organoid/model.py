@@ -61,6 +61,18 @@ try:  # Numba accelerates the per-step force balance; NumPy is the fallback.
 except Exception:  # pragma: no cover
     njit = None
 
+# Reuse the VALIDATED g4 motor-clutch law verbatim (Bell 1978; Chan & Odde 2008;
+# Adebowale 2021).  G5 flattens M cells x sectors into the "sites" axis so these
+# per-site step functions apply unchanged.
+_REPO = Path(__file__).resolve().parents[2]   # repo root (for generations.g4_* imports)
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+from generations.g4_interactive_calibration.model import (  # noqa: E402
+    bell_off_rate, patch_point)
+from generations.g4_v2_multiscale.model import (  # noqa: E402
+    ClutchState, _independent_step, _shared_step, shared_load_hazard,
+    _counter_uniform_vector)
+
 
 # =================================================================================
 # Configuration
@@ -114,6 +126,25 @@ class OrganoidConfig(CollagenConfig):
     xl_reform_prob: float = 0.5          # prob a fresh fibre crossing re-welds per update
     plasticity_interval: float = 5.0     # s between rupture/reform updates
     unload_time: float = 0.0             # s at end with pull ramped to 0 (for kappa)
+
+    # --- cell-fibre MOLECULAR CLUTCH with slippage (opt-in; replaces constant pull) ---
+    # A stochastic motor-clutch at every cell grip site: a motor pulls actin at v0 with
+    # force-velocity v=v0(1-F/F_stall) (Chan & Odde 2008 Science), clutches load
+    # (F=k_c.ext), unbind at Bell rate k_off0.exp(F/F_b) (Bell 1978), rebind at k_on;
+    # the cluster load-and-fails and traction resets (slippage).  Distinct from the
+    # crosslinker plasticity of Stage E.  Values inherited from G4/Adebowale 2021 Nat
+    # Mater SI Table 4 (docs/g4_parameter_provenance.md) -- do NOT invent.
+    clutch_dynamics: bool = False        # off -> the validated constant-pull path
+    clutch_mode: str = "independent"     # "independent" | "shared" (g4_v2 load sharing)
+    n_contact_sectors: int = 12          # grip sites per cell (angular sectors)
+    n_clutches_per_site: int = 12        # effective clutch bundle per site (Adebowale 2021)
+    clutch_stiffness: float = 2.0        # k_c, nN/um (G2 V3 / g4 provenance)
+    clutch_on_rate: float = 0.055        # k_on, 1/s (Adebowale 2021 SI Table 4)
+    clutch_off_rate0: float = 0.018      # k_off0, 1/s zero-force (Adebowale 2021)
+    bell_force: float = 1.5              # F_b, nN Bell scale (Bell 1978; Adebowale 2021)
+    unloaded_actin_speed: float = 0.025  # v0, um/s (~24 nm/s, Adebowale 2021)
+    motor_stall_per_site: float = 8.0    # F_stall, nN/site (Chan & Odde 2008 scale)
+    clutch_counter_seed: int = 3042      # deterministic counter-RNG seed (g4_v2)
 
     # --- collagen network (scaled up from the 99-fibre / 180 um G2 baseline) ---
     # Softened, lightly crosslinked collagen so the pull can visibly reorganise the
@@ -819,6 +850,162 @@ def radial_alignment_profile(
 
 
 # =================================================================================
+# Cell-fibre molecular clutch with slippage (opt-in; Bell 1978, Chan & Odde 2008)
+# =================================================================================
+def _clutch_counter_uniforms(cfg: OrganoidConfig, step: int, channel: int, n_sites: int):
+    """Deterministic counter-addressed uniforms over ALL sites (g4_v2 hash)."""
+    v = _counter_uniform_vector(cfg.clutch_counter_seed, step, channel,
+                                n_sites * cfg.n_clutches_per_site)
+    return v.reshape(n_sites, cfg.n_clutches_per_site)
+
+
+def organoid_clutch_patches(network: Network, centers: np.ndarray, cfg: OrganoidConfig,
+                            candidates: list):
+    """One grip site per (cell, angular sector): the closest gripped fibre in that sector.
+
+    Generalises g4's per-cell ``n_contact_sectors`` sites to M cells.  Returns a flat
+    list of length ``M * n_contact_sectors`` (a ``ContactPatch`` or ``None`` per site,
+    ``None`` = that sector has no fibre in reach) plus a matching ``(S, 2)`` array of the
+    owning cell centre for each site.
+    """
+    S = cfg.n_contact_sectors
+    patches: list = []
+    site_centers: list = []
+    for c, center in enumerate(centers):
+        per_sector = [None] * S
+        best_surf = [np.inf] * S
+        for p in _cell_patches(network, center, candidates[c]):
+            ang = math.atan2(p.point[1] - center[1], p.point[0] - center[0]) % (2 * math.pi)
+            sec = int(ang / (2 * math.pi) * S) % S
+            if p.surface_distance < best_surf[sec]:
+                best_surf[sec] = p.surface_distance
+                per_sector[sec] = p
+        patches.extend(per_sector)
+        site_centers.extend([center] * S)
+    return patches, np.asarray(site_centers, dtype=float)
+
+
+def _project_site_forces(network: Network, patches: list, site_force: np.ndarray) -> np.ndarray:
+    """Project each site's clutch traction onto its fibre beads (first-moment preserving)."""
+    nodal = np.zeros_like(network.r)
+    for s, patch in enumerate(patches):
+        if patch is None or site_force[s] <= 0.0:
+            continue
+        f = site_force[s] * patch.normal_in            # inward, toward the owning cell
+        i, j = network.edges[patch.edge]
+        nodal[i] += (1.0 - patch.alpha) * f
+        nodal[j] += patch.alpha * f
+    nodal[network.fixed] = 0.0
+    return nodal
+
+
+def _clutch_substrate_speeds(network: Network, velocity: np.ndarray, patches: list,
+                             site_centers: np.ndarray) -> np.ndarray:
+    """Inward speed of each gripped fibre material point toward its owning cell.
+
+    Feeds back into clutch loading: a fast-yielding (soft) fibre loads the clutches
+    less (Chan & Odde 2008 motor-clutch).  Empty sites report 0.
+    """
+    out = np.zeros(len(patches))
+    for s, patch in enumerate(patches):
+        if patch is None:
+            continue
+        point = network.material_point(patch.edge, patch.alpha)
+        inward = site_centers[s] - point
+        inward /= max(float(np.linalg.norm(inward)), 1e-12)
+        i, j = network.edges[patch.edge]
+        mv = (1.0 - patch.alpha) * velocity[i] + patch.alpha * velocity[j]
+        out[s] = float(mv @ inward)
+    return out
+
+
+def _clutch_step(cfg: OrganoidConfig, state: ClutchState, substrate: np.ndarray, step: int):
+    """Advance every site's clutch bundle one step (reuses the g4_v2 law verbatim)."""
+    S = state.bound.shape[0]
+    u_on = _clutch_counter_uniforms(cfg, step, 0, S)
+    u_off = _clutch_counter_uniforms(cfg, step, 1, S)
+    if cfg.clutch_mode == "shared":
+        return _shared_step(cfg, state, substrate, u_on, u_off)
+    return _independent_step(cfg, state, substrate, u_on, u_off)
+
+
+def _new_clutch_state(n_sites: int, cfg: OrganoidConfig) -> ClutchState:
+    return ClutchState(
+        bound=np.zeros((n_sites, cfg.n_clutches_per_site), dtype=bool),
+        extension=np.zeros((n_sites, cfg.n_clutches_per_site)),
+        site_extension=np.zeros(n_sites),
+    )
+
+
+def _run_pull_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = False) -> dict:
+    """Stage B with a stochastic motor-clutch grip (load -> Bell slip -> reset) at every
+    cell sector, instead of a constant pull.  Traction on the collagen EMERGES from the
+    clutches, so it is non-constant and shows load-and-fail slip events."""
+
+    network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
+    organoid_center = np.zeros(2)
+    stepper = OrganoidStepper(network, centers)
+    reach = cfg.cell_radius + cfg.contact_width + 2.0
+    candidates = cell_candidate_fibers(network, centers, reach)
+    patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
+    S = len(patches)
+    state = _new_clutch_state(S, cfg)
+    substrate = np.zeros(S)
+    site_force = np.zeros(S)
+
+    nsteps = int(round(cfg.duration / cfg.dt))
+    every = max(1, int(round(cfg.sample_interval / cfg.dt)))
+    frames: list[dict] = []
+    snaps: list[np.ndarray] = []
+    traction_series: list[float] = []
+
+    for step in range(nsteps + 1):
+        time = step * cfg.dt
+        _, site_force, breaks, binds, site_fail = _clutch_step(cfg, state, substrate, step)
+        active = _project_site_forces(network, patches, site_force)
+        traction_series.append(float(site_force.sum()))
+
+        if step % every == 0:
+            prof = radial_alignment_profile(network, organoid_center)
+            gripping = np.asarray([p is not None for p in patches]).reshape(len(centers), -1).any(axis=1)
+            frames.append({
+                "time": time,
+                "global_radial_order": prof["global_radial_order"],
+                "shells": prof["shells"],
+                "n_gripping_cells": int(gripping.sum()),
+                "bound_fraction": float(state.bound.mean()),
+                "cumulative_slips": int(state.cumulative_slips),
+                "mean_site_force": float(site_force[site_force > 0].mean()) if np.any(site_force > 0) else 0.0,
+                "total_traction": float(site_force.sum()),
+                "rms_bead_disp": float(np.sqrt(np.mean(np.sum((network.r - network.r0) ** 2, axis=1)))),
+            })
+            if snapshots:
+                snaps.append(network.r.copy())
+
+        if step == nsteps:
+            break
+        stepper.step(active, cfg.dt)
+        substrate = _clutch_substrate_speeds(network, stepper.velocity, patches, site_centers)
+
+    tr = np.asarray(traction_series)
+    return {
+        "config": asdict(cfg), "centers": centers, "gap_radius": gap_radius,
+        "organoid_center": organoid_center, "connectivity": report,
+        "n_cells": len(centers), "n_beads": len(network.r), "n_fibers": len(network.fibers),
+        "n_crosslinks": len(network.crosslinks), "n_clutch_sites": S,
+        "clutch_mode": cfg.clutch_mode,
+        "cumulative_slips": int(state.cumulative_slips),
+        "cumulative_site_failures": int(state.cumulative_site_failures),
+        "traction_cv": float(tr.std() / tr.mean()) if tr.mean() > 0 else 0.0,  # non-constant?
+        "frames": frames, "snapshots": np.asarray(snaps) if snapshots else None,
+        "final_positions": network.r.copy(), "initial_positions": network.r0.copy(),
+        "edges": network.edges.copy(),
+        "crosslinks": [(int(x.edge_a), float(x.alpha_a), int(x.edge_b), float(x.alpha_b))
+                       for x in network.crosslinks],
+    }
+
+
+# =================================================================================
 # Stage B driver: fixed contractile organoid -> radial alignment
 # =================================================================================
 def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
@@ -830,8 +1017,11 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
     minimal criterion: pull -> alignment).  Cell-cell forces are computed and
     reported but do not move the fixed cells (they act in Stage D).  With
     ``snapshots=True`` the full bead positions at each sampled frame are stored under
-    ``snapshots`` for animation.
+    ``snapshots`` for animation.  With ``cfg.clutch_dynamics`` the constant pull is
+    replaced by a stochastic motor-clutch grip (see :func:`_run_pull_with_clutch`).
     """
+    if cfg.clutch_dynamics:
+        return _run_pull_with_clutch(cfg, seed=seed, snapshots=snapshots)
 
     network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
     organoid_center = np.zeros(2)
@@ -951,6 +1141,97 @@ def run_organoid_pull(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
 # =================================================================================
 # Stage D driver: released cells (grip-reel reaction -> invasion; adhesion sets mode)
 # =================================================================================
+def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = False) -> dict:
+    """Stage D with the molecular clutch (INITIAL coupling).  Each released cell moves
+    under the reaction of its ACTUAL clutch traction (not the nominal pull): when a
+    cell's clutches slip, its outward reaction drops, so clutch failure feeds directly
+    into motility (invasion / escape).  Grip sites are fixed per-cell sectors; their
+    gripped fibre is re-selected as cells move (clutch state persists on the sector
+    slot -- an approximation, flagged as initial).  Determinism via counter RNG."""
+
+    network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
+    centers = centers.copy(); centers0 = centers.copy()
+    organoid_center = np.zeros(2)
+    stepper = OrganoidStepper(network, centers)
+    reach = cfg.cell_radius + cfg.contact_width + 2.0
+    n_sec = cfg.n_contact_sectors
+    candidates = cell_candidate_fibers(network, centers, reach)
+    patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
+    S = len(patches)
+    state = _new_clutch_state(S, cfg)
+    substrate = np.zeros(S)
+    site_force = np.zeros(S)
+
+    nsteps = int(round(cfg.duration / cfg.dt))
+    every = max(1, int(round(cfg.sample_interval / cfg.dt)))
+    contact_every = max(1, int(round(cfg.contact_update_interval / cfg.dt)))
+    frames: list[dict] = []
+    bead_snaps: list[np.ndarray] = []
+    cell_snaps: list[np.ndarray] = []
+
+    for step in range(nsteps + 1):
+        time = step * cfg.dt
+        _, site_force, breaks, binds, site_fail = _clutch_step(cfg, state, substrate, step)
+        active = _project_site_forces(network, patches, site_force)
+        # per-cell reaction = -(actual clutch traction it applies) = outward invasion pull
+        reaction = np.zeros((len(centers), 2))
+        for s, patch in enumerate(patches):
+            if patch is None or site_force[s] <= 0.0:
+                continue
+            reaction[s // n_sec] -= site_force[s] * patch.normal_in
+
+        if step % every == 0:
+            prof = radial_alignment_profile(network, organoid_center)
+            frames.append({
+                "time": time,
+                "global_radial_order": prof["global_radial_order"],
+                "mean_cell_radial_disp": float(np.mean(
+                    np.linalg.norm(centers, axis=1) - np.linalg.norm(centers0, axis=1))),
+                "cell_spread": float(np.mean(np.linalg.norm(centers, axis=1))),
+                "max_cell_disp": float(np.max(np.linalg.norm(centers - centers0, axis=1))),
+                "bound_fraction": float(state.bound.mean()),
+                "cumulative_slips": int(state.cumulative_slips),
+                "total_traction": float(site_force.sum()),
+            })
+            if snapshots:
+                bead_snaps.append(network.r.copy()); cell_snaps.append(centers.copy())
+
+        if step == nsteps:
+            break
+        # move cells under clutch reaction + cell-cell adhesion (overdamped, capped)
+        f_cell = reaction + cell_cell_forces(centers, cfg)
+        v_cell = f_cell / cfg.cell_drag
+        speed = np.linalg.norm(v_cell, axis=1)
+        over = speed > cfg.max_cell_speed
+        if np.any(over):
+            v_cell[over] *= (cfg.max_cell_speed / speed[over])[:, None]
+        centers += cfg.dt * v_cell
+        stepper.centers[:] = centers
+        site_centers = np.repeat(centers, n_sec, axis=0)
+
+        stepper.step(active, cfg.dt)
+        substrate = _clutch_substrate_speeds(network, stepper.velocity, patches, site_centers)
+        if step and step % contact_every == 0:      # cells moved -> re-select gripped fibres
+            candidates = cell_candidate_fibers(network, centers, reach)
+            patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
+
+    return {
+        "config": asdict(cfg), "centers0": centers0, "centers_final": centers,
+        "organoid_center": organoid_center, "connectivity": report,
+        "n_cells": len(centers), "n_beads": len(network.r), "n_fibers": len(network.fibers),
+        "n_clutch_sites": S, "clutch_mode": cfg.clutch_mode,
+        "cumulative_slips": int(state.cumulative_slips),
+        "cumulative_site_failures": int(state.cumulative_site_failures),
+        "frames": frames,
+        "bead_snapshots": np.asarray(bead_snaps) if snapshots else None,
+        "cell_snapshots": np.asarray(cell_snaps) if snapshots else None,
+        "final_positions": network.r.copy(), "initial_positions": network.r0.copy(),
+        "edges": network.edges.copy(),
+        "crosslinks": [(int(x.edge_a), float(x.alpha_a), int(x.edge_b), float(x.alpha_b))
+                       for x in network.crosslinks],
+    }
+
+
 def per_cell_reaction(per_cell: list, total_force: float) -> np.ndarray:
     """Reaction force on each cell = -(traction it applies to collagen).
 
@@ -971,7 +1252,12 @@ def run_organoid_invasion(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
     grip-and-reel traction (pulls it toward the ECM = outward invasion) plus cell-cell
     adhesion.  Strong adhesion -> the front stays cohesive (collective); weak adhesion
     -> cells escape singly.  Returns invasion metrics + optional bead/cell snapshots.
+    With ``cfg.clutch_dynamics`` the reaction comes from the ACTUAL molecular-clutch
+    traction (slip -> weaker pull -> altered motility); see
+    :func:`_run_invasion_with_clutch`.
     """
+    if cfg.clutch_dynamics:
+        return _run_invasion_with_clutch(cfg, seed=seed, snapshots=snapshots)
 
     network, centers, gap_radius, report = make_organoid(cfg, seed=seed)
     centers = centers.copy()

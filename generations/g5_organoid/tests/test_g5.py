@@ -114,6 +114,40 @@ class StageDInvasion(unittest.TestCase):
         self.assertGreater(last["mean_cell_radial_disp"], 0.0)   # net outward = invasion
 
 
+class CellFibreClutch(unittest.TestCase):
+    """Stage-B opt-in molecular clutch (Bell slip); constant path stays the default."""
+
+    def _cfg(self, **kw):
+        from generations.g5_organoid.model import parameter_variant
+        return parameter_variant(SMALL, clutch_dynamics=True, duration=40.0,
+                                 sample_interval=8.0, total_pull_force=20.0, **kw)
+
+    def test_constant_force_path_is_default(self):
+        # regression: default cfg does NOT use clutches (old validated path)
+        self.assertFalse(SMALL.clutch_dynamics)
+        out = run_organoid_pull(SMALL, seed=23)
+        self.assertNotIn("cumulative_slips", out)   # constant path has no clutch report
+
+    def test_clutch_produces_slips_and_nonconstant_traction(self):
+        out = run_organoid_pull(self._cfg(clutch_mode="independent"), seed=23)
+        self.assertGreater(out["cumulative_slips"], 0)          # load-and-fail happens
+        self.assertGreater(out["traction_cv"], 0.02)            # traction is not constant
+        tr = [fr["total_traction"] for fr in out["frames"]]
+        self.assertGreater(max(tr), 0.0)
+
+    def test_shared_and_independent_differ(self):
+        ind = run_organoid_pull(self._cfg(clutch_mode="independent"), seed=23)
+        shl = run_organoid_pull(self._cfg(clutch_mode="shared"), seed=23)
+        self.assertNotEqual(ind["cumulative_slips"], shl["cumulative_slips"])
+
+    def test_determinism_same_seed_same_slips(self):
+        cfg = self._cfg(clutch_mode="independent")
+        a = run_organoid_pull(cfg, seed=23)
+        b = run_organoid_pull(cfg, seed=23)
+        self.assertEqual(a["cumulative_slips"], b["cumulative_slips"])
+        self.assertEqual(a["cumulative_site_failures"], b["cumulative_site_failures"])
+
+
 class StageEPlasticity(unittest.TestCase):
     def test_plasticity_rewires_under_load_only(self):
         """Stage E: crosslink rupture/reform is stress-selective.

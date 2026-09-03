@@ -131,6 +131,40 @@ deformation-invariant weld identity (`_link_id`). It cleanly separates the two: 
 is a topology-change measure, not Nam's strain-recovery κ, but it is the honest, uncofounded plasticity
 signal. (A secondary `kappa_order` structural residual is also reported but is itself relaxation-limited.)
 
+## Cell–fibre clutch (slippage) — opt-in (`clutch_dynamics=True`)
+
+The default G5 grip applies a **constant** `total_pull_force` per cell (no letting go). With
+`clutch_dynamics=True` this is replaced by a stochastic **molecular motor-clutch** at every cell grip
+site, reusing the validated g4 law verbatim (Bell 1978; Chan & Odde 2008; Adebowale 2021 SI Table 4):
+
+- Each cell has `n_contact_sectors` (12) grip sites; each site is a bundle of `n_clutches_per_site`
+  (12) clutches. G5 flattens `M cells × sectors → sites`, so g4_v2's `_independent_step` /
+  `_shared_step` / `shared_load_hazard` / `bell_off_rate` apply unchanged.
+- A motor pulls actin at `v0(1 − F/F_stall)`; clutches load `F = k_c·ext`, unbind at Bell rate
+  `k_off0·exp(F/F_b)`, rebind at `k_on`; the gripped fibre's inward yield speed feeds back into loading.
+- Traction on the collagen **emerges** from the bound clutches (via the first-moment-preserving
+  projection) — it is **not** a constant. Both `independent` and `shared`-load modes are supported.
+- Determinism: counter-addressed RNG (`_clutch_counter_uniforms`) — same seed → same slip sequence.
+- This is the **cell–fibre** clutch; it is separate from the Stage-E **crosslinker** plasticity.
+
+Wired into **Stage B** (`run_organoid_pull`) and **Stage D** (`run_organoid_invasion`); in Stage D the
+per-cell reaction uses the **actual clutch traction**, so clutch slip directly weakens the outward pull
+and alters motility.
+
+**Honest findings (personal testing, not confirmed):**
+- The clutch fires as intended: bound fraction rises to ~0.67 and thousands of **load-and-fail slip
+  events** occur; aggregate traction is emergent and non-constant (CV ~0.3), ~1000 nN over ~19 cells
+  (~50 nN/cell — the right order vs Mark 2020 ~86 nN/cell).
+- Individual sites load-and-fail stochastically, but the **population-mean traction is fairly steady**
+  (many sites average out) — expected motor-clutch behaviour.
+- The near-field radial order is **barely changed** by the clutch vs the constant pull (the corona
+  already starts radial + elastic plateau), so the *aster* is not yet clutch-sensitive here.
+- In **Stage D**, realistic clutch+slip gives **less** net invasion than the idealized constant pull
+  (12-sector grip is more symmetric so inward pulls partly cancel, and slip limits sustained traction).
+- **Limitations:** Stage-D grip re-selection carries the clutch state on the fixed sector slot when a
+  sector re-picks a fibre (approximation, flagged initial); a biphasic traction–stiffness sweep is not
+  yet run (the gate here is the slip events + non-constant traction).
+
 ## Next refinements
 
 - Relaxation-independent plasticity metric (topology- or order-based) instead of load-unload rms κ.

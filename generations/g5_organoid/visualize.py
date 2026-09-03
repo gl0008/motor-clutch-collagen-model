@@ -89,26 +89,36 @@ def animate(snapshots, edges, centers, out_path, *, crosslinks=None, cell_radius
     center = np.zeros(2)
     if span is None:
         span = float(np.max(np.abs(snapshots[0]))) * 1.02
-    fig, ax = plt.subplots(figsize=(6.2, 6.2))
+    initial = snapshots[0]
+    ghost = np.stack([initial[edges[:, 0]], initial[edges[:, 1]]], axis=1)  # t=0 outline
+    fig, ax = plt.subplots(figsize=(6.6, 6.6))
 
     def draw(k):
         ax.clear()
         pos = snapshots[k]
+        # faint t=0 network so displacement from the initial geometry is visible
+        ax.add_collection(LineCollection(ghost, colors="#c9c2b4", linewidths=0.5, alpha=0.5))
+        # bead-spring collagen: each segment IS a spring, coloured by radial order
         order = _order(pos, edges, center)
         segs = np.stack([pos[edges[:, 0]], pos[edges[:, 1]]], axis=1)
-        lc = LineCollection(segs, cmap="coolwarm", norm=plt.Normalize(-1, 1), linewidths=0.7)
+        lc = LineCollection(segs, cmap="coolwarm", norm=plt.Normalize(-1, 1), linewidths=0.9)
         lc.set_array(order)
         ax.add_collection(lc)
+        # beads as dots (so it reads as bead-and-spring)
+        ax.scatter(pos[:, 0], pos[:, 1], s=1.2, c="#40484d", alpha=0.55, linewidths=0)
+        # crosslinks as gold ties between the two fibres they join
         if show_links and crosslinks is not None and len(crosslinks):
             pa, pb = _crosslink_points(pos, edges, crosslinks)
             ls = np.stack([pa, pb], axis=1)
-            ax.add_collection(LineCollection(ls, colors="#d8a329", linewidths=1.1, alpha=0.9))
+            ax.add_collection(LineCollection(ls, colors="#d8a329", linewidths=1.3, alpha=0.95))
+            mid = 0.5 * (pa + pb)
+            ax.scatter(mid[:, 0], mid[:, 1], s=6, marker="D", c="#d8a329", alpha=0.9, linewidths=0)
         for c in centers:
-            ax.add_patch(plt.Circle(c, cell_radius, color="0.25", alpha=0.5, lw=0))
+            ax.add_patch(plt.Circle(c, cell_radius, color="0.30", alpha=0.55, lw=0))
         ax.set_xlim(-span, span); ax.set_ylim(-span, span)
         ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
-        ax.set_title("%s\nframe %d/%d   (yellow = crosslinks)" % (title, k + 1, len(snapshots)),
-                     fontsize=10)
+        ax.set_title("%s\nframe %d/%d   grey=t0 outline · dots=beads · gold=crosslinks · blue→red=tangential→radial"
+                     % (title, k + 1, len(snapshots)), fontsize=8)
 
     anim = FuncAnimation(fig, draw, frames=len(snapshots), interval=1000 / fps)
     anim.save(out_path, writer=PillowWriter(fps=fps))
