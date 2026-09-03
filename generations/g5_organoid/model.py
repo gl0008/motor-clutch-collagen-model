@@ -109,6 +109,9 @@ class OrganoidConfig(CollagenConfig):
     #     adhesion, letting them break from the pack = single-cell escape ---
     leader_fraction: float = 0.0         # fraction of cells that are low-adhesion leaders
     leader_adhesion_factor: float = 0.15 # leaders' adhesion multiplier (EMT-like)
+    leader_pull_factor: float = 1.0      # leaders' traction multiplier (>1 = high-traction
+                                         #   leader; Reffay 2014 Nat Cell Biol: front cells
+                                         #   exert larger TFM traction). 1.0 = adhesion-only.
 
     # --- Stage D: released rigid cells (translation under overdamped dynamics) ---
     # Each cell feels the reaction of the traction it applies to collagen (grip-and-
@@ -551,6 +554,20 @@ def leader_adhesion_scale(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarra
     return scale
 
 
+def leader_pull_scale(centers: np.ndarray, cfg: OrganoidConfig) -> np.ndarray:
+    """Per-cell traction multiplier: the same outermost ``leader_fraction`` leaders get
+    ``leader_pull_factor`` (>1 = high-traction leader, Reffay 2014), the rest 1.  Uses the
+    identical outermost-cell selection as :func:`leader_adhesion_scale` so the boosted
+    cells and the low-adhesion cells coincide.  Returns all-ones when factor==1."""
+    m = len(centers)
+    scale = np.ones(m)
+    n_lead = int(round(cfg.leader_fraction * m))
+    if n_lead > 0 and cfg.leader_pull_factor != 1.0:
+        outer = np.argsort(-np.linalg.norm(centers, axis=1))[:n_lead]
+        scale[outer] = cfg.leader_pull_factor
+    return scale
+
+
 # =================================================================================
 # Numba per-step integrator (generalised to M cell centres)
 # =================================================================================
@@ -799,7 +816,8 @@ def _cell_patches(network: Network, center: np.ndarray, fiber_ids) -> list:
 
 
 def organoid_active_forces(network: Network, centers: np.ndarray, total_force: float,
-                           candidates: list | None = None):
+                           candidates: list | None = None,
+                           per_cell_scale: np.ndarray | None = None):
     """Every cell grips nearby fibres all-around and reels them inward.
 
     Reuses the G2 Gaussian contact kernel per cell.  Only cells whose contact shell
@@ -818,7 +836,8 @@ def organoid_active_forces(network: Network, centers: np.ndarray, total_force: f
             patches = contact_patches(network, center, angle_deg=0.0, half_width_deg=180.0)
         per_cell.append(patches)
         if patches:
-            f, _ = forces_from_patches(network, patches, total_force)
+            fc = total_force if per_cell_scale is None else total_force * per_cell_scale[c]
+            f, _ = forces_from_patches(network, patches, fc)
             nodal += f
     nodal[network.fixed] = 0.0
     return nodal, per_cell
@@ -1278,7 +1297,8 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
     }
 
 
-def per_cell_reaction(per_cell: list, total_force: float) -> np.ndarray:
+def per_cell_reaction(per_cell: list, total_force: float,
+                      per_cell_scale: np.ndarray | None = None) -> np.ndarray:
     """Reaction force on each cell = -(traction it applies to collagen).
 
     A cell reels its gripped fibres inward, so the reaction points OUTWARD toward the
@@ -1287,8 +1307,9 @@ def per_cell_reaction(per_cell: list, total_force: float) -> np.ndarray:
 
     reac = np.zeros((len(per_cell), 2))
     for c, patches in enumerate(per_cell):
+        fc = total_force if per_cell_scale is None else total_force * per_cell_scale[c]
         for p in patches:
-            reac[c] -= total_force * p.weight * p.normal_in
+            reac[c] -= fc * p.weight * p.normal_in
     return reac
 
 
@@ -1316,11 +1337,15 @@ def run_organoid_invasion(cfg: OrganoidConfig = OrganoidConfig(), seed=None,
     every = max(1, int(round(cfg.sample_interval / cfg.dt)))
     contact_every = max(1, int(round(cfg.contact_update_interval / cfg.dt)))
 
+    pull_scale = leader_pull_scale(centers0, cfg)      # high-traction leaders (Reffay 2014)
+
     def refresh():
         cand = cell_candidate_fibers(network, centers, reach)
         active_full, per_cell = organoid_active_forces(
-            network, centers, cfg.total_pull_force, candidates=cand)
-        return active_full, per_cell, per_cell_reaction(per_cell, cfg.total_pull_force)
+            network, centers, cfg.total_pull_force, candidates=cand,
+            per_cell_scale=pull_scale)
+        return active_full, per_cell, per_cell_reaction(
+            per_cell, cfg.total_pull_force, per_cell_scale=pull_scale)
 
     active_full, per_cell, reaction = refresh()
     adh_scale = leader_adhesion_scale(centers0, cfg)   # low-adhesion leaders (EMT), fixed
