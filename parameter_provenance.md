@@ -200,3 +200,23 @@ does), then `contact_width` can return to 3 and the corona hack can be dropped. 
 then, compare organoid results by **per-active-sector** traction, not raw totals.
 Reproduce: `generations/g5_organoid/lineage.py` + the G5-0A driver (output
 `g5_0A_scale_transfer.gif`).
+
+### G5-0B cell-number-only result (2026-09)
+
+Fixed cells, G4-frozen, vary M in the same network; measure per-active-sector traction.
+
+| M cells | active sectors | per-sector traction | vs M=1 |
+|---------|---------------|---------------------|--------|
+| 1  | 3/12  | 5.37 nN | 1.00 |
+| 7  | 1/84  | 4.80 nN | 0.90 |
+| 13 | 2/156 | 5.51 nN | 1.03 |
+| 19 | 5/228 | 4.20 nN | 0.78 |
+| 37 | 2/444 | 4.39 nN | 0.82 |
+
+**Interpretation.** Per-clutch traction is M-independent (~4-5.5 nN) -> there is **no
+per-clutch collective amplification**; clutches act independently.  So in the current
+model "multicellularity" produces collective behaviour *only through cell-cell adhesion
+mechanics* (cohesion / surface tension), not through cells pulling harder together --
+Delta_multicell(per-clutch traction) approximately 0.  The tiny active-sector counts
+(1-5 of hundreds) also confirm the coverage problem for packed cells in a uniform
+network, which is why the corona construct was added.  Output `g5_0B_cell_number.gif`.
