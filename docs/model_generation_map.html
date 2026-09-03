@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Model generation map — biology vs physics lineage tree</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --ink:#18242b;--muted:#667078;--paper:#f2efe7;--panel:#fffefa;
+  --orange:#c85f3d;--teal:#297a70;--purple:#76559b;--line:#ded6c9;
+  --bio:#5a9a55;--bio-bg:#eef6ec;--bio-line:#bcdcb6;
+  --phy:#4f74b8;--phy-bg:#eef2fa;--phy-line:#c3d2ee;
+  --warn:#c06157;--fb:#fff7d6;--fb-line:#e6d48a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--teal)}
+.hero{padding:52px max(22px,calc((100vw - 1240px)/2));background:#162832;color:#fff}
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:#e8b59e;font-size:12px;font-weight:700}
+.hero h1{font:700 clamp(30px,5vw,54px)/1.02 Georgia,serif;margin:12px 0 14px;max-width:960px}
+.hero p{max-width:900px;color:#d1dcdf;font-size:17px;margin:0 0 6px}
+.hero .lanes{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px}
+.hero .lanes span{font-size:13px;padding:7px 12px;border-radius:20px;font-weight:600}
+.chip-bio{background:rgba(120,190,110,.22);color:#c8ecc0;border:1px solid #4c7a47}
+.chip-phy{background:rgba(110,150,220,.22);color:#c6d8f5;border:1px solid #47649c}
+.chip-warn{background:rgba(200,95,80,.22);color:#f2c3ba;border:1px solid #9a4a3e}
+.chip-fb{background:rgba(230,212,140,.2);color:#f0e2a8;border:1px solid #8a7d3f}
+.wrap{max-width:1240px;margin:auto;padding:34px 22px 10px}
+
+/* legend */
+.legend{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin:0 0 26px;
+  font-size:13px;color:var(--muted)}
+.legend b{color:var(--ink)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* column headers */
+.laneHead{display:grid;grid-template-columns:1fr 200px 1fr;gap:18px;margin-bottom:6px;
+  position:sticky;top:0;z-index:5;padding:10px 0;background:linear-gradient(var(--paper) 78%,transparent)}
+.laneHead .h{border-radius:11px;padding:11px 14px;font-weight:700;text-align:center;font-size:14px;color:#fff}
+.laneHead .hb{background:var(--bio)}
+.laneHead .hs{background:#2f3a41}
+.laneHead .hp{background:var(--phy)}
+.laneHead .h small{display:block;font-weight:500;opacity:.9;font-size:12px}
+
+/* generation block */
+.gen{position:relative;margin:0}
+.grid{display:grid;grid-template-columns:1fr 200px 1fr;gap:18px;align-items:stretch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.bio{background:var(--bio-bg);border-color:var(--bio-line)}
+.phy{background:var(--phy-bg);border-color:var(--phy-line)}
+.card h4{margin:0 0 8px;font:700 16px/1.2 Georgia,serif}
+.bio h4{color:#3c6b38}.phy h4{color:#3a5794}
+.card p{margin:0 0 8px;font-size:14.5px}
+.card .eqlist{margin:0;padding:0;list-style:none;font-size:14px}
+.card .eqlist li{padding:6px 0;border-top:1px dashed var(--phy-line)}
+.card .eqlist li:first-child{border-top:0}
+.card .eqlist .lbl{display:block;font-weight:600;color:#3a5794;font-size:12.5px;margin-bottom:2px}
+em{color:#4a5a52;font-style:italic}
+.phy em{color:#3f5680}
+
+/* spine node */
+.node{align-self:center;background:#fff;border:2px solid #9aa0a6;border-radius:14px;
+  padding:14px 12px;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.04)}
+.node .g{font:700 20px/1 Georgia,serif;color:var(--ink)}
+.node .role{font-size:12px;color:var(--muted);margin-top:8px}
+.badge{display:inline-block;margin-top:9px;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.b-frozen{background:#ededed;color:#6b7075;border:1px solid #cfd2d5}
+.b-current{background:#d9efe8;color:#1f6b5f;border:1px solid #8fcabc}
+.b-planned{background:#fbe2dd;color:#a4463a;border:1px solid #e6a99f}
+.node.current{border-color:var(--teal)}
+.node.planned{border-color:var(--warn);border-style:dashed}
+
+/* feedback slot */
+.fb{margin:12px 0 0;background:var(--fb);border:1px solid var(--fb-line);border-left:5px solid #d9b93c;
+  border-radius:9px;padding:9px 14px;font-size:13px;color:#6a5a12}
+.fb b{color:#7a5a00}
+.fb.pending{background:#fdeee9;border-color:#eab4a7;border-left-color:var(--warn);color:#7c3a2e}
+.fb.pending b{color:#8f2f20}
+
+/* limitation connector */
+.limit{display:flex;justify-content:center;margin:14px 0}
+.limit span{position:relative;background:#fff;border:1.5px solid var(--warn);color:var(--warn);
+  font-size:13px;font-weight:600;padding:7px 16px;border-radius:22px}
+.limit span::before,.limit span::after{content:"";position:absolute;left:50%;width:2px;height:14px;
+  background:var(--warn);transform:translateX(-50%)}
+.limit span::before{top:-15px}.limit span::after{bottom:-15px}
+.limit .arrow{margin-left:8px}
+
+/* tables */
+.tables{margin:44px 0 10px}
+.tables h2{font:700 26px Georgia,serif;margin:0 0 4px}
+.tables .sub{color:var(--muted);margin:0 0 20px;font-size:15px}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.tbl{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;overflow:auto}
+.tbl.wide{grid-column:1 / -1}
+.tbl h3{margin:0 0 3px;font:700 18px Georgia,serif}
+.tbl .cap{color:var(--muted);font-size:12.5px;margin:0 0 12px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{color:#fff;font-weight:600}
+.tbl-phy th{background:var(--phy)}
+.tbl-grey th{background:#8b9196}
+.tbl-bio th{background:var(--bio)}
+tbody tr:nth-child(even){background:#faf8f2}
+.yes{color:#a4463a;font-weight:700}.no{color:#3c6b38;font-weight:700}
+.cur{color:var(--teal);font-weight:700}
+code{background:#efeadf;padding:1px 5px;border-radius:4px;font-size:12.5px}
+
+footer{max-width:1240px;margin:auto;padding:24px 22px 46px;color:var(--muted);font-size:13.5px}
+
+@media(max-width:900px){
+  .laneHead,.grid{grid-template-columns:1fr}
+  .laneHead{position:static}
+  .node{order:-1}
+  .tgrid{grid-template-columns:1fr}
+  .limit span::before,.limit span::after{display:none}
+}
+@media print{
+  .hero{background:#162832 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .laneHead{position:static}
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="eyebrow">PDAC / solid-tumour invasion — model lineage</div>
+  <h1>One tree, two lanes: the biology and the physics side by side</h1>
+  <p>Every model generation (G1 → G5) is shown twice at once. Read <b>down the left lane for the biology</b>
+     — what the cell or organoid actually does — and <b>down the right lane for the physics</b> — the equations.
+     The central spine is the lineage; each red marker is the <b>limitation that motivated the next version</b>.</p>
+  <p>Nothing is overwritten: every version is preserved. Yellow slots are for recording meeting feedback.</p>
+  <div class="lanes">
+    <span class="chip-bio">🧬 left lane = biology · for Prof. Kolade</span>
+    <span class="chip-phy">∑ right lane = physics/equations · for Prof. Hongbo</span>
+    <span class="chip-warn">⚠ spine = limitation → next</span>
+    <span class="chip-fb">🗒 yellow = feedback slot</span>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <div class="legend">
+    <span><span class="dot" style="background:#ededed;border:1px solid #cfd2d5"></span><b>Frozen</b> (preserved)</span>
+    <span><span class="dot" style="background:#d9efe8;border:1px solid #8fcabc"></span><b>Current</b> (active)</span>
+    <span><span class="dot" style="background:#fbe2dd;border:1px solid #e6a99f"></span><b>Planned</b> / prototype</span>
+    <span style="margin-left:auto">Text mirror: <a href="model_generation_map.md">model_generation_map.md</a> · editable diagram: <a href="model_generation_map.drawio">model_generation_map.drawio</a></span>
+  </div>
+
+  <div class="laneHead">
+    <div class="h hb">🧬 BIOLOGY / cell modelling<small>read down this lane — for Prof. Kolade</small></div>
+    <div class="h hs">LINEAGE<small>tree spine</small></div>
+    <div class="h hp">∑ PHYSICS / equations<small>read down this lane — for Prof. Hongbo</small></div>
+  </div>
+
+  <!-- G1 -->
+  <div class="gen">
+    <div class="grid">
+      <div class="card bio">
+        <h4>The question forming</h4>
+        <p>How does a cell mechanically talk to collagen? Prototyped, in order:
+           SLS relaxation → a few single fibres → first fibre–fibre crosslinks →
+           a first moving cell → first “does the matrix stay deformed after unloading?” test.</p>
+        <p><em>Kept only to show how the idea evolved — history, not results.</em></p>
+      </div>
+      <div class="node">
+        <div class="g">G1</div>
+        <div class="role">V0–V4<br>development archive</div>
+        <span class="badge b-frozen">Frozen</span>
+      </div>
+      <div class="card phy">
+        <h4>No active equation set</h4>
+        <p>Archived prototypes. The SLS hypothesis was inserted <em>before</em> elastic
+           collagen and crosslink transmission were validated — hence corrected in G2.</p>
+      </div>
+    </div>
+    <div class="fb"><b>Feedback / notes</b> (date / who / point): &nbsp;<em>— archive, usually none —</em></div>
+  </div>
+
+  <div class="limit"><span>⚠ correct BCs, units, coupling; drop premature SLS <span class="arrow">↓</span></span></div>
+
+  <!-- G2 -->
+  <div class="gen">
+    <div class="grid">
+      <div class="card bio">
+        <h4>One cell grips collagen; the pull spreads</h4>
+        <p>A local 5&nbsp;nN pull reaches distant fibres <em>only</em> through fibre–fibre
+           crosslinks (21.6% larger response with links). A released cell then migrates
+           (0.28&nbsp;µm/min).</p>
+        <p>Plasticity was tested — and honestly <em>not</em> seen at 5&nbsp;nN.</p>
+      </div>
+      <div class="node">
+        <div class="g">G2</div>
+        <div class="role">V2–V4<br>corrected elastic baseline<br>(shared engine · 92 tests)</div>
+        <span class="badge b-frozen">Frozen</span>
+      </div>
+      <div class="card phy">
+        <h4>Overdamped bead — the shared engine</h4>
+        <ul class="eqlist">
+          <li><span class="lbl">Force balance per bead</span>
+            $$\zeta\,\dot{\mathbf r}_i=\mathbf F_i^{\text{stretch}}+\mathbf F_i^{\text{bend}}+\mathbf F_i^{\text{clutch}}$$</li>
+          <li>Elastic stretch (Hooke) + standard elastic bend. <em>No SLS, no plasticity.</em></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb"><b>Feedback / notes</b> (date / who / point):</div>
+  </div>
+
+  <div class="limit"><span>⚠ migration direction still prescribed (imposed imbalance) <span class="arrow">↓</span></span></div>
+
+  <!-- G3 -->
+  <div class="gen">
+    <div class="grid">
+      <div class="card bio">
+        <h4>Reel collagen into a radial aster</h4>
+        <p>A round spheroid not touching collagen at t=0 sends protrusions out in
+           <em>all</em> directions, grips fibres and reels them inward → a disordered tangle
+           becomes a radial pattern (TACS-3-like; radial order −0.49 → −0.04).</p>
+        <p><em>Symmetric, no prescribed side; the point is matrix remodelling.</em></p>
+      </div>
+      <div class="node">
+        <div class="g">G3</div>
+        <div class="role">spheroid<br>contractile → radial<br>collagen (aster)</div>
+        <span class="badge b-frozen">Frozen</span>
+      </div>
+      <div class="card phy">
+        <h4>Spatial clutches on a rigid body</h4>
+        <ul class="eqlist">
+          <li><span class="lbl">Persistent material point</span>$x_j=(1-\alpha_j)\,r_a+\alpha_j\,r_b$</li>
+          <li><span class="lbl">Bell off-rate (clutch)</span>$r_{\text{off}}=r_{\text{off}}^{0}\exp(|F_j|/F_b)$</li>
+          <li><span class="lbl">Gaussian projection</span>$w_{ij}\propto\exp(-d^2/2\sigma^2),\ \textstyle\sum_i w_{ij}=1$</li>
+          <li><span class="lbl">Rigid body</span>$\gamma_c\,\dot{\mathbf r}_c=-\textstyle\sum_j\mathbf F_j$</li>
+          <li><span class="lbl">Contact penalty</span>$\mathbf F^{\text{contact}}=k\,\delta\,(\mathbf r_i-\mathbf r_c)/d$</li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb"><b>Feedback / notes</b> (date / who / point):</div>
+  </div>
+
+  <div class="limit"><span>⚠ calibrate stiffness; prove indirect path; release the cell <span class="arrow">↓</span></span></div>
+
+  <!-- G4 v1 -->
+  <div class="gen">
+    <div class="grid">
+      <div class="card bio">
+        <h4>Calibrate the single cell — four steps</h4>
+        <p><b>A</b> tune matrix stiffness. <b>B</b> show a non-contact fibre moves <em>only</em>
+           via crosslinks. <b>C</b> clutches stochastically slip &amp; let go.
+           <b>D</b> release the cell so it can crawl with no prescribed direction.</p>
+      </div>
+      <div class="node">
+        <div class="g">G4 v1</div>
+        <div class="role">A–D<br>interactive calibration<br>(short-time)</div>
+        <span class="badge b-frozen">Frozen</span>
+      </div>
+      <div class="card phy">
+        <h4>Independent Bell clutches</h4>
+        <ul class="eqlist">
+          <li>Same overdamped core + Bell clutch kinetics.</li>
+          <li>12 <em>independent</em> clutches per material point.</li>
+          <li><em>2–5 min horizon — changes came out sub-pixel.</em></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb"><b>Feedback / notes</b> (date / who / point):</div>
+  </div>
+
+  <div class="limit"><span>⚠ observe 2 h; resolve individual clutch failure <span class="arrow">↓</span></span></div>
+
+  <!-- G4 v2 -->
+  <div class="gen">
+    <div class="grid">
+      <div class="card bio">
+        <h4>Watch the same cell for 2 h — like the imaging</h4>
+        <p>Individual clutches visibly load, slip and fully detach; fibres recoil.
+           Compare 12 <em>independent</em> clutches vs a <em>shared-load</em> team that fails
+           as a cascade. Fixed / moving / mobile-ECM controls.</p>
+      </div>
+      <div class="node current">
+        <div class="g">G4 v2</div>
+        <div class="role">A–D<br>long-time +<br>visible clutch failure</div>
+        <span class="badge b-current">Current</span>
+      </div>
+      <div class="card phy">
+        <h4>Shared-load clutch cluster</h4>
+        <ul class="eqlist">
+          <li><span class="lbl">On $i$ of $N$ bound clutches at one site</span>
+            $$f_i=\frac{F_{\text{site}}}{i},\quad r_i=i\,k_{\text{off}}^{0}\exp\!\Big(\frac{F_{\text{site}}}{i\,F_b}\Big),\quad g_i=(N-i)\,k_{\text{on}}$$</li>
+          <li><em>Rebinding can rescue the cluster.</em></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb"><b>Feedback / notes</b> (date / who / point):</div>
+  </div>
+
+  <div class="limit"><span>⚠ single cell → multicellular organoid <span class="arrow">↓</span></span></div>
+
+  <!-- G5 -->
+  <div class="gen">
+    <div class="grid">
+      <div class="card bio">
+        <h4>A whole organoid, not one cell</h4>
+        <p>~200&nbsp;µm, ~19–43 motor–clutch cells held together by <em>cell–cell adhesion</em>.
+           Together they pull the collagen radial, then <em>invade</em> outward.</p>
+        <p>The balance of cell–cell adhesion vs cell–matrix traction decides
+           <b>collective advance vs single-cell escape</b> (grounded in Kolade/Gloria organoid movies).</p>
+      </div>
+      <div class="node planned">
+        <div class="g">G5</div>
+        <div class="role">organoid<br>multicellular tumour<br>organoid invasion</div>
+        <span class="badge b-planned">Planned</span>
+      </div>
+      <div class="card phy">
+        <h4>Many cells + a new cell–cell term</h4>
+        <ul class="eqlist">
+          <li><span class="lbl">Force balance per bead</span>
+            $\zeta\dot{\mathbf r}_i=\mathbf F^{\text{stretch}}+\mathbf F^{\text{bend}}+\mathbf F^{\text{crosslink}}+\mathbf F^{\text{repulsion}}+\mathbf F^{\text{active}}$</li>
+          <li><span class="lbl">Cell $m$ reaction (invasion)</span>
+            $\gamma_c\,\dot{\mathbf r}_c^{(m)}=-\textstyle\sum_j\mathbf F_j^{(m)}+\sum \mathbf F_{cc}$</li>
+          <li><span class="lbl">New — cell–cell</span>
+            $\mathbf F_{cc}=\text{soft attract–repel }U(|\mathbf r_a-\mathbf r_b|)$</li>
+          <li><span class="lbl">Stage E plasticity</span>crosslink Bell rupture + re-weld</li>
+        </ul>
+      </div>
+    </div>
+    <div class="fb pending"><b>⚠ Advisor sign-off PENDING</b> &nbsp;·&nbsp;
+      <b>Q1</b> exact cell–cell adhesion form? &nbsp;·&nbsp;
+      <b>Q2</b> swirling NOT seen in Kolade lab — don't build on the Saraswathibhatla swirling mechanism.
+      &nbsp;(date / who / point):</div>
+  </div>
+
+  <!-- TABLES -->
+  <section class="tables">
+    <h2>Comparison tables</h2>
+    <p class="sub">Quick side references the professors asked for.</p>
+
+    <div class="tgrid">
+      <div class="tbl wide tbl-phy">
+        <h3>Table 1 · Two force couplings — does either break?</h3>
+        <p class="cap">Clears up the “which spring ruptures?” confusion — <b>Bell-on-clutch ≠ Bell-on-crosslinker</b> (CLAUDE.md §5).</p>
+        <table>
+          <thead><tr><th>Coupling</th><th>Breaks?</th><th>Governed by</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>Cell–fibre clutch</b><br>(cell grips collagen)</td>
+              <td><span class="no">No</span> (default):<br>constant 12&nbsp;nN</td>
+              <td>Prescribed traction (<code>total_pull_force</code>).<br>
+                  Opt-in slip mode: Bell $k_{\text{off}}^{0}e^{F/F_b}$, $k_{\text{off}}^{0}=0.018$/s, $F_b=1.5$&nbsp;nN</td>
+            </tr>
+            <tr>
+              <td><b>Crosslinker</b><br>(fibre–fibre weld)</td>
+              <td><span class="yes">Yes</span> — Stage&nbsp;E<br>(<code>plasticity=True</code>)</td>
+              <td>Bell rupture $k_{\text{off}}^{0}e^{F/F_b}$, $k_{\text{off}}^{0}=2\times10^{-4}$/s, $F_b=3.0$&nbsp;nN;<br>
+                  re-welds at current crossings → <b>irreversible</b> strain</td>
+            </tr>
+            <tr>
+              <td><b>Fibre segment</b><br>(bead–bead spring)</td>
+              <td><span class="no">No</span></td>
+              <td>Elastic Hooke $F=\kappa_s\cdot\text{ext}$, $\kappa_s=4\times10^{-3}$&nbsp;N/m</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tbl tbl-grey">
+        <h3>Table 2 · Generation status</h3>
+        <p class="cap">Nothing is overwritten — every version is preserved (VERSION_MAP.md).</p>
+        <table>
+          <thead><tr><th>Gen</th><th>What it is</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>G1</td><td>V0–V4 history archive</td><td>frozen</td></tr>
+            <tr><td>G2</td><td>corrected elastic baseline (engine)</td><td>frozen</td></tr>
+            <tr><td>G3</td><td>spheroid → radial aster</td><td>frozen</td></tr>
+            <tr><td>G4 v1</td><td>single-cell calibration</td><td>frozen</td></tr>
+            <tr><td>G4 v2</td><td>2 h + visible clutch failure</td><td><span class="cur">CURRENT</span></td></tr>
+            <tr><td>G5</td><td>organoid remodel + invade</td><td>planned / prototype</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tbl tbl-bio">
+        <h3>Table 3 · Stage A–F roadmap</h3>
+        <p class="cap">Orthogonal to G1–G5: the mechanics-first staging <em>inside</em> the current focus (CLAUDE.md §3b) — not separate models.</p>
+        <table>
+          <thead><tr><th>Stage</th><th>Adds</th><th>Gate</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>minimal fibre network</td><td>forces balance at rest</td></tr>
+            <tr><td>B</td><td>overdamped dynamics</td><td>alignment from pull alone</td></tr>
+            <tr><td>C</td><td>fixed rigid cell + Gaussian</td><td>material-point + FOI response</td></tr>
+            <tr><td>D</td><td>moving attachment sites</td><td>attachment tracks deforming fibre</td></tr>
+            <tr><td>E</td><td>mobile rigid cell</td><td>cell migrates; reactions balance</td></tr>
+            <tr><td>F</td><td>deformable cell / richer biology</td><td>only after A–E validate</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Left lane = biology (Kolade) · right lane = physics/equations (Hongbo) · spine = each version’s limitation motivates the next.
+  This page and <a href="model_generation_map.drawio">model_generation_map.drawio</a> are the visual versions;
+  the text mirror for appending notes is <a href="model_generation_map.md">model_generation_map.md</a>.
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  renderMathInElement(document.body,{
+    delimiters:[
+      {left:"$$",right:"$$",display:true},
+      {left:"$",right:"$",display:false}
+    ],
+    throwOnError:false
+  });
+});
+</script>
+</body>
+</html>
