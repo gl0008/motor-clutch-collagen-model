@@ -8,7 +8,7 @@
   const list=document.querySelector('#versionList');
   const detail=document.querySelector('#versionDetail');
   let activeGroup='all';
-  let activeVersion='g5-e';
+  let activeVersion='g5-d2';
 
   const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const feedbackHtml=feedback=>feedback.length

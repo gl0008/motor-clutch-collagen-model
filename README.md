@@ -197,13 +197,22 @@ single-cell escape) and the plan in [`docs/G5_organoid_plan.md`](docs/G5_organoi
 | A | Do N adhesive cells pack into a cohesive, force-balanced organoid? | ✅ built |
 | B | Does the fixed organoid's contractile pull turn near-field collagen radial? | ✅ built (effect real but modest) |
 | C | Does fibre strain-stiffening sharpen/extend the aster? | ✅ built — honest negative in this gentle regime (strains ~1–5 %) |
-| D | When cells are released, do they invade outward, and does adhesion set collective vs single-cell escape? | ✅ built (organoid spreads 38→44 µm, invades +5.8 µm; low adhesion → more escape) |
+| D v1 | When homogeneous cells are released, do they invade outward? | ✅ built (organoid spreads 38→44 µm, invades +5.8 µm) |
+| D v2 | Can low-adhesion leader/EMT-like heterogeneity separate stuck, collective-strand and single-cell regimes? | ✅ built — exploratory adhesion × pull map; personal testing, not experimentally validated |
 | E | Does Bell crosslink rupture + re-weld make deformation irreversible (plasticity κ)? | ✅ mechanism built + stress-selective; a clean κ is **confounded** and diagnosed |
 
 Choices: **softened, lightly crosslinked** collagen (3 MPa, 10 nN/µm links) as in G3/G4 so the pull
 visibly reorganises the near field; the network generator excludes the **union of cell disks** so
 collagen reaches every perimeter cell. Performance: a full-scale run (43 cells, ~24k beads, 2400
 steps) takes ~8 s via a Numba integrator, an O(E) grid crosslinker, and cached contacts.
+
+The 2026-09-03 G5D-v2 refinement adds `leader_fraction` and
+`leader_adhesion_factor`. The outermost selected cells use 15% of the ordinary
+adhesion strength. In the seed-23, two-hour personal-test comparison, high
+adhesion/low pull is stuck, intermediate adhesion/high pull forms a connected
+leader–follower strand, and low adhesion/high pull disperses as single cells.
+These regimes are model outputs awaiting experimental calibration; a current
+leader does not yet have elevated traction or proteolysis.
 
 Honest limits (all recorded in the G5 README): Stage-B alignment is modest and Stage-E κ cannot yet
 be isolated because the grippable **near-field fibres are under-connected to the fixed boundary** — the
