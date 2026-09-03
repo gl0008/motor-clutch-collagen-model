@@ -151,19 +151,27 @@ Wired into **Stage B** (`run_organoid_pull`) and **Stage D** (`run_organoid_inva
 per-cell reaction uses the **actual clutch traction**, so clutch slip directly weakens the outward pull
 and alters motility.
 
+**Empty-sector guard (important correctness fix).** Only sectors that actually grip a fibre run the
+clutch; empty sectors are masked (`_clutch_active_mask`) so they cannot bind/load against nothing.
+Without this, empty sectors loaded phantom clutches and inflated the reported traction ~9× and the slip
+count ~10×. Reported traction/slips/bound-fraction are over the **active** sites only.
+
 **Honest findings (personal testing, not confirmed):**
-- The clutch fires as intended: bound fraction rises to ~0.67 and thousands of **load-and-fail slip
-  events** occur; aggregate traction is emergent and non-constant (CV ~0.3), ~1000 nN over ~19 cells
-  (~50 nN/cell — the right order vs Mark 2020 ~86 nN/cell).
-- Individual sites load-and-fail stochastically, but the **population-mean traction is fairly steady**
-  (many sites average out) — expected motor-clutch behaviour.
-- The near-field radial order is **barely changed** by the clutch vs the constant pull (the corona
-  already starts radial + elastic plateau), so the *aster* is not yet clutch-sensitive here.
-- In **Stage D**, realistic clutch+slip gives **less** net invasion than the idealized constant pull
-  (12-sector grip is more symmetric so inward pulls partly cancel, and slip limits sustained traction).
-- **Limitations:** Stage-D grip re-selection carries the clutch state on the fixed sector slot when a
-  sector re-picks a fibre (approximation, flagged initial); a biphasic traction–stiffness sweep is not
-  yet run (the gate here is the slip events + non-constant traction).
+- The clutch fires as intended: on ~28 real grip sites (11 of 19 cells, ~2.5 of 12 sectors each) the
+  bound fraction rises to ~0.68 with **load-and-fail slip events** (~1100 slips over 200 s); traction is
+  emergent and non-constant (CV ~0.27).
+- **Traction is LOW: ~114 nN total, ~10 nN/cell** — well below Mark 2020's ~86 nN/cell — and it moves
+  collagen only ~0.1 µm. This is the motor-clutch **soft-substrate regime**: the softened collagen
+  yields fast (high substrate speed) so the clutches barely load before the fibre gives way (Chan & Odde
+  2008 biphasic traction–stiffness). An honest, physically-sensible result, not a dramatic aster.
+- Individual sites load-and-fail stochastically, but the **population-mean traction is steady** (expected
+  motor-clutch behaviour).
+- The near-field radial order is **barely changed** vs the constant pull (few gripping sectors + soft
+  collagen + corona already radial), so the *aster* is not clutch-sensitive here.
+- **Stage D:** realistic clutch+slip gives **less** net invasion than the idealized constant pull.
+- **Limitations:** only ~2.5/12 sectors grip (small cells, sparse near-field) so total traction is low;
+  Stage-D grip re-selection carries clutch state on the fixed sector slot (approximation, flagged
+  initial); a biphasic traction–stiffness sweep is not yet run.
 
 ## Next refinements
 

@@ -919,14 +919,30 @@ def _clutch_substrate_speeds(network: Network, velocity: np.ndarray, patches: li
     return out
 
 
-def _clutch_step(cfg: OrganoidConfig, state: ClutchState, substrate: np.ndarray, step: int):
-    """Advance every site's clutch bundle one step (reuses the g4_v2 law verbatim)."""
+def _clutch_step(cfg: OrganoidConfig, state: ClutchState, substrate: np.ndarray, step: int,
+                 active_mask: np.ndarray | None = None):
+    """Advance every site's clutch bundle one step (reuses the g4_v2 law verbatim).
+
+    ``active_mask`` (True = the sector currently grips a fibre) must be given so that
+    EMPTY sectors do not run: a clutch cannot bind a non-existent fibre, so those sites
+    would otherwise load against nothing and inflate the traction / slip counts.
+    """
     S = state.bound.shape[0]
     u_on = _clutch_counter_uniforms(cfg, step, 0, S)
     u_off = _clutch_counter_uniforms(cfg, step, 1, S)
+    if active_mask is not None:
+        empty = ~active_mask
+        u_on[empty] = 2.0                       # > any probability -> never binds
+        state.bound[empty] = False              # drop any grip on a vanished fibre
+        state.extension[empty] = 0.0
+        state.site_extension[empty] = 0.0
     if cfg.clutch_mode == "shared":
         return _shared_step(cfg, state, substrate, u_on, u_off)
     return _independent_step(cfg, state, substrate, u_on, u_off)
+
+
+def _clutch_active_mask(patches: list) -> np.ndarray:
+    return np.asarray([p is not None for p in patches], dtype=bool)
 
 
 def _new_clutch_state(n_sites: int, cfg: OrganoidConfig) -> ClutchState:
@@ -949,6 +965,7 @@ def _run_pull_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = Fals
     candidates = cell_candidate_fibers(network, centers, reach)
     patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
     S = len(patches)
+    active_mask = _clutch_active_mask(patches)      # sectors that actually grip a fibre
     state = _new_clutch_state(S, cfg)
     substrate = np.zeros(S)
     site_force = np.zeros(S)
@@ -961,19 +978,21 @@ def _run_pull_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = Fals
 
     for step in range(nsteps + 1):
         time = step * cfg.dt
-        _, site_force, breaks, binds, site_fail = _clutch_step(cfg, state, substrate, step)
+        _, site_force, breaks, binds, site_fail = _clutch_step(
+            cfg, state, substrate, step, active_mask)
         active = _project_site_forces(network, patches, site_force)
         traction_series.append(float(site_force.sum()))
 
         if step % every == 0:
             prof = radial_alignment_profile(network, organoid_center)
-            gripping = np.asarray([p is not None for p in patches]).reshape(len(centers), -1).any(axis=1)
+            gripping = active_mask.reshape(len(centers), -1).any(axis=1)
             frames.append({
                 "time": time,
                 "global_radial_order": prof["global_radial_order"],
                 "shells": prof["shells"],
                 "n_gripping_cells": int(gripping.sum()),
-                "bound_fraction": float(state.bound.mean()),
+                "n_active_sites": int(active_mask.sum()),
+                "bound_fraction": float(state.bound[active_mask].mean()) if active_mask.any() else 0.0,
                 "cumulative_slips": int(state.cumulative_slips),
                 "mean_site_force": float(site_force[site_force > 0].mean()) if np.any(site_force > 0) else 0.0,
                 "total_traction": float(site_force.sum()),
@@ -1158,6 +1177,7 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
     candidates = cell_candidate_fibers(network, centers, reach)
     patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
     S = len(patches)
+    active_mask = _clutch_active_mask(patches)
     state = _new_clutch_state(S, cfg)
     substrate = np.zeros(S)
     site_force = np.zeros(S)
@@ -1171,7 +1191,8 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
 
     for step in range(nsteps + 1):
         time = step * cfg.dt
-        _, site_force, breaks, binds, site_fail = _clutch_step(cfg, state, substrate, step)
+        _, site_force, breaks, binds, site_fail = _clutch_step(
+            cfg, state, substrate, step, active_mask)
         active = _project_site_forces(network, patches, site_force)
         # per-cell reaction = -(actual clutch traction it applies) = outward invasion pull
         reaction = np.zeros((len(centers), 2))
@@ -1189,7 +1210,8 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
                     np.linalg.norm(centers, axis=1) - np.linalg.norm(centers0, axis=1))),
                 "cell_spread": float(np.mean(np.linalg.norm(centers, axis=1))),
                 "max_cell_disp": float(np.max(np.linalg.norm(centers - centers0, axis=1))),
-                "bound_fraction": float(state.bound.mean()),
+                "n_active_sites": int(active_mask.sum()),
+                "bound_fraction": float(state.bound[active_mask].mean()) if active_mask.any() else 0.0,
                 "cumulative_slips": int(state.cumulative_slips),
                 "total_traction": float(site_force.sum()),
             })
@@ -1214,6 +1236,7 @@ def _run_invasion_with_clutch(cfg: OrganoidConfig, seed=None, snapshots: bool = 
         if step and step % contact_every == 0:      # cells moved -> re-select gripped fibres
             candidates = cell_candidate_fibers(network, centers, reach)
             patches, site_centers = organoid_clutch_patches(network, centers, cfg, candidates)
+            active_mask = _clutch_active_mask(patches)
 
     return {
         "config": asdict(cfg), "centers0": centers0, "centers_final": centers,
