@@ -1,71 +1,101 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Motor–clutch collagen model generations</title>
-<meta name="description" content="Versioned motor–clutch and bead–spring collagen simulations from single protrusions to a multicellular organoid.">
-<meta property="og:title" content="Motor–clutch collagen model">
-<meta property="og:description" content="A human-readable model evolution notebook">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motor–clutch collagen research notebook</title>
+<meta name="description" content="One evidence-linked notebook for the evolution, models and experiment history of the motor–clutch collagen project.">
+<meta property="og:title" content="Motor–clutch collagen research notebook">
+<meta property="og:description" content="Follow every generation, inspect each model and trace experiments back to Git commits and evidence.">
 <meta property="og:image" content="https://gl0008.github.io/motor-clutch-collagen-model/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Motor–clutch collagen model">
-<meta name="twitter:description" content="A human-readable model evolution notebook">
-<meta name="twitter:image" content="https://gl0008.github.io/motor-clutch-collagen-model/og.png">
-<style>
-:root{--ink:#18242b;--muted:#667078;--paper:#f2efe7;--panel:#fffefa;--orange:#c85f3d;--teal:#297a70;--purple:#76559b;--line:#ded6c9}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif}.hero{padding:64px max(22px,calc((100vw - 1180px)/2));background:#162832;color:white}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:#e8b59e;font-size:12px;font-weight:700}.hero h1{font:700 clamp(37px,6vw,70px)/.98 Georgia,serif;margin:12px 0 18px;max-width:900px}.hero p{max-width:850px;color:#d1dcdf;font-size:18px}.wrap{max-width:1180px;margin:auto;padding:38px 22px}.generation{margin-bottom:46px}.generationHead{display:grid;grid-template-columns:140px 1fr;gap:22px;align-items:start;margin-bottom:18px}.number{font:700 54px/.95 Georgia,serif;color:var(--orange)}h2{font:700 31px/1.1 Georgia,serif;margin:0 0 7px}.generationHead p{margin:0;color:var(--muted);max-width:850px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;min-height:365px}.card.current{border:2px solid var(--teal)}.tag{text-transform:uppercase;letter-spacing:.09em;font-size:11px;font-weight:700;color:var(--orange)}.current .tag{color:var(--teal)}.card h3{font:700 24px/1.12 Georgia,serif;margin:5px 0 8px}.card p{color:var(--muted);margin:0 0 10px}.purpose{font-size:14px;border-left:3px solid var(--teal);padding-left:9px;color:#405159!important}.however-mini{font-size:13px;background:#faece6;border-radius:7px;padding:8px;color:#76402f!important}.card ul{padding-left:19px;margin:4px 0 18px}.card a{margin-top:auto;width:max-content;max-width:100%;padding:9px 12px;border-radius:8px;background:var(--ink);color:white;text-decoration:none}.archive{opacity:.9}.result,.transition{border-left:5px solid var(--purple);padding:15px 18px;background:#f6edf7;margin-top:18px}.transition{border-left-color:var(--orange);background:#faece6}.transition h3{margin:0 0 7px;font:700 22px Georgia,serif}.transition ul{margin:6px 0;padding-left:20px}.visualKey{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.visualKey div{background:#e8e3d9;padding:10px;border-radius:8px}.visualKey b{display:block}.visualKey span{font-size:13px;color:var(--muted)}footer{text-align:center;padding:28px;color:var(--muted)}@media(max-width:900px){.cards,.visualKey{grid-template-columns:1fr 1fr}.generationHead{grid-template-columns:1fr}.number{font-size:38px}}@media(max-width:620px){.cards,.visualKey{grid-template-columns:1fr}}
-</style>
-<style>
-.heroActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.heroActions a{padding:10px 13px;border-radius:8px;background:white;color:var(--ink);font-weight:750;text-decoration:none}.heroActions a:last-child{border:1px solid #526871;background:transparent;color:white}
-</style>
+<link rel="stylesheet" href="model-evolution.css?v=20260907a">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script defer src="model-notebook-data.js?v=g4-abcd-20260824"></script>
+<script defer src="model-evolution-data.js?v=20260907a"></script>
+<script defer src="experiment-log-data.js?v=20260907a"></script>
+<script defer src="model-evolution.js?v=20260907a"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-<section class="hero"><div class="eyebrow">Versioned computational research notebook</div><h1>Every model remembers why you built it</h1><p>Each version now opens as a complete notebook: your original purpose, the simulation, every implemented equation, highlighted key equations, computation order, paper support, assumptions, results and the flaw that motivated the next version.</p><div class="heroActions"><a href="model-evolution.html">Open the evolution map</a><a href="g5.html">Open current G5 simulation</a></div></section>
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a class="home" href="#evolution">Motor–clutch collagen notebook</a>
+    <div class="top-links" aria-label="Research notebook sections">
+      <a data-view-link="evolution" href="#evolution">Evolution</a>
+      <a data-view-link="versions" href="#versions">Version library</a>
+      <a data-view-link="experiments" href="#experiments">Experiment log</a>
+    </div>
+    <a class="source-link" href="https://github.com/gl0008/motor-clutch-collagen-model">GitHub source</a>
+  </div>
+</nav>
+
+<header class="notebook-header">
+  <div>
+    <span class="eyebrow">Computational research record</span>
+    <h1>One notebook for every generation</h1>
+    <p>Scientific generations remain separate and traceable. The notebook connects each limitation to the next question, each model to its equations, and each experiment to its branch, commit and evidence.</p>
+  </div>
+  <dl class="notebook-counts" aria-label="Notebook contents">
+    <div><dt>Generations</dt><dd>G1–G5</dd></div>
+    <div><dt>Version records</dt><dd>28</dd></div>
+    <div><dt>Experiment checkpoints</dt><dd>14</dd></div>
+  </dl>
+</header>
+
 <main class="wrap">
-<section class="generation archive"><div class="generationHead"><div class="number">G1</div><div><h2>Original V0–V4 development archive</h2><p>These notebooks preserve how the scientific question evolved. The original simulations remain unchanged; every page now records the exact purpose and the reason it was not sufficient.</p></div></div><div class="cards">
-<article class="card"><div class="tag">Question-forming prototype</div><h3>V0 · SLS prototypes</h3><p class="purpose"><b>Purpose:</b> isolate actin → clutch → SLS relaxation → Bell rupture → cluster lifetime in 1D.</p><p>Single-protrusion chain followed by a triangular SLS bead network.</p><p class="however-mini"><b>However:</b> SLS was added before elastic collagen geometry and crosslink transmission were validated.</p><a href="model-notebook.html?model=g1-v0">Purpose + equations + papers</a></article>
-<article class="card"><div class="tag">Minimal mechanics baseline</div><h3>V1 · five fibres</h3><p class="purpose"><b>Purpose:</b> make connected beads visibly behave as fibres under stretch, bend, active pull and drag.</p><p>Five independent bead chains; fixed cell; no crosslinks.</p><p class="however-mini"><b>However:</b> Gaussian force reached all beads and isolated fibres could not transmit force.</p><a href="model-notebook.html?model=g1-v1">Purpose + simulation + equations</a></article>
-<article class="card"><div class="tag">First crosslinked network</div><h3>V2 · elastic transmission</h3><p class="purpose"><b>Purpose:</b> use hard contact + Gaussian weights and permanent crosslinks to move indirect fibres.</p><p>Same-network linked/no-link comparison.</p><p class="however-mini"><b>However:</b> every fibre end was fixed; units and visual encoding were ambiguous.</p><a href="model-notebook.html?model=g1-v2">Purpose + simulation + equations</a></article>
-<article class="card"><div class="tag">First migration prototype</div><h3>V3 · moving cell</h3><p class="purpose"><b>Purpose:</b> let stochastic left/right clutch imbalance move a released cell.</p><p>Fixed versus moving conditions share proposed random events.</p><p class="however-mini"><b>However:</b> ~0.18 µm motion was visually indistinguishable and uncalibrated.</p><a href="model-notebook.html?model=g1-v3">Purpose + simulation + equations</a></article>
-<article class="card"><div class="tag">First plastic hypothesis</div><h3>V4 · rest-state reset</h3><p class="purpose"><b>Purpose:</b> ask whether force-driven break/re-form events retain deformation after unloading.</p><p>Same-partner dynamic links reset their rest vector.</p><p class="however-mini"><b>However:</b> no new topology; the rule produced no resolved excess remodeling.</p><a href="model-notebook.html?model=g1-v4">Purpose + simulation + equations</a></article>
-</div><div class="transition"><h3>Overall G1 flaw → the specification for G2</h3><ul><li>Replace all-end anchoring with outer-boundary-only anchoring and a connectivity gate.</li><li>Use a 180 µm, 99-fibre, physically scaled nN–µm network with compression softening.</li><li>Show every bead, spring, crosslink, contact, force direction and anchor.</li><li>Calibrate cell speed and make fixed/moving conditions visibly separable without exaggeration.</li><li>Require plastic residual to exceed an elastic load–unload control.</li></ul></div></section>
+  <section class="view-shell" id="evolution" data-view="evolution" aria-labelledby="map-title">
+    <div class="view-intro">
+      <div><span class="section-number">01 · Scientific reasoning</span><h2 id="map-title">Evolution</h2></div>
+      <p>Every generation appears in one continuous map, while its internal versions remain a separate chain. Arrows record the limitation that created the next question.</p>
+    </div>
+    <section class="panel map-panel">
+      <div class="map-scroll">
+        <div class="map-track" id="generationMap" aria-label="Model generation lineage"></div>
+      </div>
+      <article class="generation-story" id="generationStory" aria-live="polite"></article>
+      <section class="version-evolution" id="versionEvolution" aria-label="Evolution within the selected generation" aria-live="polite"></section>
+    </section>
+    <aside class="entry-rule">
+      <b>Rule for a future generation</b>
+      <span>A new generation enters this map only when it names its parent version, preserved generation branch, evidence commit, changed mechanism, result, limitation and next question.</span>
+    </aside>
+  </section>
 
-<section class="generation"><div class="generationHead"><div class="number" style="color:var(--teal)">G2</div><div><h2>Corrected bead–spring collagen baseline</h2><p>One shared 180 µm, 99-fibre engine is used by all three stages. Only outer-boundary beads are fixed; contact fibres must reach that boundary through the crosslink graph; every bead, bond, link, contact force and cell trajectory is visible.</p></div></div><div class="cards">
-<article class="card current"><div class="tag">Validated elastic baseline</div><h3>V2 · crosslink transmission</h3><p class="purpose"><b>Purpose:</b> test whether only crosslinks transmit a local 5 nN pull to indirect fibres in a boundary-connected network.</p><ul><li>7,173 visible beads</li><li>383 visible crosslinks</li><li>21.6% larger intermediate response with links</li></ul><a href="model-notebook.html?model=g2-v2">Purpose + simulation + equations</a></article>
-<article class="card current"><div class="tag">Validated migration baseline</div><h3>V3 · fixed versus moving</h3><p class="purpose"><b>Purpose:</b> show how the same clutch imbalance produces zero versus multi-micrometre movement when translation is released.</p><ul><li>30 min, 6 s frames</li><li>0.280 µm/min median calibration</li><li>4.76 µm true net movement</li></ul><a href="model-notebook.html?model=g2-v3">Purpose + simulation + equations</a></article>
-<article class="card"><div class="tag" style="color:var(--purple)">Gated negative result</div><h3>V4 · new-contact plasticity</h3><p class="purpose"><b>Purpose:</b> require genuinely new contacts and an excess unloaded residual before claiming permanent remodeling.</p><ul><li>one new weak link</li><li>elastic vs new-link load–unload</li><li>no resolved plastic residual</li></ul><a href="model-notebook.html?model=g2-v4">Purpose + simulation + equations</a></article>
-</div><div class="result"><b>Why V4 is not made artificially dramatic:</b> the accepted 5 nN elastic baseline does not bring enough new fibre pairs together to produce measurable plasticity. This is a useful model result: the next hypothesis must change loading history or plastic mechanism explicitly, not silently tune animation geometry.</div>
-<div class="visualKey"><div><b>Circles + segments</b><span>collagen beads and springs</span></div><div><b>Gold / purple diamonds</b><span>permanent / newly formed links</span></div><div><b>Orange halos + arrows</b><span>direct Gaussian-weighted contacts</span></div><div><b>Black squares</b><span>outer-boundary anchors only</span></div></div></section>
+  <section class="view-shell" id="versions" data-view="versions" aria-labelledby="library-title" hidden>
+    <div class="view-intro">
+      <div><span class="section-number">02 · Model contents</span><h2 id="library-title">Version library</h2></div>
+      <p>Select any version for its implemented change, key equation, parameter provenance, repository evidence and professor feedback. Simulations and theory guides open as supporting evidence.</p>
+    </div>
+    <section class="panel library-panel">
+      <div class="filter-row" id="generationFilters" aria-label="Filter versions by generation"></div>
+      <div class="library-grid">
+        <div class="version-list" id="versionList" aria-label="All model versions"></div>
+        <article class="version-detail" id="versionDetail" aria-live="polite"></article>
+      </div>
+    </section>
+  </section>
 
-<section class="generation"><div class="generationHead"><div class="number" style="color:#5875c5">G3</div><div><h2>Contractile spheroid remodels collagen into a radial pattern</h2><p>G3 is rebuilt directly on Gloria's frozen G2 collagen engine. A cell spheroid starts with a fibre-free gap, sends protrusions out in every direction, grips the collagen with motor–clutches and reels it inward — reorganising the surrounding fibres from a disordered tangle into a radial aster. It removes G2 V3's <code>polarity_probability=0.65</code>: gripping is symmetric and all-around, and the point is the matrix remodelling, not cell motion.</p><p><a href="model-notebook.html?model=g3"><b>Open the G3 notebook: animation + equations + papers →</b></a></p></div></div><div class="cards">
-<article class="card current"><div class="tag" style="color:#5875c5">All around, no 0.65</div><h3>Protrusions in every direction</h3><p class="purpose"><b>Purpose:</b> reach out across the t=0 gap and grip collagen all around the spheroid, with no prescribed side or direction.</p><ul><li>all 24 protrusions engage</li><li>peak collective traction ~123 nN</li><li>no ψ=0.65, gripping is symmetric</li></ul><a href="model-notebook.html?model=g3">Mechanism + equations</a></article>
-<article class="card"><div class="tag" style="color:#5875c5">Tangential → radial</div><h3>Collagen turns radial</h3><p class="purpose"><b>Purpose:</b> reel gripped fibres inward so the near-field collagen rotates from a disordered tangle into radial tracts.</p><ul><li>near-shell radial order −0.49 → −0.04</li><li>~12 µm fibre displacement</li><li>softened, lightly crosslinked matrix</li></ul><a href="model-notebook.html?model=g3">Animation + radial-order readout</a></article>
-<article class="card"><div class="tag" style="color:var(--purple)">The point isn't cell motion</div><h3>Cell stays put · beads shown</h3><p class="purpose"><b>Purpose:</b> keep the spheroid ~stationary and use excluded volume so it never overlaps the collagen; draw every bead like G2.</p><ul><li>net displacement ~0.6 µm in 90 min</li><li>excluded-volume clears the cell interior</li><li>full-field and follow-cell views</li></ul><a href="model-notebook.html?model=g3">Full field + evidence boundary</a></article>
-</div><div class="transition"><h3>What the G3 rebuild shows—and what it does not claim</h3><ul><li><b>Shows:</b> no contact at t=0 → protrusions reaching out in every direction → motor–clutch reel-in → the collagen reorganising from tangential/random into a radial aster, on the validated G2 engine.</li><li><b>Emergent, symmetric:</b> gripping is all-around with no ψ=0.65, no +x force and no prescribed velocity; the cell barely moves.</li><li><b>Declared choice:</b> the collagen is softened and its crosslink density reduced relative to the stiff G2 baseline so the near-field fibres can visibly rotate radially.</li><li><b>Preserved:</b> G1 and G2 remain frozen; the earlier <code>src/g3/</code> stage model is archived under <code>legacy/g3_v1_superseded/</code>.</li><li><b>Not yet present:</b> nonlinear strain-stiffening, stress relaxation or plasticity, 3D density/pores, deformable cortex/nucleus — the aster here is elastic reorganisation.</li></ul></div>
-<div class="visualKey"><div><b>Blue-grey beads + lines</b><span>crosslinked elastic collagen network</span></div><div><b>Gold diamonds</b><span>permanent inter-fibre crosslinks</span></div><div><b>Green / orange shafts + tips</b><span>probing / gripping protrusions all around</span></div><div><b>Red spokes + magenta points</b><span>clutches reeling captured fibre points inward</span></div></div></section>
-
-<section class="generation"><div class="generationHead"><div class="number" style="color:var(--orange)">G4</div><div><h2>Two preserved versions: short mechanism check → multiscale observation</h2><p>G4 v1 established the four-stage elastic sequence. G4 v2 preserves it, extends the biologically relevant observation time, separates overview data from event clips, and compares independent clutches with a shared-load cluster.</p><p><a href="g4-v2.html"><b>Open G4 v2: two-hour ECM + visible clutch failure →</b></a> &nbsp;·&nbsp; <a href="g4-lab.html">keep viewing G4 v1</a></p></div></div>
-<div class="result"><b>G4 v1 · preserved original short laboratory.</b> These four cards remain the exact 2–5 minute version that exposed the visibility problem.</div><div class="cards">
-<article class="card"><div class="tag">G4 v1 · calibration</div><h3>G4A · tune mechanics</h3><p class="purpose"><b>Purpose:</b> hold the cell fixed and vary pull, bending, drag, link probability and link stiffness one at a time.</p><p class="however-mini"><b>However:</b> two minutes was too short to separate drag-controlled approach times.</p><a href="model-notebook.html?model=g4-a">V1 purpose + equations</a></article>
-<article class="card"><div class="tag">G4 v1 · mechanism</div><h3>G4B · indirect realignment</h3><p class="purpose"><b>Purpose:</b> prove that non-contact fibres move through retained crosslinks, not a hidden whole-network Gaussian.</p><p class="however-mini"><b>However:</b> true indirect displacement was mostly subpixel.</p><a href="model-notebook.html?model=g4-b">V1 graph test</a></article>
-<article class="card"><div class="tag">G4 v1 · stochastic</div><h3>G4C · clutch slippage</h3><p class="purpose"><b>Purpose:</b> test Bell rupture, traction drop and recoil with a fixed cell.</p><p class="however-mini"><b>However:</b> total counts hid individual events and parallel clutches kept sites attached.</p><a href="model-notebook.html?model=g4-c">V1 slip record</a></article>
-<article class="card"><div class="tag">G4 v1 · movement</div><h3>G4D · release the cell</h3><p class="purpose"><b>Purpose:</b> keep G4C and add only rigid-cell translation and rotation.</p><p class="however-mini"><b>However:</b> five-minute fixed/moving motion looked nearly identical.</p><a href="model-notebook.html?model=g4-d">V1 movement record</a></article>
-</div>
-<div class="result" style="border-left-color:var(--teal);margin-top:28px"><b>G4 v2 · current multiscale laboratory.</b> Geometry and effective parameters remain declared; observation scale and clutch-load-sharing comparison change.</div><div class="cards">
-<article class="card current"><div class="tag">G4 v2 · 2 hours</div><h3>G4A · long mechanics</h3><p class="purpose"><b>Purpose:</b> distinguish elastic stiffness from drag-controlled approach time without increasing force to make a dramatic animation.</p><p class="however-mini"><b>Leads to B:</b> sensitivity still does not identify an indirect force path.</p><a href="g4-v2.html#a">Run G4A v2</a></article>
-<article class="card current"><div class="tag">G4 v2 · graph paths</div><h3>G4B · resolved realignment</h3><p class="purpose"><b>Purpose:</b> measure direct, one-hop, two+-hop and unconnected displacement and orientation over two hours.</p><p class="however-mini"><b>Leads to C:</b> deterministic pull still cannot detach an adhesion site.</p><a href="g4-v2.html#b">Run G4B v2</a></article>
-<article class="card current"><div class="tag">G4 v2 · event microscope</div><h3>G4C · collective failure</h3><p class="purpose"><b>Purpose:</b> compare independent Bell slips with equal-load-sharing cascade and show every clutch spoke.</p><p class="however-mini"><b>Leads to D:</b> the equal-and-opposite cell reaction remains constrained.</p><a href="g4-v2.html#c">Run G4C v2</a></article>
-<article class="card current"><div class="tag">G4 v2 · 2 hours</div><h3>G4D · emergent path</h3><p class="purpose"><b>Purpose:</b> compare fixed and released cells with matched ECM and random stream, without prescribed polarity.</p><p class="however-mini"><b>Boundary:</b> still elastic, 2D and single-cell—not a complete TME migration model.</p><a href="g4-v2.html#d">Run G4D v2</a></article>
-</div><div class="transition"><h3>G4 v2 evidence boundary</h3><ul><li>Single cell remains radius 10 µm; it is not silently re-labelled as an organoid.</li><li>Actual geometry stays 1×. Only displacement vectors may be shown at 10× or 50×, with the multiplier permanently labelled.</li><li>Shared-load failure is a separate documented hypothesis beside the independent baseline.</li><li>Plastic crosslink breaking/remodelling remains outside G4 v2 by design.</li></ul></div>
-<div class="visualKey"><div><b>Visible beads + springs</b><span>all 99 finite collagen fibres</span></div><div><b>Gold links</b><span>probabilistically retained, permanent</span></div><div><b>Orange / blue / purple</b><span>direct / 1-hop / 2+-hop fibres</span></div><div><b>Small red arrows</b><span>display-capped direct traction only</span></div></div></section>
-
-<section class="generation"><div class="generationHead"><div class="number" style="color:#2c7fb8">G5</div><div><h2>From one cell to a whole tumour organoid</h2><p>G5 now uses the G4 molecular clutch as its biological baseline. Three lineage controls isolate scale, cell number and adhesion; a matched eight-condition ablation then shows which mechanisms drive motion, cohesion and force transmission.</p><p><a href="g5.html#clutch-baseline"><b>Open the newest G5 controls and results →</b></a></p></div></div><div class="cards">
-<article class="card current"><div class="tag" style="color:#2c7fb8">Newest · 8-way ablation</div><h3>Test one mechanism at a time</h3><p class="purpose"><b>Purpose:</b> start from the molecular-clutch collective baseline, then remove or add one mechanism in each matched run.</p><ul><li>no clutch: 25 → 4.7 µm</li><li>no adhesion: 25 → 68 µm, but dispersal</li><li>no crosslinks: 25 → 7.7 µm</li></ul><a href="g5.html#clutch-baseline">Ablation GIF + interpretation</a></article>
-<article class="card current"><div class="tag" style="color:#2c7fb8">G5-0A / 0B / 0C</div><h3>Audit the G4→G5 transfer</h3><p class="purpose"><b>Purpose:</b> freeze the G4 clutch, test scale and cell number separately, then isolate adhesion after cells are released.</p><ul><li>per-sector transfer ratio: 1.15×</li><li>G5-0B v2: 4.40–4.51 nN per active sector</li><li>adhesion off disperses; adhesion on stays cohesive</li></ul><a href="g5.html#lineage-controls">Lineage-control GIFs + interpretation</a></article>
-<article class="card current"><div class="tag" style="color:#2c7fb8">Current G5D modes</div><h3>Adhesion changes the invasion mode</h3><p class="purpose"><b>Purpose:</b> keep the molecular clutch fixed while cell–cell adhesion moves the model from cohesive to collective to single-cell escape.</p><ul><li>cohesive: 22 µm, cohesion 1.00</li><li>collective: 25 µm, cohesion 1.02</li><li>single-cell: 78 µm, cohesion 1.62</li></ul><a href="g5.html#leader-update">Three-mode comparison</a></article>
-<article class="card"><div class="tag" style="color:var(--purple)">Preserved earlier evidence</div><h3>Alignment and leader tests</h3><p class="purpose"><b>Purpose:</b> retain earlier questions without presenting them as the newest baseline.</p><ul><li>E=3 MPa + stiffening: aster +0.06</li><li>current invasion ablation: 24 vs 25 µm</li><li>earlier extra leader traction did not drag followers</li></ul><a href="g5.html#stiffness-update">Earlier tests + evidence boundaries</a></article>
-</div><div class="transition"><h3>What G5 shows — and its boundary</h3><ul><li><b>Shows:</b> G4 per-active-sector clutch mechanics transfer to the larger box, and cell number alone does not amplify an individual clutch.</li><li><b>Explains:</b> the molecular clutch drives motion, adhesion controls whether cells stay together, and collagen crosslinks transmit the pull in this baseline.</li><li><b>Separates readouts:</b> stiffening changed alignment in the earlier prescribed-pull sweep but changed invasion little in the current clutch ablation.</li><li><b>Not modelled:</b> proteolysis, 3D pores/nucleus or a deformable cell cortex. These seed-23 simulations remain personal testing until matched to experiments.</li></ul></div>
-<div class="visualKey"><div><b>Blue → red fibres</b><span>tangential → radial (radial order)</span></div><div><b>Grey disks</b><span>fixed cells (contract stage)</span></div><div><b>Blue disks + trails</b><span>moving cells (invade stage)</span></div><div><b>Softened collagen</b><span>3 MPa so the pull visibly remodels</span></div></div></section>
+  <section class="view-shell" id="experiments" data-view="experiments" aria-labelledby="log-title" hidden>
+    <div class="view-intro">
+      <div><span class="section-number">03 · Reproducible history</span><h2 id="log-title">Experiment log</h2></div>
+      <p>Human-readable notes are paired with Git evidence. Newest entries appear first; each one records what was inherited, what changed, what happened and why another experiment was needed.</p>
+    </div>
+    <section class="panel branch-panel" aria-labelledby="branch-title">
+      <div class="section-head">
+        <div><span class="section-number">Repository policy</span><h2 id="branch-title">Branches preserve generations</h2></div>
+        <p><code>main</code> is the complete synthesis. Merging does not remove the separate generation or important working branches.</p>
+      </div>
+      <div class="branch-grid" id="branchRegistry"></div>
+    </section>
+    <section class="panel log-panel" aria-label="Chronological experiment records">
+      <div class="experiment-log" id="experimentLog"></div>
+    </section>
+  </section>
 </main>
-<footer>G1 is frozen · G2 is the corrected baseline · G3 is preserved · G4 v1 and v2 remain separately accessible · G5 scales up to a multicellular organoid — none overwrite one another.</footer>
+
+<footer>One scientific lineage · separate generations · evidence-linked experiments</footer>
 </body>
 </html>

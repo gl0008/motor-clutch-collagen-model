@@ -4,8 +4,8 @@ This file is the map for reading the repository without confusing a scientific
 model version with a temporary Git working branch.
 
 For a human-readable visual map with the limitation → next-question reasoning,
-equations, parameter provenance, and collapsible professor feedback under every
-version, open the [model evolution notebook](https://gl0008.github.io/motor-clutch-collagen-model/model-evolution.html).
+equations, parameter provenance, collapsible professor feedback and Git evidence
+under every version, open the [research notebook](https://gl0008.github.io/motor-clutch-collagen-model/#evolution).
 
 ## The lineage
 
@@ -48,9 +48,24 @@ G5D v3 preserves the earlier high-leader-traction test. The newest matched
 ablation changes one mechanism at a time around the molecular-clutch collective
 baseline. None of these versions overwrites the earlier G5 results.
 
-The repository's default Git branch remains `main` because it is the published
-catalogue and GitHub Pages source. It contains both generations so that the
-website can compare them. This does **not** mean that G2 overwrote G1.
+The repository's default Git branch remains `main` because it is the reviewed
+synthesis and GitHub Pages source. It can contain every generation so the website
+can compare them, but it never replaces their permanent checkpoints.
+
+## Permanent branch rule
+
+- Every scientific generation has its own `generation/gN` branch, even after its
+  reviewed files are merged into `main`.
+- `main` is the complete readable synthesis; it is not a sixth generation and is
+  not the only surviving copy of a model.
+- Important `agent/...` and `codex/...` branches are retained when they contain a
+  meaningful experiment or documentation trail. Merging them does not imply
+  deletion.
+- A version may be placed under a generation on the website only when a preserved
+  branch and an evidence commit support that placement. The experiment log must
+  also name its parent, question, change, result, limitation and next question.
+- A future generation receives a new directory and new `generation/gN` branch;
+  it must not be folded into the previous generation merely to simplify Git.
 
 ## Git branches and immutable tags
 
@@ -59,10 +74,14 @@ website can compare them. This does **not** mean that G2 overwrote G1.
 | `main` | Published catalogue containing every preserved model | receives reviewed merges |
 | `generation/g1` | Frozen G1 lineage at the pre-correction archive | do not modify |
 | `generation/g2` | Corrected branch descended from G1 | may receive later G2-only work |
+| `generation/g3` | Accepted spheroid-guidance evidence checkpoint | preserve after integration |
+| `generation/g4` | Accepted G4 v2 long-time/multiscale checkpoint | preserve after integration |
+| `generation/g5` | Current molecular-clutch, lineage-control and ablation checkpoint | preserve after integration |
 | `codex/g3-emergent-guidance` | Historical G3 construction branch | preserved implementation history |
 | `agent/g4-interactive-calibration` | G4A–D construction/review branch | merge after tests and site validation |
 | `agent/g4-v2-multiscale` | G4 v2 long-time/multiscale construction branch | merge after tests and site validation |
 | `agent/g5-organoid-plan` | G5-0A–0C lineage controls, molecular-clutch organoid A–E, mode comparison and ablation | preserve staged results; merge after review |
+| `codex/model-evolution-notebook` | Human-readable website and experiment-record development | preserve documentation history after merge |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
 | `g2-v2` … `g2-v4` | Stable pointers to the documented corrected release | immutable tags |
 
@@ -73,8 +92,10 @@ three G2 tags identify different model folders in one validated corrected
 snapshot. This is more honest than inventing separate historical commits that
 never existed.
 
-Feature branches such as `agent/...` are temporary construction history. They
-are not scientific model versions.
+Working branches such as `agent/...` are implementation history, not scientific
+model versions themselves. Important ones remain available after merge because
+their commit sequence is useful evidence; the permanent `generation/gN` branch
+is still the stable scientific checkpoint.
 
 ## Model directory map
 
@@ -102,16 +123,20 @@ are not scientific model versions.
 
 ## Rule for adding a future model
 
-1. Create a new directory; never replace an earlier version directory.
+1. Name the parent version, create a new directory, and create a separate
+   `generation/gN` branch; never replace an earlier generation or version directory.
 2. Put its purpose, changed assumptions, complete equations, evidence boundary,
    run instructions, tests and result interpretation in that directory's
    `README.md`.
 3. Reuse shared code only through an explicitly named generation-level module.
 4. Precompute visualization data from Python; the website only plays those
    frames.
-5. Add the version to the website and to
-   [`references/README.md`](references/README.md).
-6. After tests pass, merge to `main` and create an immutable model tag.
+5. Record the version's preserved branch and evidence commit, plus the human
+   question → change → result → limitation → next-question chain.
+6. Add the version to the website and to
+   [`references/README.md`](references/README.md) only after that evidence exists.
+7. After tests pass, merge to `main`, retain the generation and important working
+   branches, and create an immutable model tag when a release is declared.
 
 These rules preserve every result, including negative results, and prevent a
 later hypothesis from silently changing the meaning of an earlier model.

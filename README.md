@@ -11,7 +11,7 @@ up to a multicellular tumour **organoid** (many motor-clutch cells + cell–cell
 adhesion) that remodels and invades the collagen network.
 
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
-- Human-readable evolution notebook: <https://gl0008.github.io/motor-clutch-collagen-model/model-evolution.html>
+- Human-readable research notebook: <https://gl0008.github.io/motor-clutch-collagen-model/> — evolution, version library and experiment log in one place
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
 
 ## How the repository is organized
@@ -31,7 +31,9 @@ clutch-failure views. The default Git branch `main` remains the reviewed catalog
 
 Stable tags `g1-v0` through `g1-v4` and `g2-v2` through `g2-v4` identify the
 documented snapshots. Scientific versions live in permanent directories;
-temporary `agent/...` branches are implementation history, not models.
+temporary `agent/...` branches are implementation history, not models. Permanent
+`generation/g1` through `generation/g5` branches remain available after their
+reviewed contents are integrated into `main`.
 
 ## Generation 1 — original V0–V4 archive
 
