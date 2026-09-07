@@ -8,7 +8,7 @@
 </head>
 <body>
 <header class="hero">
-  <a class="back" href="index.html">← all model generations</a>
+  <a class="back" href="index.html#evolution">← research notebook</a> · <a class="back" href="theory/g4_model_theory.pdf">G4 theory PDF</a>
   <div class="eyebrow">Generation 4 · one cumulative experiment</div>
   <h1>Calibrate the ECM first. Then add slip. Then release the cell.</h1>
   <p>Every displayed trajectory was precomputed by the Python bead–spring model. The browser only selects and plays saved data; it does not interpolate or run a second physics engine.</p>
@@ -17,7 +17,7 @@
 <main>
   <section class="history">
     <h2>The decision that created G4</h2>
-    <blockquote lang="zh-Hant">G3A/B/C 只有 3–8 條、沒有 crosslink、而且每條 fiber 兩端固定；G2 雖然有 99-fiber outer-boundary network，卻把每個 2D intersection 都設為 crosslink。所以下一版最合理的做法不是直接繼續調 G3，而是保留 G3，建立一個新的 elastic calibration generation：沿用 G2 的網路幾何與 boundary anchoring、G3 的 material-point clutch/contact，再把 crosslink 改成有機率的永久 elastic links。先固定 cell 把 ECM 調對，再恢復 protrusion 與 cell movement。</blockquote>
+    <blockquote>The early G3A/B/C fixtures used only 3–8 fibres, no crosslinks, and fixed both ends of every fibre. G2 used a 99-fibre outer-boundary network but treated every 2D intersection as a crosslink. The next step should therefore preserve G3 and create a separate elastic-calibration generation: retain G2 network geometry and boundary anchoring, retain G3 material-point clutch contact, and replace all-intersection linking with probabilistic permanent elastic links. Calibrate the ECM with the cell fixed before restoring protrusions and cell movement.</blockquote>
     <p class="correction"><b>Version-history correction:</b> this diagnosed the superseded early G3 fixtures. The active G3 was later rebuilt with 120–150 fibres, outer-boundary anchoring and a 0.30 crosslink fraction. G4 preserves the reasoning and turns it into a controlled calibration sequence rather than claiming that it is still the current G3 code.</p>
   </section>
 

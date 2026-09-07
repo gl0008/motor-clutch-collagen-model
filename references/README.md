@@ -31,6 +31,7 @@ should only be copied into the repository when redistribution rights are clear.
 | G4 v2 A–B | R1–R4, R8, R10, R26 | preserved elastic network, two-hour observation scale, four-minute sampling, crosslink-path transmission and multiscale reporting |
 | G4 v2 C | R5–R7, R27–R28 | Bell rupture, independent versus shared-load cluster hypotheses, force redistribution and collective failure |
 | G4 v2 D | R6–R9, R15 | same shared-load mechanics with only reaction-driven cell translation/rotation released |
+| G5 A–E | R1–R6, R8, R11–R13, R15–R16, R23, R27–R28 plus the G5 literature files | inherited bead–spring collagen and clutch; multicellular cohesion; radial alignment; nonlinear tensile recruitment; reaction-driven collective/single-cell invasion; crosslink-topology plasticity |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography

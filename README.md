@@ -1,14 +1,17 @@
 # Motor–clutch collagen model
 
-This repository preserves three model generations and develops a fourth.
+This repository preserves four model generations and develops a fifth.
 Generation 1 records the historical development path; Generation 2 corrects the
 boundary conditions, network coupling, physical units, migration comparison, and
 visualization; Generation 3 demonstrates symmetric spheroid-driven radial
 reorganisation; Generation 4 calibrates the elastic ECM interactively, verifies
 crosslink-mediated indirect motion, adds motor-clutch slip, and finally releases
-the rigid cell without a prescribed direction.
+the rigid cell without a prescribed direction; Generation 5 scales the single cell
+up to a multicellular tumour **organoid** (many motor-clutch cells + cell–cell
+adhesion) that remodels and invades the collagen network.
 
 - Website: <https://gl0008.github.io/motor-clutch-collagen-model/>
+- Human-readable research notebook: <https://gl0008.github.io/motor-clutch-collagen-model/> — evolution, version library and experiment log in one place
 - Frozen pre-correction state: Git tag `legacy-generation-1-2026-08-14`
 
 ## How the repository is organized
@@ -28,7 +31,9 @@ clutch-failure views. The default Git branch `main` remains the reviewed catalog
 
 Stable tags `g1-v0` through `g1-v4` and `g2-v2` through `g2-v4` identify the
 documented snapshots. Scientific versions live in permanent directories;
-temporary `agent/...` branches are implementation history, not models.
+temporary `agent/...` branches are implementation history, not models. Permanent
+`generation/g1` through `generation/g5` branches remain available after their
+reviewed contents are integrated into `main`.
 
 ## Generation 1 — original V0–V4 archive
 
@@ -178,6 +183,52 @@ outer-boundary anchoring and reduced link density; G4 formalizes the calibration
 logic without rewriting that history. Plastic crosslink breaking is deliberately
 deferred beyond G4D.
 
+## Generation 5 — tumour organoid remodels and invades collagen
+
+Generation 5 scales the single-cell core up to a multicellular **organoid**: N motor–clutch
+**disks** held together by a simplified **cell–cell adhesion** potential, all coupled to one shared
+G2 collagen network. Implementation and full notes:
+[`generations/g5_organoid/`](generations/g5_organoid/). It is grounded in Kolade/Gloria's 4MOSC1
+OSCC/PDAC organoid movies (~200 µm organoid; radial collagen alignment; collective + occasional
+single-cell escape) and the plan in [`docs/G5_organoid_plan.md`](docs/G5_organoid_plan.md)
+(literature: [`docs/G5_research_findings.md`](docs/G5_research_findings.md); engine audit:
+[`docs/G5_code_assessment.md`](docs/G5_code_assessment.md)).
+
+| Stage | One new question | Status |
+|---|---|---|
+| 0A | Does G4 single-cell clutch physics transfer cleanly to the larger G5 box when parameters and fibre density are frozen? | ✅ built — per-active-sector traction ratio 1.15×; total differs because only 3/12 sectors grip |
+| 0B | Does increasing cell number amplify per-clutch traction after near-cell fibre coverage is restored? | ✅ corona v2 — no; approximately 4.40–4.51 nN per active sector for M=1–19 |
+| 0C | With the molecular clutch fixed, what does cell–cell adhesion add after cells are released? | ✅ built — adhesion off gives 68 µm dispersed motion; adhesion on gives 25 µm cohesive motion |
+| A | Do N adhesive cells pack into a cohesive, force-balanced organoid? | ✅ built |
+| B | Does the fixed organoid's contractile pull turn near-field collagen radial? | ✅ built (effect real but modest) |
+| C | Does fibre strain-stiffening sharpen/extend the aster? | ✅ earlier alignment sweep — E=3 MPa raises aster order by 0.06; current clutch invasion ablation changes little (24 vs 25 µm) |
+| D v1 | When homogeneous molecular-clutch cells are released, do they invade outward? | ✅ current baseline — 25 µm with cohesion 1.02 over two hours |
+| D v2 | Can adhesion separate cohesive, collective and single-cell invasion under the same clutch baseline? | ✅ built — 22, 25 and 78 µm respectively |
+| D v3 | Does higher leader traction pull followers into a connected strand? | ✅ earlier constant-pull test preserved — followers still remain behind |
+| E | Does Bell crosslink rupture + re-weld change the current invasion distance? | ✅ mechanism built — 25 µm, approximately the same as the matched clutch baseline; long-term plastic κ remains confounded |
+| Ablation | Which current mechanism drives motion, cohesion and force transmission? | ✅ eight matched runs — clutch, adhesion and crosslinks have the largest effects |
+
+Choices: **softened, lightly crosslinked** collagen (3 MPa, 10 nN/µm links) as in G3/G4 so the pull
+visibly reorganises the near field; the network generator excludes the **union of cell disks** so
+collagen reaches every perimeter cell. Performance: a full-scale run (43 cells, ~24k beads, 2400
+steps) takes ~8 s via a Numba integrator, an O(E) grid crosslinker, and cached contacts.
+
+The 2026-09-03 G5 refinements make the inherited molecular clutch the current
+biological baseline. G5-0A freezes the G4 parameters for scale transfer; the
+G5-0B corona-network rerun shows that per-active-sector traction is not amplified
+by cell number; and G5-0C isolates adhesion after cells are released. The matched
+eight-condition ablation identifies the clutch as the main motion driver,
+cell–cell adhesion as the cohesion switch, and collagen crosslinks as the
+transmission path in this seed-23, two-hour baseline. Earlier constant-pull
+leader-traction and stiffness/alignment tests remain preserved as historical
+evidence rather than being silently overwritten. These are model outputs awaiting
+experimental calibration; proteolysis remains outside the model.
+
+Honest limits (all recorded in the G5 README): the current mechanism comparisons
+use one 2D seed and parameter set; the earlier high-stiffness stiffening runs need
+a smaller time step; and Stage-E κ cannot yet be isolated from slow elastic
+relaxation. Own-simulation output is *personal testing*, not a confirmed finding.
+
 ## Run and test
 
 ```bash
@@ -201,13 +252,21 @@ python3 generations/g4_interactive_calibration/build_demo.py
 
 # Generation 4 v2 long-time data (compact, lazy-loaded JSON chunks)
 python3 generations/g4_v2_multiscale/build_demo.py --workers 4
+
+# Generation 5 tumour organoid (Stage A–E)
+python3 -m pytest generations/g5_organoid/tests/test_g5.py -q
+python3 generations/g5_organoid/build_demo.py            # Stage-B animation
 ```
 
 For G2, Python precomputes all physics into each `demo/data.js`; the web pages only play saved
 frames. The rebuilt G3 renders its GIFs directly with matplotlib in the same visual grammar.
 
-See [`ASSUMPTIONS.md`](ASSUMPTIONS.md), [`RESULTS.md`](RESULTS.md), and
-[`CITATIONS.md`](CITATIONS.md) for interpretation boundaries and sources.
+See [`ASSUMPTIONS.md`](ASSUMPTIONS.md), [`RESULTS.md`](RESULTS.md),
+[`CITATIONS.md`](CITATIONS.md), and
+[`parameter_provenance.md`](parameter_provenance.md) (English) or
+[`parameter_provenance_zh-TW.md`](parameter_provenance_zh-TW.md)（繁體中文）
+for interpretation boundaries, sources, and the current-versus-target ECM
+parameter table.
 
 ## Separate future biology track
 
