@@ -10,6 +10,10 @@ movies (~200 µm organoid, radial collagen alignment, clearance zones).
 Full architecture, scale, parameters, validation targets and ablation design:
 [`docs/G5_organoid_plan.md`](../../docs/G5_organoid_plan.md).
 
+Complete theory, governing equations, G4 lineage, stage-by-stage assumptions and
+evidence boundaries:
+[`docs/theory/g5_model_theory.pdf`](../../docs/theory/g5_model_theory.pdf).
+
 ## What is built (Stages A–B)
 
 - **Stage A — multi-cell scaffold.** `hex_centers` packs N disks; `cell_cell_forces` is a
