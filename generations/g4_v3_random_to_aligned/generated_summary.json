@@ -1,0 +1,434 @@
+{
+  "version": "G4 v3 \u00b7 random mechanics through fixed traction",
+  "quick": false,
+  "report": {
+    "source_fibers": 240,
+    "realised_fragments": 241,
+    "beads": 7663,
+    "candidate_crosslinks": 1291,
+    "crosslinks": 1291,
+    "crosslink_probability": 1.0,
+    "outer_fixed_beads": 77,
+    "inner_boundary_beads": 9,
+    "contact_fragments": 9,
+    "boundary_connected_fraction": 0.9917012,
+    "contact_connected_fraction": 1.0,
+    "contact_fragments_reaching_boundary": 7,
+    "initial_global_nematic_order": 0.0429134,
+    "initial_radial_order_by_shell": [
+      -0.0584874,
+      0.0739071,
+      -0.0076736
+    ],
+    "near_cell_beads": 419,
+    "seed": 41
+  },
+  "cases": {
+    "contraction-5": {
+      "file": "g4-v3-data/contraction-5.json",
+      "bytes": 462426,
+      "contraction": 0.05,
+      "mode": "contraction",
+      "value": 0.05,
+      "crosslinkProbability": 1.0,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 1291,
+        "crosslink_probability": 1.0,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9917012,
+        "contact_connected_fraction": 1.0,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.016362,
+          0.004177,
+          0.000514
+        ],
+        "energyRatio": 17.51677,
+        "recruitedFraction": 0.547718,
+        "boundaryForce": 21.585818
+      }
+    },
+    "contraction-10": {
+      "file": "g4-v3-data/contraction-10.json",
+      "bytes": 462437,
+      "contraction": 0.1,
+      "mode": "contraction",
+      "value": 0.1,
+      "crosslinkProbability": 1.0,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 1291,
+        "crosslink_probability": 1.0,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9917012,
+        "contact_connected_fraction": 1.0,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.011133,
+          0.00915,
+          0.000658
+        ],
+        "energyRatio": 22.875668,
+        "recruitedFraction": 0.551867,
+        "boundaryForce": 44.509419
+      }
+    },
+    "contraction-20": {
+      "file": "g4-v3-data/contraction-20.json",
+      "bytes": 462509,
+      "contraction": 0.2,
+      "mode": "contraction",
+      "value": 0.2,
+      "crosslinkProbability": 1.0,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 1291,
+        "crosslink_probability": 1.0,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9917012,
+        "contact_connected_fraction": 1.0,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.072748,
+          0.008362,
+          0.00406
+        ],
+        "energyRatio": 33.666145,
+        "recruitedFraction": 0.572614,
+        "boundaryForce": 93.615072
+      }
+    },
+    "links-0": {
+      "file": "g4-v3-data/links-0.json",
+      "bytes": 462423,
+      "contraction": 0.2,
+      "mode": "contraction",
+      "value": 0.2,
+      "crosslinkProbability": 0.0,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 0,
+        "crosslink_probability": 0.0,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.3112033,
+        "contact_connected_fraction": 0.0373444,
+        "contact_fragments_reaching_boundary": 0,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.013725,
+          -0.003368,
+          -0.001601
+        ],
+        "energyRatio": 17837.0623,
+        "recruitedFraction": 0.029046,
+        "boundaryForce": 48.40406
+      }
+    },
+    "links-15": {
+      "file": "g4-v3-data/links-15.json",
+      "bytes": 462537,
+      "contraction": 0.2,
+      "mode": "contraction",
+      "value": 0.2,
+      "crosslinkProbability": 0.15,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 162,
+        "crosslink_probability": 0.15,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.7219917,
+        "contact_connected_fraction": 0.5103734,
+        "contact_fragments_reaching_boundary": 5,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.015204,
+          0.00283,
+          -0.000367
+        ],
+        "energyRatio": 58.822655,
+        "recruitedFraction": 0.161826,
+        "boundaryForce": 56.686887
+      }
+    },
+    "links-35": {
+      "file": "g4-v3-data/links-35.json",
+      "bytes": 462510,
+      "contraction": 0.2,
+      "mode": "contraction",
+      "value": 0.2,
+      "crosslinkProbability": 0.35,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 403,
+        "crosslink_probability": 0.35,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9460581,
+        "contact_connected_fraction": 0.9087137,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.020788,
+          0.007503,
+          9.4e-05
+        ],
+        "energyRatio": 40.80836,
+        "recruitedFraction": 0.381743,
+        "boundaryForce": 64.745687
+      }
+    },
+    "links-60": {
+      "file": "g4-v3-data/links-60.json",
+      "bytes": 462517,
+      "contraction": 0.2,
+      "mode": "contraction",
+      "value": 0.2,
+      "crosslinkProbability": 0.6,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 744,
+        "crosslink_probability": 0.6,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9834025,
+        "contact_connected_fraction": 0.9834025,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.053555,
+          0.007266,
+          0.001845
+        ],
+        "energyRatio": 35.07048,
+        "recruitedFraction": 0.53112,
+        "boundaryForce": 82.481824
+      }
+    },
+    "traction-12": {
+      "file": "g4-v3-data/traction-12.json",
+      "bytes": 469574,
+      "contraction": 0.0,
+      "mode": "traction",
+      "value": 12.0,
+      "crosslinkProbability": 0.35,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 403,
+        "crosslink_probability": 0.35,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9460581,
+        "contact_connected_fraction": 0.9087137,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.007839,
+          1.7e-05,
+          1e-05
+        ],
+        "energyRatio": 2.460432,
+        "recruitedFraction": 0.294606,
+        "boundaryForce": 12.0
+      }
+    },
+    "traction-24": {
+      "file": "g4-v3-data/traction-24.json",
+      "bytes": 469606,
+      "contraction": 0.0,
+      "mode": "traction",
+      "value": 24.0,
+      "crosslinkProbability": 0.35,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 403,
+        "crosslink_probability": 0.35,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9460581,
+        "contact_connected_fraction": 0.9087137,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.010214,
+          1.7e-05,
+          2e-05
+        ],
+        "energyRatio": 2.922485,
+        "recruitedFraction": 0.302905,
+        "boundaryForce": 24.0
+      }
+    },
+    "traction-48": {
+      "file": "g4-v3-data/traction-48.json",
+      "bytes": 469635,
+      "contraction": 0.0,
+      "mode": "traction",
+      "value": 48.0,
+      "crosslinkProbability": 0.35,
+      "report": {
+        "source_fibers": 240,
+        "realised_fragments": 241,
+        "beads": 7663,
+        "candidate_crosslinks": 1291,
+        "crosslinks": 403,
+        "crosslink_probability": 0.35,
+        "outer_fixed_beads": 77,
+        "inner_boundary_beads": 9,
+        "contact_fragments": 9,
+        "boundary_connected_fraction": 0.9460581,
+        "contact_connected_fraction": 0.9087137,
+        "contact_fragments_reaching_boundary": 7,
+        "initial_global_nematic_order": 0.0429134,
+        "initial_radial_order_by_shell": [
+          -0.0584874,
+          0.0739071,
+          -0.0076736
+        ],
+        "near_cell_beads": 419,
+        "seed": 41
+      },
+      "final": {
+        "deltaRadialOrder": [
+          0.014117,
+          1.9e-05,
+          3.9e-05
+        ],
+        "energyRatio": 4.759955,
+        "recruitedFraction": 0.298755,
+        "boundaryForce": 48.0
+      }
+    }
+  },
+  "acceptance": {
+    "global_nematic_below_0_10": true,
+    "minimum_four_natural_contacts": true,
+    "no_handcrafted_contact_fibers": true,
+    "same_geometry_for_all_cases": true
+  }
+}

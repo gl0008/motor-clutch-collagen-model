@@ -1,0 +1,84 @@
+:root {
+  --ink: #17212b;
+  --muted: #66717b;
+  --paper: #f7f3eb;
+  --panel: #fffdf8;
+  --line: #d9d1c3;
+  --blue: #406a91;
+  --orange: #d85835;
+  --green: #28a89a;
+  --red: #9f3d31;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.55 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+header, main { width: min(1220px, calc(100% - 40px)); margin: auto; }
+header { padding: 42px 0 28px; border-bottom: 1px solid var(--line); }
+a { color: #1b628a; }
+h1 {
+  max-width: 950px;
+  margin: 12px 0;
+  font-size: clamp(36px, 6vw, 70px);
+  line-height: 1.03;
+  letter-spacing: -.045em;
+}
+h2 { margin: 7px 0 18px; font-size: 30px; line-height: 1.15; letter-spacing: -.025em; }
+h3 { margin: .2rem 0 .35rem; }
+.lead { max-width: 900px; color: #3f4a52; font-size: 20px; }
+.eyebrow { color: var(--red); font-size: 12px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+section { padding: 34px 0; border-bottom: 1px solid var(--line); }
+.decision { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.decision div, .equations article, .assumptions details {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.lab { padding-top: 28px; }
+.labHead { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+.controls { display: flex; align-items: end; gap: 10px; }
+.controls label { display: grid; font-size: 13px; font-weight: 700; }
+.controls select, .controls button {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #9da7ad;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+}
+.controls button { cursor: pointer; font-weight: 800; }
+.timeRow { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+.timeRow input { width: 100%; }
+.timeRow output { min-width: 78px; text-align: right; font-variant-numeric: tabular-nums; }
+.viewerGrid { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 16px; }
+.canvasWrap { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #f3eee4; }
+canvas { display: block; width: 100%; height: auto; aspect-ratio: 820 / 720; }
+.legend { padding: 10px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.legend span { display: inline-block; width: 15px; height: 3px; margin: 0 4px 0 12px; vertical-align: middle; }
+.blue { background: var(--blue); }
+.orange { background: var(--orange); }
+.green { background: var(--green); }
+.red { background: var(--red); }
+.ghost { border-top: 2px dashed #9a9387; }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 8px; }
+.metric { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.metric b { font-variant-numeric: tabular-nums; }
+.note, .interpretation { padding: 12px 15px; border-left: 4px solid #d9951c; background: #fff5dc; }
+.interpretation { margin-bottom: 0; }
+.equations { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.equations article.key { border-top: 5px solid var(--orange); }
+.equations p { color: #4d5861; }
+.assumptions { display: grid; gap: 10px; }
+.assumptions summary { cursor: pointer; font-weight: 800; }
+.references p { margin: .4rem 0; }
+
+@media (max-width: 800px) {
+  .decision, .viewerGrid, .equations { grid-template-columns: 1fr; }
+  .labHead { display: block; }
+  .controls { margin-top: 12px; }
+}
