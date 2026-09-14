@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 v4 · Single-cell force–collagen alignment</title>
+  <link rel="stylesheet" href="g4-v4.css?v=2">
+  <script>window.MathJax={tex:{inlineMath:[["\\(","\\)" ]],displayMath:[["\\[","\\]"]]}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header>
+  <a href="index.html">← model lineage</a>
+  <span class="eyebrow">G4 v4 · new branch from preserved G4 v3</span>
+  <h1>Literature-grounded single-cell force–collagen alignment</h1>
+  <p class="lead">One MDA-MB-231 proxy, one initially random elastic fiber network, and one added mechanism at a time. The biological cell never shrinks. A contracting cavity remains visible only as an ECM benchmark.</p>
+  <span id="buildStatus" class="status">Loading generated result status…</span>
+</header>
+
+<main>
+  <section>
+    <span class="eyebrow">lineage protection</span>
+    <h2>What is inherited—and what is new</h2>
+    <div class="lineage">
+      <article class="box">
+        <h3>Frozen G4 v3</h3>
+        <p>Uniformly random finite fibers, a cell-sized void, bead–spring stretching and bending, probabilistic permanent elastic crosslinks, outer-boundary anchoring and overdamped bead dynamics.</p>
+        <p><a href="g4-v3.html">Open the unchanged G4 v3 evidence →</a></p>
+      </article>
+      <article class="box">
+        <h3>Added in G4 v4</h3>
+        <p>A strict cavity-versus-cell distinction; fixed-radius biological cell; continuous material-point contacts; normal versus dipole force; parallel/perpendicular decomposition; two-hour motor–clutch loading; local-tangent contact guidance; and six-hour released-cell mechanics.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">cumulative design</span>
+    <h2>Each block has a stopping gate</h2>
+    <div class="four">
+      <article class="stage"><h3>v4-A · mechanics controls</h3><p>Passive fixed-size cell must do nothing. A prescribed contractile cavity separately tests the bending-to-stretching recruitment mechanism.</p><p class="however"><b>However:</b> cavity contraction is a boundary condition, not biological traction and not cell shrinkage.</p></article>
+      <article class="stage"><h3>v4-B · fixed cell</h3><p>Normal traction acts only on surface-band material points. A dipole is a same-total-force control. \(F_\parallel\) and \(F_\perp\) are measured predictions.</p><p class="however"><b>However:</b> deterministic force cannot show attachment loading, failure or recoil.</p></article>
+      <article class="stage"><h3>v4-C · motor–clutch</h3><p>Relative actin–ECM motion loads clutches after contact. Independent and equal-load-sharing sites are shown side by side.</p><p class="however"><b>However:</b> a fixed cell records reaction but cannot translate.</p></article>
+      <article class="stage"><h3>v4-D · moving cell</h3><p>Only translation is released. New site direction comes from the encountered local collagen tangent, never a global polarization value.</p><p class="however"><b>Boundary:</b> this remains 2D, elastic and single-cell; no growth, plasticity, degradation or deformable nucleus.</p></article>
+    </div>
+  </section>
+
+  <section class="lab" id="lab">
+    <div class="labHead">
+      <div><span class="eyebrow">precomputed physics · interactive playback</span><h2>Compare the cumulative experiments</h2></div>
+      <div class="controls">
+        <label>Experiment
+          <select id="caseSelect">
+            <option value="passive">A1 · passive fixed cell</option>
+            <option value="cavity">A2 · contractile cavity benchmark</option>
+            <option value="normal" selected>B1 · fixed cell, normal traction</option>
+            <option value="dipole">B2 · fixed cell, dipole control</option>
+            <option value="clutch-independent">C1 · independent clutches</option>
+            <option value="clutch">C2 · shared-load clutches</option>
+            <option value="moving">D · released cell</option>
+          </select>
+        </label>
+        <label>Displacement arrows
+          <select id="amplification"><option value="1">1× true displacement</option><option value="10">10× arrows</option><option value="50">50× arrows</option></select>
+        </label>
+        <button id="play" type="button">Play</button>
+        <button id="step" type="button">Step</button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+    </div>
+    <div class="timeRow"><input id="time" type="range" min="0" max="1" value="0" step="1"><output id="timeLabel">0 s</output></div>
+    <div class="viewer">
+      <div class="canvasWrap">
+        <canvas id="network" width="820" height="820" aria-label="Animated bead-fiber collagen network"></canvas>
+        <canvas id="plot" width="820" height="350" aria-label="Time series of radial alignment and traction"></canvas>
+        <div class="legend">
+          <span><i class="fiber"></i>fiber bonds + beads</span>
+          <span><i class="link"></i>permanent crosslinks</span>
+          <span><i class="contact"></i>continuous contact points</span>
+          <span><i class="total"></i>total force</span>
+          <span><i class="parallel"></i>parallel component</span>
+          <span><i class="perpendicular"></i>perpendicular component</span>
+        </div>
+      </div>
+      <aside>
+        <div class="toggles"><label><input id="showBeads" type="checkbox" checked> beads</label><label><input id="showLinks" type="checkbox" checked> crosslinks</label><label><input id="showGhost" type="checkbox" checked> initial ghost</label><label><input id="showComponents" type="checkbox" checked> force components</label></div>
+        <div class="metric"><span>Central object</span><b id="objectLabel">—</b></div>
+        <div class="metric"><span>Near-cell \(\Delta S_r\)</span><b id="nearMetric">—</b></div>
+        <div class="metric"><span>\(\sum |F_\parallel|\)</span><b id="parallelMetric">—</b></div>
+        <div class="metric"><span>\(\sum |F_\perp|\)</span><b id="perpMetric">—</b></div>
+        <div class="metric"><span>Mean axial strain</span><b id="strainMetric">—</b></div>
+        <div class="metric"><span>Mean bending change</span><b id="bendMetric">—</b></div>
+        <div class="metric"><span>Bound clutches</span><b id="boundMetric">—</b></div>
+        <div class="metric"><span>Ruptures / site failures</span><b id="eventMetric">—</b></div>
+        <div class="metric"><span>Cell net / path</span><b id="motionMetric">—</b></div>
+        <p id="scaleNote" class="note"><b>Geometry is drawn at true scale.</b> Arrow amplification changes only the gray displacement arrows.</p>
+      </aside>
+    </div>
+    <p id="interpretation" class="interpretation">Loading simulation data…</p>
+
+    <div id="eventPanel" class="eventPanel">
+      <span class="eyebrow">20-second event microscope</span>
+      <h3>Complete shared-load site failure</h3>
+      <div class="eventGrid">
+        <canvas id="eventCanvas" width="820" height="480" aria-label="High-frequency clutch rupture event"></canvas>
+        <aside>
+          <div class="timeRow"><input id="eventTime" type="range" min="0" max="1" value="0" step="1"><output id="eventTimeLabel">—</output></div>
+          <div class="metric"><span>Bound clutch count</span><b id="eventBound">—</b></div>
+          <div class="metric"><span>Total site traction</span><b id="eventForce">—</b></div>
+          <div class="metric"><span>Ruptures / binds in frame</span><b id="eventCounts">—</b></div>
+          <div class="metric"><span>Complete site failures in frame</span><b id="eventFailures">—</b></div>
+          <p class="note">A single rupture removes one spoke. The entire cell–collagen link disappears only when the site reaches \(N_{\rm bound}=0\).</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">generated evidence gates</span>
+    <h2>An animation is not the acceptance test</h2>
+    <div id="gateGrid" class="three"></div>
+    <p id="ensembleText" class="interpretation">Loading ensemble statistics…</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">parameter provenance</span>
+    <h2>What the current coefficients mean</h2>
+    <p>The clock is source matched; most mechanics and clutch values are not. Hover or focus a coefficient to see why it exists and what changing it affects.</p>
+    <div class="params">
+      <div class="param" tabindex="0" title="Provisional fixed biological-cell radius. It controls contact circumference and leverage. The declared 8–12 µm sensitivity sweep is implemented but not yet run as a full ensemble; radius never changes within a biological run."><b>\(R=10\,\mu\mathrm m\)</b><span>cell radius · provisional</span></div>
+      <div class="param" tabindex="0" title="Hard contact eligibility: only material points 0–3 µm outside the cell surface can receive direct force. Wider bands create more direct contacts."><b>\(d_c=3\,\mu\mathrm m\)</b><span>contact band · inherited</span></div>
+      <div class="param" tabindex="0" title="Gaussian width only distributes force among already eligible contacts. Smaller sigma concentrates force on the closest surface points."><b>\(\sigma_c=1.5\,\mu\mathrm m\)</b><span>weight width · advisor-approved assumption</span></div>
+      <div class="param" tabindex="0" title="Probability that a geometric 2D fiber intersection becomes a permanent elastic crosslink. It is not a biochemical concentration and is not transferable to 3D."><b>\(p_x=0.35\)</b><span>effective 2D connectivity</span></div>
+      <div class="param" tabindex="0" title="Spring stiffness of a retained material-point crosslink. Larger values transmit more load between fibers but can make the 2D network artificially rigid."><b>\(k_x=10\,\mathrm{nN}/\mu\mathrm m\)</b><span>crosslink stiffness · uncalibrated</span></div>
+      <div class="param" tabindex="0" title="Twelve coarse-grained clutches occupy one surface site. This is an effective redundancy count, not twelve identified integrin molecules."><b>\(N=12\)</b><span>effective clutches per site</span></div>
+      <div class="param" tabindex="0" title="Unloaded actin retrograde speed. It sets how fast clutch extension grows before substrate tracking or motor stall. Inherited; not fit to MDA-MB-231 collagen data."><b>\(v_0=0.025\,\mu\mathrm m\,\mathrm s^{-1}\)</b><span>actin loading speed · inherited</span></div>
+      <div class="param" tabindex="0" title="Bell force controls force sensitivity of slip-bond rupture. Smaller values cause stronger load acceleration of failure. Current value is an effective uncalibrated default."><b>\(F_b=1.5\,\mathrm{nN}\)</b><span>effective Bell force</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">all implemented equations</span>
+    <h2>What every block computes</h2>
+    <div class="equations">
+      <article class="key"><h3>Key · overdamped bead force balance</h3><div class="math">\[\zeta_b\dot{\mathbf r}_i=\mathbf F_i^{\rm stretch}+\mathbf F_i^{\rm bend}+\mathbf F_i^{\rm crosslink}+\mathbf F_i^{\rm contact}+\mathbf F_i^{\rm steric}.\]</div><p>Drag converts the instantaneous net force into velocity. It dissipates motion but stores no viscoelastic memory.</p></article>
+      <article><h3>Axial bead bond</h3><div class="math">\[\mathbf F_{ij}^{s}=k_{ij}(\ell_{ij}-\ell_{ij}^{0})\hat{\mathbf e}_{ij},\qquad k_{ij}=\frac{EA}{\ell_{ij}^{0}}.\]</div><p>The reported axial strain is \((\ell-\ell_0)/\ell_0\). Compression uses the inherited microbuckling softening.</p></article>
+      <article><h3>Discrete bending</h3><div class="math">\[E_b=\frac{\kappa_b}{2}\sum_j\left\|\mathbf r_{j-1}-2\mathbf r_j+\mathbf r_{j+1}-\mathbf c_j^0\right\|^2,\qquad \mathbf F_i^{b}=-\frac{\partial E_b}{\partial\mathbf r_i}.\]</div><p>Bending change is the magnitude of the discrete curvature vector relative to its initial value.</p></article>
+      <article><h3>Permanent elastic crosslink</h3><div class="math">\[E_x=\frac{k_x}{2}\left\|\big(\mathbf p_b-\mathbf p_a\big)-\boldsymbol\ell_x^0\right\|^2,\qquad \mathbf F_i^x=-\frac{\partial E_x}{\partial\mathbf r_i}.\]</div><p>Each endpoint is a continuous point on a fiber segment. Crosslinks transmit force but never break or reset in this revision.</p></article>
+      <article class="key"><h3>Key control · contractile cavity</h3><div class="math">\[\mathbf r_i(t)=\big[1-\varepsilon(t)\big]\mathbf r_i(0),\qquad \varepsilon(t)=\varepsilon_{\max}\min\!\left(1,\frac{t}{t_{\rm ramp}}\right).\]</div><p>This prescribed displacement validates ECM recruitment only. It is never called a tumor cell.</p></article>
+      <article class="key"><h3>Key contact rule · hard band then Gaussian</h3><div class="math">\[0\le d_s\le d_c,\qquad w_s=\frac{\exp(-d_s^2/\sigma_c^2)}{\sum_q\exp(-d_q^2/\sigma_c^2)},\qquad \mathbf F_s=w_sF_{\rm total}\hat{\mathbf n}_{\rm in}.\]</div><p>Noncontact fibers receive no Gaussian force. They can respond only through fiber bonds, steric contact or a crosslink path.</p></article>
+      <article class="key"><h3>Key analysis · same force, two components</h3><div class="math">\[\mathbf F_{\parallel,s}=(\mathbf F_s\!\cdot\!\mathbf t_s)\mathbf t_s,\qquad \mathbf F_{\perp,s}=\mathbf F_s-\mathbf F_{\parallel,s}.\]</div><p>The model tests whether transverse loading associates with bending/rotation and axial loading with tension/transmission; it does not hard-code those outcomes.</p></article>
+      <article><h3>Radial versus boundary orientation</h3><div class="math">\[\alpha_r=\cos^{-1}|\mathbf t\!\cdot\!\mathbf e_r|,\qquad \alpha_b=\cos^{-1}|\mathbf t\!\cdot\!\mathbf t_{\rm boundary}|.\]</div><p>Radial collagen has \(\alpha_r\approx0^\circ\), \(\alpha_b\approx90^\circ\). Boundary-parallel collagen has the reverse.</p></article>
+      <article><h3>Shell-wise radial order</h3><div class="math">\[S_r=\left\langle2(\mathbf t\!\cdot\!\mathbf e_r)^2-1\right\rangle,\qquad \Delta S_r=S_r(t)-S_r(0).\]</div><p>\(S_r=1\) is radial, \(-1\) circumferential and approximately 0 isotropic. \(\Delta S_r\) removes finite-sample starting bias.</p></article>
+      <article class="key"><h3>Key · continued clutch loading</h3><div class="math">\[\dot x_s=v_0\max\!\left(0,1-\frac{F_s}{F_{\rm stall}}\right)-(\mathbf v_{\rm ECM,s}-\mathbf v_c)\!\cdot\!\hat{\boldsymbol\ell}_s,\qquad F_c=k_cx_c.\]</div><p>Force keeps rising after contact because actin moves relative to ECM. It stops through ECM tracking, motor stall or rupture—not cell shrinkage.</p></article>
+      <article><h3>Bell slip-bond rupture and rebinding</h3><div class="math">\[k_{\rm off}(f)=k_{\rm off}^0\exp\!\left(\frac{|f|}{F_b}\right),\qquad P_{\rm off}=1-e^{-k_{\rm off}\Delta t},\qquad P_{\rm on}=1-e^{-k_{\rm on}\Delta t}.\]</div><p>These are effective slip bonds. Catch bonding, reinforcement and focal-adhesion maturation are absent.</p></article>
+      <article class="key"><h3>Key comparison · equal load sharing</h3><div class="math">\[f_i=\frac{F_{\rm site}}{i},\qquad r_i=i k_{\rm off}^0\exp\!\left(\frac{F_{\rm site}}{iF_b}\right),\qquad g_i=(N-i)k_{\rm on}.\]</div><p>As \(i\) falls, the remaining clutches carry more force and can fail cooperatively. The independent model remains visible as the redundancy control.</p></article>
+      <article><h3>Contact-guided reselection</h3><div class="math">\[\hat{\mathbf g}_s=\operatorname{orient}_{\rm outward}(\mathbf t_s),\qquad q^*=\arg\max_{q\in\mathcal C}\hat{\mathbf g}_s\!\cdot\!\hat{\mathbf e}_{r,q}.\]</div><p>Only after \(N_{\rm bound}=0\), the next eligible contact direction is chosen from the encountered local tangent. This is a declared assumption, not a measured probability law.</p></article>
+      <article class="key"><h3>Key · released-cell translation</h3><div class="math">\[\zeta_c\dot{\mathbf r}_c=-\sum_s\mathbf F_s^{\rm cell\to ECM}.\]</div><p>The same ECM forces give the cell an equal-and-opposite reaction. A balanced synthetic force pair must not move it.</p></article>
+      <article><h3>Drag dissipation</h3><div class="math">\[W_{\rm diss}(t)=\int_0^t\zeta_b\sum_i|\dot{\mathbf r}_i|^2\,dt.\]</div><p>No SLS relaxation is present. Overdamped drag controls the route and timescale toward an elastic configuration.</p></article>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">paper-by-paper review</span>
+    <h2>What each source supports—and does not support</h2>
+    <p>The complete author, DOI/PMID, matrix, geometry, duration and access ledger is stored with the code. These entries summarize the evidence boundary.</p>
+    <div class="tableWrap"><table>
+      <thead><tr><th>Evidence group</th><th>Paper and access</th><th>Starting ECM / clock</th><th>Used for</th><th>Not used for</th></tr></thead>
+      <tbody>
+        <tr><td>TACS</td><td><a href="https://doi.org/10.1186/1741-7015-4-38">Provenzano et al. 2006</a><br><span class="access">Open full text</span></td><td>Random 3D collagen explant; 8 h example</td><td>Random-to-radial tumor-associated alignment</td><td>Clutch law, force value, cell shrinkage</td></tr>
+        <tr><td>TACS boundary</td><td><a href="https://doi.org/10.1016/j.ajpath.2010.11.076">Conklin et al. 2011</a><br><span class="access">Free PMC</span></td><td>196 human specimens; clinical follow-up</td><td>Perpendicular-to-boundary TACS-3 metric</td><td>Formation mechanism</td></tr>
+        <tr><td>Strain alignment</td><td><a href="https://doi.org/10.1371/journal.pone.0005902">Vader et al. 2009</a><br><span class="access">Open full text</span></td><td>1 mg/ml random collagen; strain cycles</td><td>Elastic alignment can occur without plasticity</td><td>Tumor clutch parameters</td></tr>
+        <tr><td>Discrete fibers</td><td><a href="https://doi.org/10.1016/j.bpj.2014.08.029">Abhilash et al. 2014</a><br><span class="access">Free PMC</span></td><td>Random fiber model; mechanical loading</td><td>Cavity benchmark; bending-to-stretching recruitment</td><td>Biological cell shrinkage</td></tr>
+        <tr><td>Long range</td><td><a href="https://doi.org/10.1016/j.bpj.2013.02.017">Ma et al. 2013</a><br><span class="access">Free PMC</span></td><td>Fibroblast collagen; 4–24 h</td><td>Connected fibers transmit stress farther</td><td>2D link probability</td></tr>
+        <tr><td>Force direction</td><td><a href="https://doi.org/10.1016/j.bpj.2014.09.044">Wang et al. 2014</a><br><span class="access">Free PMC</span></td><td>Fibrous constitutive model; quasi-static</td><td>Tension-driven alignment and dipole control</td><td>Discrete contact law</td></tr>
+        <tr><td>Single cell</td><td><a href="https://doi.org/10.1016/j.bpj.2014.10.035">Riching et al. 2014</a><br><span class="access">Free PMC + movies</span></td><td>MDA-MB-231; 2 h / 6 h clocks</td><td>Observation clocks and collagen-guided protrusions</td><td>Clutch/calibration constants</td></tr>
+        <tr><td>Spheroid</td><td><a href="https://doi.org/10.1371/journal.pone.0156442">Kopanska et al. 2016</a><br><span class="access">Open full text</span></td><td>CT26 collagen; 24–72 h</td><td>Growth and inward matrix motion can coexist</td><td>Single-cell coefficients</td></tr>
+        <tr><td>Guidance</td><td><a href="https://doi.org/10.1371/journal.pone.0264571">Geiger et al. 2022</a><br><span class="access">Open full text</span></td><td>Prealigned spheroid matrix; 1–3 d</td><td>Radial vs tangential invasion</td><td>Formation from random ECM</td></tr>
+        <tr><td>Shell analysis</td><td><a href="https://doi.org/10.1016/j.matbio.2023.11.004">Böhringer et al. 2023</a><br><span class="access">Free PMC manuscript</span></td><td>HSC/glioblastoma collagen; 1–8 d</td><td>Shell-wise orientation and dipole comparison</td><td>MDA-MB-231 calibration</td></tr>
+        <tr><td>Motor–clutch</td><td><a href="https://doi.org/10.1126/science.1163595">Chan &amp; Odde 2008</a><br><span class="limited">Abstract/metadata used</span></td><td>Growth-cone filopodia; nanoscale cycles</td><td>Actin-driven load-and-fail concept</td><td>Collagen or tumor-cell constants</td></tr>
+        <tr><td>Motor–clutch</td><td><a href="https://doi.org/10.1016/j.bpj.2013.06.027">Bangasser et al. 2013</a><br><span class="access">Free PMC</span></td><td>Compliant-substrate model</td><td>Load-and-fail and slippage regimes</td><td>3D collagen calibration</td></tr>
+        <tr><td>Shared load</td><td><a href="https://doi.org/10.1209/epl/i2003-10239-3">Erdmann &amp; Schwarz 2004</a><br><span class="access">Open arXiv manuscript</span></td><td>Theoretical adhesion cluster</td><td>Equal load sharing and collective failure</td><td>Catch bonds or focal-adhesion maturation</td></tr>
+        <tr><td>Integrated models</td><td><a href="https://doi.org/10.3390/cells12232688">Poonja et al. 2023</a><br><span class="access">Open full text</span></td><td>Multicellular agent model; days</td><td>Later TACS-rule comparison</td><td>Bead/clutch validation</td></tr>
+        <tr><td>Integrated models</td><td><a href="https://doi.org/10.1007/s12195-026-00922-0">Ley et al. 2026</a><br><span class="limited">Abstract-level review</span></td><td>3D discrete-fiber feedback model</td><td>Later feedback/plasticity comparator</td><td>Quantitative values in G4 v4</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">assumptions and scientific boundary</span>
+    <h2>What can change the conclusion</h2>
+    <div class="two">
+      <article class="box"><h3>Explicit assumptions</h3><ul><li>\(R=10\,\mu\mathrm m\), with an implemented but not-yet-run 8–12 µm ensemble sensitivity; circular and constant within each run.</li><li>2D uniform random starting angles and stress-free straight fibers.</li><li>Permanent elastic intersection links with effective \(p_x=0.35\).</li><li>Outer anchors; convergence must be checked at constant fiber density.</li><li>Normal traction primary; dipole secondary.</li><li>Effective Bell clutches; no molecular calibration yet.</li></ul></article>
+      <article class="box"><h3>Deliberately absent</h3><ul><li>No crosslink breaking or plastic rest-state reset.</li><li>No SLS material memory or Brownian forcing.</li><li>No collagen degradation, deposition or biochemical feedback.</li><li>No cell growth, spheroid biology, deformable cortex or nucleus.</li><li>No global polarization value.</li><li>No claim that a 2D link probability transfers to 3D collagen.</li></ul></article>
+    </div>
+    <p class="interpretation"><b>Decision rule:</b> alignment is accepted only when a seed-ensemble confidence interval separates from the passive control. One visually convincing trajectory is insufficient. v4-D remains diagnostic until v4-B and v4-C pass their gates.</p>
+  </section>
+</main>
+
+<footer>G4 v3 is preserved · G4 v4 is cumulative · every quick result is labeled · equations are rendered with MathJax · source links and access limits are explicit.</footer>
+<script src="g4-v4-manifest.js?v=1"></script>
+<script>window.G4V4_CASES={};window.G4V4_EVENTS={};</script>
+<script src="g4-v4-data/normal.js?v=1"></script>
+<script src="g4-v4.js?v=2"></script>
+</body>
+</html>

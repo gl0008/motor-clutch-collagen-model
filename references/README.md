@@ -31,6 +31,7 @@ should only be copied into the repository when redistribution rights are clear.
 | G4 v2 A–B | R1–R4, R8, R10, R26 | preserved elastic network, two-hour observation scale, four-minute sampling, crosslink-path transmission and multiscale reporting |
 | G4 v2 C | R5–R7, R27–R28 | Bell rupture, independent versus shared-load cluster hypotheses, force redistribution and collective failure |
 | G4 v2 D | R6–R9, R15 | same shared-load mechanics with only reaction-driven cell translation/rotation released |
+| G4 v4 A–D | [version-specific paper ledger](../generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md) | random-to-aligned observations, cavity mechanics benchmark, MDA-MB-231 observation clocks, force-direction analysis, motor–clutch loading, shared-load failure and the explicit limits of every citation |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
 ## Bibliography
@@ -137,6 +138,12 @@ The candidate-by-candidate decision table for G3-R is in
 [`../docs/G3_REVISION_PLAN.md`](../docs/G3_REVISION_PLAN.md). Sources R19–R25
 motivate that proposal; they are not evidence that those mechanisms are already
 implemented or validated.
+
+G4 v4 has a separate, paper-by-paper evidence record because access status,
+starting ECM, cell type, geometry, observation duration, supported claim and
+unsupported claim all matter to that revision. Use the
+[`PAPER_LEDGER.md`](../generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md)
+entry rather than treating a bibliography item as blanket validation.
 
 ## Evidence boundary
 

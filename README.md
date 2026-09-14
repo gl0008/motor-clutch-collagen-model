@@ -15,9 +15,10 @@ the rigid cell without a prescribed direction.
 
 Generation 1 is the conceptual archive; Generation 2 is the corrected mechanism
 baseline; Generation 3 is the preserved spheroid-remodelling extension; and
-Generation 4 is the active elastic-calibration-to-motion sequence. Its short-time
-v1 remains archived beside v2, which adds long-time, multiscale and explicit
-clutch-failure views. The default Git branch `main` remains the reviewed catalogue.
+Generation 4 is the active elastic-calibration-to-motion sequence. Its v1–v3
+history remains archived. G4 v4 branches from the preserved random-network v3,
+keeps the biological cell radius constant, and adds one force/contact mechanism
+at a time. The default Git branch `main` remains the reviewed catalogue.
 
 - [`VERSION_MAP.md`](VERSION_MAP.md) — branch/tag lineage, permanent folder map
   and the rule that prevents versions from overwriting one another;
@@ -178,6 +179,16 @@ outer-boundary anchoring and reduced link density; G4 formalizes the calibration
 logic without rewriting that history. Plastic crosslink breaking is deliberately
 deferred beyond G4D.
 
+The current review branch adds **G4 v4** in
+[`generations/g4_v4_single_cell_force_alignment/`](generations/g4_v4_single_cell_force_alignment/)
+without modifying G4 v3. Its dedicated
+[website](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4.html)
+separates a contractile-cavity mechanics benchmark from every fixed-radius
+biological-cell run. It then adds force-direction analysis, motor–clutch
+loading, shared-load site failure and released-cell translation cumulatively.
+The source and access record is in
+[`PAPER_LEDGER.md`](generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md).
+
 ## Run and test
 
 ```bash
@@ -201,6 +212,10 @@ python3 generations/g4_interactive_calibration/build_demo.py
 
 # Generation 4 v2 long-time data (compact, lazy-loaded JSON chunks)
 python3 generations/g4_v2_multiscale/build_demo.py --workers 4
+
+# Generation 4 v4: quick pipeline check, then full 2 h / 6 h build
+python3 -m generations.g4_v4_single_cell_force_alignment.build_demo --quick
+python3 -m generations.g4_v4_single_cell_force_alignment.build_demo
 ```
 
 For G2, Python precomputes all physics into each `demo/data.js`; the web pages only play saved

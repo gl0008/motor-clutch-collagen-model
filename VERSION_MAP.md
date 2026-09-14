@@ -19,6 +19,11 @@ G1 V0  →  G1 V1  →  G1 V2  →  G1 V3  →  G1 V4
                                                                                   │
                                                                                   └── G4 v2 long-time/multiscale
                                                                                        G4A → G4B → G4C → G4D
+                                                                                             │
+                                                                                             └── G4 v3 random-to-aligned (preserved)
+                                                                                                  │
+                                                                                                  └── G4 v4 fixed-radius single cell
+                                                                                                       A → B → C → D
 ```
 
 Generation 1 is the conceptual mainline: it records how the question developed
@@ -32,6 +37,11 @@ elastic ECM, verify indirect graph transmission, add slippage, then release the
 rigid cell. G4 v1 is the short-time implementation; G4 v2 branches from it and
 adds two-hour observation, multiscale rendering, explicit individual-clutch
 state, a shared-load alternative and fixed/moving/mobile-ECM controls.
+G4 v3 then rebuilt the ECM from uniform random finite fibers. G4 v4 branches
+from that preserved state and adds a literature ledger, separates a contractile
+cavity benchmark from the biological cell, keeps the biological cell radius
+constant, decomposes surface force, adds clutch loading/failure, and only then
+releases single-cell translation.
 
 The repository's default Git branch remains `main` because it is the published
 catalogue and GitHub Pages source. It contains both generations so that the
@@ -47,6 +57,8 @@ website can compare them. This does **not** mean that G2 overwrote G1.
 | `codex/g3-emergent-guidance` | Historical G3 construction branch | preserved implementation history |
 | `agent/g4-interactive-calibration` | G4A–D construction/review branch | merge after tests and site validation |
 | `agent/g4-v2-multiscale` | G4 v2 long-time/multiscale construction branch | merge after tests and site validation |
+| `revision/g4-v3-random-to-aligned` | Preserved random-to-aligned mechanics branch | do not overwrite |
+| `revision/g4-v4-single-cell-force-alignment` | G4 v4 literature-grounded fixed-radius single-cell branch | current review branch |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
 | `g2-v2` … `g2-v4` | Stable pointers to the documented corrected release | immutable tags |
 
@@ -79,6 +91,8 @@ are not scientific model versions.
 | G4 v2 B | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [realignment paths](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#b) | current long-time generation |
 | G4 v2 C | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [clutch failure](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#c) | current long-time generation |
 | G4 v2 D | [`generations/g4_v2_multiscale/`](generations/g4_v2_multiscale/) | [fixed/moving cell](https://gl0008.github.io/motor-clutch-collagen-model/g4-v2.html#d) | current long-time generation |
+| G4 v3 | [`generations/g4_v3_random_to_aligned/`](generations/g4_v3_random_to_aligned/) | [random-to-aligned benchmark](https://gl0008.github.io/motor-clutch-collagen-model/g4-v3.html) | preserved parent of v4 |
+| G4 v4 A–D | [`generations/g4_v4_single_cell_force_alignment/`](generations/g4_v4_single_cell_force_alignment/) | [single-cell force–alignment lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4.html) | current review branch |
 
 ## Rule for adding a future model
 

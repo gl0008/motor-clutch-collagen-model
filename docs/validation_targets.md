@@ -56,3 +56,26 @@ no-fibre controls support the intended collagen-guidance mechanism, but 7/20 iso
 failed the rigid-cell overlap guard. The complete 100-seed G3B/G3C final ensemble has not been
 opened, and G3C formal validation is halted until the contact-enabled G3B campaign is rerun from
 clean checkpoints and all calibration gates pass.
+
+# G4 v4 validation status
+
+G4 v4 is cumulative and does not overwrite G4 v3. The full generated build uses
+a 7,200-s fixed-cell clock, a 21,600-s released-cell clock, 0.05-s solver steps,
+four-minute fixed-cell output and ten-minute released-cell output.
+
+| Gate | Full-build status |
+|---|---|
+| Passive fixed cell has zero traction and negligible alignment drift | **Pass** |
+| Biological cell radius is constant | **Pass** |
+| Force decomposition and cell/ECM action–reaction identities | **Pass** |
+| Timestamped rupture and complete shared-load site failure | **Pass** |
+| Near-cell alignment differs from passive zero across seeds 41–45 | **Pass**: mean \(\Delta S_r=0.0227\), 95% CI [0.0084, 0.0370] |
+| One-hop displacement exceeds unconnected displacement | **Not yet**: mean difference \(1.40\times10^{-2}\,\mu\mathrm m\), 95% CI [\(-8.22\times10^{-4}\), \(2.88\times10^{-2}\)] |
+| 8/10/12-µm radius sensitivity | **Implemented, not yet run as a full ensemble** |
+| 180/270/360-µm constant-density domain convergence | **Implemented, not yet run** |
+| Full 0.05/0.025-s timestep sensitivity | **Not yet run** |
+
+Because the indirect-transmission interval still includes zero, the G4 v4-D
+released-cell trajectory is a diagnostic output, not an accepted migration
+prediction. The website preserves this failed gate rather than visually tuning
+it away.

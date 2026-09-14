@@ -1,0 +1,124 @@
+{
+  "version": "G4 v4 \u00b7 literature-grounded single-cell force\u2013collagen alignment",
+  "quick": 0,
+  "actual_clocks": {
+    "fixedSeconds": 7200.0,
+    "movingSeconds": 21600.0,
+    "fixedObservationSeconds": 240.0,
+    "movingObservationSeconds": 600.0
+  },
+  "gates": {
+    "passiveZero": 1,
+    "biologicalCellRadiusConstant": 1,
+    "mechanicsImplementation": 1,
+    "clutchRuptureObserved": 1,
+    "completeSiteFailureObserved": 1,
+    "alignmentExcludesPassive": 1,
+    "oneHopExceedsUnconnected": 0,
+    "movingScientificStatus": "diagnostic only until all upstream biological gates pass"
+  },
+  "ensemble": {
+    "seeds": [
+      41,
+      42,
+      43,
+      44,
+      45
+    ],
+    "cases": [
+      {
+        "seed": 41,
+        "near_delta_radial_order": 0.032891,
+        "one_hop_minus_unconnected_displacement": 0.019633,
+        "contacts": 15
+      },
+      {
+        "seed": 42,
+        "near_delta_radial_order": 0.018031,
+        "one_hop_minus_unconnected_displacement": 0.031578,
+        "contacts": 19
+      },
+      {
+        "seed": 43,
+        "near_delta_radial_order": 0.029598,
+        "one_hop_minus_unconnected_displacement": 0.008462,
+        "contacts": 18
+      },
+      {
+        "seed": 44,
+        "near_delta_radial_order": 0.00465,
+        "one_hop_minus_unconnected_displacement": 0.000586,
+        "contacts": 16
+      },
+      {
+        "seed": 45,
+        "near_delta_radial_order": 0.028364,
+        "one_hop_minus_unconnected_displacement": 0.009711,
+        "contacts": 23
+      }
+    ],
+    "near_delta_mean": 0.022707,
+    "near_delta_ci95": [
+      0.008401,
+      0.037013
+    ],
+    "near_alignment_excludes_passive_zero": 1,
+    "one_hop_advantage_mean": 0.013994,
+    "one_hop_advantage_ci95": [
+      -0.000822,
+      0.02881
+    ],
+    "one_hop_exceeds_unconnected": 0
+  },
+  "cases": {
+    "passive": {
+      "frames": 1,
+      "duration": 0.0,
+      "ruptures": 0,
+      "site_failures": 0,
+      "net_displacement": 0.0
+    },
+    "cavity": {
+      "frames": 41,
+      "duration": 480.0,
+      "ruptures": 0,
+      "site_failures": 0,
+      "net_displacement": 0.0
+    },
+    "normal": {
+      "frames": 31,
+      "duration": 7200.0,
+      "ruptures": 0,
+      "site_failures": 0,
+      "net_displacement": 0.0
+    },
+    "dipole": {
+      "frames": 31,
+      "duration": 7200.0,
+      "ruptures": 0,
+      "site_failures": 0,
+      "net_displacement": 0.0
+    },
+    "clutch-independent": {
+      "frames": 31,
+      "duration": 7200.0,
+      "ruptures": 23774,
+      "site_failures": 0,
+      "net_displacement": 0.0
+    },
+    "clutch": {
+      "frames": 31,
+      "duration": 7200.0,
+      "ruptures": 29329,
+      "site_failures": 351,
+      "net_displacement": 0.0
+    },
+    "moving": {
+      "frames": 37,
+      "duration": 21600.0,
+      "ruptures": 90765,
+      "site_failures": 1444,
+      "net_displacement": 3.145979
+    }
+  }
+}
