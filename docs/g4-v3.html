@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 v3 · Random collagen to measured alignment</title>
+  <link rel="stylesheet" href="g4-v3.css?v=1">
+  <script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<header>
+  <a href="index.html">← model lineage</a>
+  <span class="eyebrow">G4 v3 · independent branch from frozen G4 v2</span>
+  <h1>Can random collagen become radially aligned?</h1>
+  <p class="lead">The first block removes the twelve hand-made radial contact fibres. It tests the elastic network with a literature-style prescribed contraction before any motor–clutch biology is added.</p>
+</header>
+
+<main>
+  <section class="decision">
+    <div><b>What is inherited?</b><br>G4 v2 cell scale, finite bead-fibres, stretching, bending, overdamped drag, outer anchoring, explicit crosslinks and real units.</div>
+    <div><b>What is removed?</b><br>The radial contact-fibre generator, clutch kinetics, cell motion, plasticity, Brownian forcing and prescribed polarity.</div>
+    <div><b>What is added now?</b><br>Uniform random source angles, a cell-sized void, prescribed contraction, shell-wise radial order and stretching-versus-bending energy accounting.</div>
+  </section>
+
+  <section class="lab">
+    <div class="labHead">
+      <div>
+        <span class="eyebrow">prescribed-contraction benchmark</span>
+        <h2>Same random ECM, one added factor at a time</h2>
+      </div>
+      <div class="controls">
+        <label>Controlled case <select id="caseSelect"><optgroup label="Benchmark · 100% links"><option value="contraction-5">5% contraction</option><option value="contraction-10" selected>10% contraction</option><option value="contraction-20">20% contraction</option></optgroup><optgroup label="v3-A · 20% contraction"><option value="links-0">0% links</option><option value="links-15">15% links</option><option value="links-35">35% links</option><option value="links-60">60% links</option></optgroup><optgroup label="v3-C · pₓ=0.35 fixed traction"><option value="traction-12">12 nN pull</option><option value="traction-24">24 nN pull</option><option value="traction-48">48 nN pull</option></optgroup></select></label>
+        <button id="play">Play</button>
+        <button id="reset">Reset</button>
+      </div>
+    </div>
+    <div class="timeRow"><input id="time" type="range" min="0" max="10" value="0" step="0.01"><output id="timeLabel">0 s</output></div>
+    <div class="viewerGrid">
+      <div class="canvasWrap">
+        <canvas id="network" width="820" height="720"></canvas>
+        <div class="legend"><span class="blue"></span> fibre bonds + beads <span class="orange"></span> locally more radial than at start <span class="green"></span> crosslink endpoints <span class="red"></span> cell traction (3 px/nN) <span class="ghost"></span> initial ghost</div>
+      </div>
+      <aside>
+        <div class="toggles"><label><input id="showBeads" type="checkbox" checked> beads</label><label><input id="showLinks" type="checkbox" checked> crosslinks</label><label><input id="showGhost" type="checkbox" checked> initial ghost</label></div>
+        <div class="metric"><span>Retained crosslinks</span><b id="linkCount">—</b></div>
+        <div class="metric"><span>Contact-connected network</span><b id="connectivity">—</b></div>
+        <div class="metric"><span>near-cell ΔS<sub>r</sub></span><b id="near">—</b></div>
+        <div class="metric"><span>10–25 µm ΔS<sub>r</sub></span><b id="middle">—</b></div>
+        <div class="metric"><span>25–50 µm ΔS<sub>r</sub></span><b id="far">—</b></div>
+        <div class="metric"><span>E<sub>stretch</sub> / E<sub>bend</sub></span><b id="ratio">—</b></div>
+        <div class="metric"><span id="forceLabel">Required inward force</span><b id="force">—</b></div>
+        <div class="metric"><span>Stretch-dominated fragments</span><b id="recruited">—</b></div>
+        <p class="note">Orange is a <b>color classification</b>, not enlarged displacement. Geometry is always drawn at the true µm scale.</p>
+      </aside>
+    </div>
+    <p id="interpretation" class="interpretation">Loading data…</p>
+  </section>
+
+  <section class="resultGate">
+    <span class="eyebrow">first reproducibility check</span>
+    <h2>20% contraction was repeated on five independent random geometries</h2>
+    <p><b>Evidence state:</b> random-to-aligned collagen is supported by experiments and earlier discrete-fibre simulations. What remains unvalidated is this project's exact combination of 2D geometry, effective force scale, clutch cluster and future contact-relocation rule.</p>
+    <p>With all geometric intersections linked, near-cell ΔS<sub>r</sub> was positive in 5/5 seeds: 0.073, 0.115, 0.075, 0.123 and 0.121. Mean ΔS<sub>r</sub> = 0.101. The 10–25 µm mean was only 0.012 and the 25–50 µm mean was 0.002.</p>
+    <p><b>Allowed interpretation:</b> strong prescribed contraction can produce reproducible but localized radial alignment in this highly connected 2D elastic network. It does not yet establish long-range remodeling or show that a calibrated motor–clutch force can generate the same contraction.</p>
+    <p><b>v3-C stopping result:</b> the inherited 12–48 nN force range at p<sub>x</sub>=0.35 produced only near-cell ΔS<sub>r</sub>=0.008–0.014 and negligible middle/far response. Clutch kinetics and contact relocation are therefore not added yet.</p>
+    <p><b>Numerical check:</b> halving the time step changed the 24 nN near-cell result by only 7.1×10<sup>−6</sup> relative. Extending 480 s to 960 s raised near-cell ΔS<sub>r</sub> from 0.0102 to 0.0139, while middle/far alignment stayed negligible. The longer run was still changing slowly, so this does not claim a two-hour steady state.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">all equations in this block</span>
+    <h2>What the simulation is solving</h2>
+    <div class="equations">
+      <article class="key"><h3>Key equation · overdamped bead balance</h3>\[\zeta_b\dot{\mathbf r}_i=\mathbf F_i^{\rm stretch}+\mathbf F_i^{\rm bend}+\mathbf F_i^{\rm crosslink}\]<p>Velocity is proportional to the combined elastic force. Drag dissipates motion; it does not store elastic memory.</p></article>
+      <article><h3>Axial bead bond</h3>\[\mathbf F_{ij}^{s}=k_{ij}(\ell_{ij}-\ell_{ij}^{0})\hat{\mathbf e}_{ij},\qquad k_{ij}={EA\over \ell_{ij}^{0}}\]<p>Extension stores stretching energy. Compression is softened by the inherited microbuckling ratio.</p></article>
+      <article><h3>Discrete bending</h3>\[E_b={\kappa_b\over2}\sum_j\left\|\mathbf r_{j-1}-2\mathbf r_j+\mathbf r_{j+1}-\mathbf c_j^0\right\|^2\]<p>The force is the negative gradient of this curvature-change energy. Straight initial fibres have \(\mathbf c_j^0=0\).</p></article>
+      <article><h3>Permanent elastic crosslink</h3>\[E_x={k_x\over2}\left\|\big(\mathbf p_b-\mathbf p_a\big)-\boldsymbol\ell_x^0\right\|^2\]<p>Each endpoint is a continuous material point on a bead bond. Full linking is used only for this literature-style benchmark.</p></article>
+      <article class="key"><h3>Key input · prescribed contraction</h3>\[\mathbf r_i(t)=\big[1-\varepsilon(t)\big]\mathbf r_i(0),\quad \varepsilon(t)=\varepsilon_{\max}\min\!\left(1,{t\over t_{\rm ramp}}\right)\]<p>This input tests ECM mechanics. It does not predict how much force a real cell generates.</p></article>
+      <article class="key"><h3>Key output · radial order</h3>\[S_r=\left\langle2(\hat{\mathbf t}\!\cdot\!\hat{\mathbf e}_r)^2-1\right\rangle,\qquad \Delta S_r=S_r(t)-S_r(0)\]<p>+1 radial, −1 circumferential, approximately 0 isotropic. ΔS<sub>r</sub> removes the initial finite-sample bias.</p></article>
+      <article><h3>Deformation mode</h3>\[E_R={E_{\rm stretch}\over E_{\rm bend}}\]<p>E<sub>R</sub> &gt; 1 means stretching-dominated mechanics. It is not, by itself, evidence of biological or permanent remodeling.</p></article>
+      <article><h3>Drag dissipation</h3>\[W_{\rm diss}(t)=\int_0^t\zeta_b\sum_i\left|\dot{\mathbf r}_i\right|^2\,dt\]<p>This accumulated nonnegative work is lost through overdamped drag; no SLS relaxation term is present.</p></article>
+      <article class="key"><h3>v3-C · hybrid contact and Gaussian force</h3>\[0\le d_a\le d_c,\qquad w_a={\exp(-d_a^2/\sigma_c^2)\over\sum_b\exp(-d_b^2/\sigma_c^2)},\qquad \mathbf F_a=w_aF_{\rm total}\hat{\mathbf n}_{\rm in}\]<p>Only the closest material point of each fibre inside the contact band is eligible. Non-contact fibres receive force only through crosslinks.</p></article>
+      <article><h3>Fixed-cell reaction ledger</h3>\[\mathbf F_{\rm cell}=-\sum_a\mathbf F_a,\qquad \mathbf r_c(t)=\mathbf r_c(0)\]<p>The reaction is recorded exactly, but the fixed-cell constraint prevents translation. Cell motion is not silently included.</p></article>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">assumption ledger</span>
+    <h2>What we assume—and what each assumption can change</h2>
+    <div class="assumptions">
+      <details open><summary>A-001 to A-003 · 2D, random angles, pre-cut void</summary><p>2D isolates the mechanism but overstates geometric intersection relative to 3D. Uniform source angles prevent designed radial fibres. The inert void is present from the beginning so all later stages can reuse identical topology.</p></details>
+      <details><summary>A-004 to A-006 · straight fibres, fixed outer boundary, fully linked benchmark</summary><p>Straight fibres omit crimp and may recruit tension earlier. The fixed outer boundary removes rigid translation but can stiffen the finite field. Connecting every intersection matches the calibration benchmark, not a biological crosslink density.</p></details>
+      <details><summary>A-007 to A-009 · prescribed strain, no Brownian force, energy-ratio diagnostic</summary><p>Prescribed 5–20% contraction separates ECM behavior from active-force calibration. Brownian forcing is omitted because the present target is mean cell-driven reorganization. E<sub>R</sub> classifies deformation mode but does not prove remodeling.</p></details>
+      <details><summary>A-011 · probabilistic links are effective 2D connectivity</summary><p>Every 2D geometric intersection receives a fixed random mark and is kept when the mark is below p<sub>x</sub>. This gives a nested comparison, but p<sub>x</sub> is not a biochemical crosslink concentration and cannot be transferred directly to 3D.</p></details>
+      <details><summary>A-012 to A-014 · contact width, inherited force range, fixed material points</summary><p>The 3 µm hard contact band and 1.5 µm Gaussian width are inherited, not fitted. Total pull stays inside the earlier 12–48 nN range. v3-C pulls the same collagen material points throughout; relocation remains a later, separate hypothesis.</p></details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">interpretation gate</span>
+    <h2>Why the next block is not clutch failure yet</h2>
+    <p>The prescribed-displacement benchmark passes, but inherited force-controlled traction remains weak and local. Adding stochastic detachment now would mix an unresolved mechanics/calibration gap with a new kinetic mechanism.</p>
+    <p>The next revision must choose <b>one source-matched comparison</b>: measured cell/spheroid boundary displacement; documented elongated or contractile-dipole cell geometry; or fibre/contact calibration to one collagen preparation. These are separate scientific questions, not interchangeable sliders. The chosen assumption and acceptance metric must be written before implementation.</p>
+  </section>
+
+  <section class="references">
+    <h2>Evidence used</h2>
+    <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4213674/">Abhilash et al., 2014</a> — random linked fibre-network contraction and bending-to-stretching recruitment.</p>
+    <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1781458/">Provenzano et al., 2006</a> — collagen orientation at non-invasive versus invasive tumor interfaces.</p>
+    <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4896628/">Kopanska et al., 2016</a> — spheroid contraction preceding collagen bundling and invasion.</p>
+    <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2691583/">Vader et al., 2009</a> — strain-induced, potentially reversible collagen alignment.</p>
+    <p><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4255175/">Wang et al., 2014</a> — tension-driven fibre alignment and long-range force transmission.</p>
+    <p><a href="https://doi.org/10.1007/s12195-026-00922-0">Ley et al., 2026</a> — a closely related 3D bead-spring, tractor and cell–ECM-feedback model. It is retained for later comparison; repeated cycles and plasticity are not imported into this elastic baseline.</p>
+  </section>
+</main>
+<script src="g4-v3-manifest.js?v=1"></script>
+<script src="g4-v3.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+{
+  "protocol": "20% prescribed contraction; full permanent intersection linking",
+  "seeds": [
+    41,
+    42,
+    43,
+    44,
+    45
+  ],
+  "cases": [
+    {
+      "seed": 41,
+      "initial_radial_order": [
+        -0.05848739413290605,
+        0.07390706463946464,
+        -0.007673599783438859
+      ],
+      "delta_radial_order": [
+        0.07274779350998434,
+        0.008361596696246684,
+        0.004059634428152846
+      ],
+      "stretch_to_bend_ratio": 33.666145142327046,
+      "required_inward_force": 93.61507209380095,
+      "natural_contact_fragments": 9
+    },
+    {
+      "seed": 42,
+      "initial_radial_order": [
+        -0.06623614461609588,
+        0.05760656750313341,
+        -0.01613206363687139
+      ],
+      "delta_radial_order": [
+        0.11541740187176161,
+        0.014697677932886288,
+        0.0017658101571366071
+      ],
+      "stretch_to_bend_ratio": 20.32451721441354,
+      "required_inward_force": 123.77503058585363,
+      "natural_contact_fragments": 14
+    },
+    {
+      "seed": 43,
+      "initial_radial_order": [
+        0.18042904549196315,
+        0.229466137339385,
+        0.020857171859457038
+      ],
+      "delta_radial_order": [
+        0.07540827608508466,
+        0.015281433345737755,
+        -0.0016825441885026694
+      ],
+      "stretch_to_bend_ratio": 36.791176845377635,
+      "required_inward_force": 141.89234788940774,
+      "natural_contact_fragments": 13
+    },
+    {
+      "seed": 44,
+      "initial_radial_order": [
+        -0.15505170123205642,
+        0.07101152614834748,
+        0.0007012986489497477
+      ],
+      "delta_radial_order": [
+        0.12312263264670525,
+        0.0016561389518843506,
+        0.0011108523185850332
+      ],
+      "stretch_to_bend_ratio": 24.599181168987588,
+      "required_inward_force": 85.35755581019471,
+      "natural_contact_fragments": 15
+    },
+    {
+      "seed": 45,
+      "initial_radial_order": [
+        0.13305815069103544,
+        -0.049415609499915095,
+        0.005096511909202688
+      ],
+      "delta_radial_order": [
+        0.1206059813708511,
+        0.020346374902338,
+        0.0037267601630462605
+      ],
+      "stretch_to_bend_ratio": 23.37095460896229,
+      "required_inward_force": 157.39075690085494,
+      "natural_contact_fragments": 18
+    }
+  ],
+  "delta_radial_order_mean": [
+    0.1014604170968774,
+    0.012068644365818615,
+    0.0017961025756836155
+  ],
+  "delta_radial_order_median": [
+    0.11541740187176161,
+    0.014697677932886288,
+    0.0017658101571366071
+  ],
+  "near_cell_positive_fraction": 1.0,
+  "near_cell_above_0_05_fraction": 1.0
+}

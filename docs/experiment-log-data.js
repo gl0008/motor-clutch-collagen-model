@@ -4,6 +4,8 @@ window.REPOSITORY_BRANCHES = [
   {name:'generation/g2',role:'Generation 2 checkpoint',state:'preserved',description:'Permanent corrected G2 branch, kept separately after integration into main.'},
   {name:'generation/g3',role:'Generation 3 checkpoint',state:'preserved',description:'Permanent G3 spheroid-guidance branch at the accepted G3 evidence state.'},
   {name:'generation/g4',role:'Generation 4 checkpoint',state:'preserved',description:'Permanent G4 branch at the long-time and multiscale v2 evidence state.'},
+  {name:'revision/g4-v3-random-to-aligned',role:'G4 v3 parent',state:'preserved',description:'Random finite-fibre mechanics benchmark preserved independently from the biological-cell interpretation.'},
+  {name:'revision/g4-v4-single-cell-force-alignment',role:'G4 v4 review',state:'current',description:'Literature-gated constant-radius single-cell force–alignment model and website.'},
   {name:'generation/g5',role:'Generation 5 checkpoint',state:'preserved',description:'Permanent G5 model branch at the current molecular-clutch and ablation evidence state.'},
   {name:'agent/g5-organoid-plan',role:'G5 working history',state:'active history',description:'The model-development branch remains visible after merge so its experiment sequence can be audited.'},
   {name:'codex/model-evolution-notebook',role:'Notebook working history',state:'active history',description:'The website-development branch remains visible after merge so documentation changes can be audited.'}
@@ -22,6 +24,11 @@ window.VERSION_EVIDENCE = {
   'g4-v1-d':{branch:'agent/g4-interactive-calibration',commit:'5922afa'},
   'g4-v2-a':{branch:'generation/g4',commit:'de0c0ba'},'g4-v2-b':{branch:'generation/g4',commit:'de0c0ba'},
   'g4-v2-c':{branch:'generation/g4',commit:'de0c0ba'},'g4-v2-d':{branch:'generation/g4',commit:'de0c0ba'},
+  'g4-v3':{branch:'revision/g4-v3-random-to-aligned',commit:'4757bdf'},
+  'g4-v4-a':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
+  'g4-v4-b':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
+  'g4-v4-c':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
+  'g4-v4-d':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -31,6 +38,16 @@ window.VERSION_EVIDENCE = {
 };
 
 window.EXPERIMENT_LOG = [
+  {
+    date:'2026-09-14',generation:'G4',version:'G4 v4 A–D',branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1',
+    parent:'G4 v3 random-to-aligned mechanics benchmark (4757bdf)',
+    question:'Can a constant-radius single cell continue loading initially random collagen and produce measurable alignment without using cell shrinkage as the explanation?',
+    change:'Added a paper ledger, separated passive-cell and contractile-cavity controls, decomposed contact force by fibre direction, implemented motor–clutch cycling, and released cell translation only in the final block.',
+    result:'Passive traction and mechanics identities pass. Near-cell ΔSr is 0.0227 with 95% CI [0.0084, 0.0370]. Shared-load clusters show 351 complete site failures in 30 minutes. The six-hour moving-cell diagnostic gives 3.146 µm net displacement.',
+    limitation:'One-hop transmission is not accepted because its confidence interval includes zero. Radius, domain and timestep sensitivity runs are still marked NOT RUN; therefore G4 v4D is diagnostic rather than a validated migration result.',
+    next:'Run those three predeclared gates and calibrate effective clutch parameters before interpreting migration or adding biology.',
+    evidence:[{label:'Interactive G4 v4 laboratory',href:'g4-v4.html'},{label:'Paper ledger',href:'https://github.com/gl0008/motor-clutch-collagen-model/blob/revision/g4-v4-single-cell-force-alignment/generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md'}]
+  },
   {
     date:'2026-09-07',generation:'G3–G5',version:'Theory record',branch:'codex/model-evolution-notebook',commit:'c4085e0',
     parent:'Validated implementations and result pages',

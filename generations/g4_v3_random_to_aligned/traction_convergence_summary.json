@@ -1,0 +1,49 @@
+{
+  "protocol": "seed 41; same geometry; 24 nN; p_x=0.35; fixed material contacts",
+  "baseline": {
+    "dt": 0.05,
+    "duration": 480.0,
+    "final_delta_radial_order": [
+      0.010213709,
+      1.74134e-05,
+      1.97437e-05
+    ],
+    "max_displacement": 0.8497749128
+  },
+  "cases": [
+    {
+      "label": "half_dt",
+      "dt": 0.025,
+      "duration": 480.0,
+      "final_delta_radial_order": [
+        0.010213781245723662,
+        1.7412136991690197e-05,
+        1.974457863896783e-05
+      ],
+      "last_sample_delta_change": [
+        0.0001055453736417758,
+        -3.474593028018891e-07,
+        7.24552698958339e-07
+      ],
+      "max_displacement": 0.8497704134046536
+    },
+    {
+      "label": "double_duration",
+      "dt": 0.05,
+      "duration": 960.0,
+      "final_delta_radial_order": [
+        0.013883593628821495,
+        -5.992969149729022e-06,
+        4.9552327287407695e-05
+      ],
+      "last_sample_delta_change": [
+        8.147493387304638e-05,
+        -6.347769903325418e-07,
+        7.468548481803436e-07
+      ],
+      "max_displacement": 0.871423823941694
+    }
+  ],
+  "near_cell_relative_dt_difference": 7.073407286439277e-06,
+  "near_cell_change_when_duration_doubled": 0.003669884628821495
+}
