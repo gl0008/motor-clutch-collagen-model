@@ -1,5 +1,9 @@
 # Generation 4 · interactive elastic calibration → slippage → moving cell
 
+The complete G4 theory guide—including both the original short laboratory and
+the later multiscale G4 v2 observation design—is
+[`docs/theory/g4_model_theory.pdf`](../../docs/theory/g4_model_theory.pdf).
+
 G4 is a cumulative experiment, not four unrelated animations:
 
 1. **G4A — tune the basic mechanics.** A rigid cell is fixed. A prescribed,

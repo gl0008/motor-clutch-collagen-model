@@ -1,0 +1,401 @@
+% !TEX program = tectonic
+\documentclass[10.5pt]{article}
+\usepackage{newtxtext,newtxmath}
+\usepackage[a4paper,margin=0.86in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs,longtable,array}
+\usepackage{xcolor,enumitem,titlesec}
+\usepackage[hidelinks,colorlinks=true,linkcolor=blue!55!black,urlcolor=teal!60!black]{hyperref}
+
+\definecolor{g4}{HTML}{C65335}
+\definecolor{teal}{HTML}{267B72}
+\definecolor{muted}{HTML}{536A73}
+\newcommand{\rv}{\mathbf r}
+\newcommand{\Fv}{\mathbf F}
+\newcommand{\uv}{\mathbf u}
+\newcommand{\ev}{\widehat{\mathbf e}}
+\newcommand{\keylabel}{\par\smallskip\noindent\textcolor{g4}{\textbf{KEY EQUATION}}\par\vspace{-5pt}}
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+\setlist[itemize]{leftmargin=1.35em,itemsep=2pt,topsep=3pt}
+\titleformat{\section}{\Large\bfseries\color{black!85}}{\thesection}{0.55em}{}
+\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{0.55em}{}
+\allowdisplaybreaks
+
+\title{\vspace{-1.2cm}\textbf{The Generation-4 Single-Cell Collagen Model}\\[3pt]
+\large Theory, Governing Equations, Staged Controls, and Evidence Boundaries\\[6pt]
+\normalsize\textnormal{Motor--clutch collagen-remodelling project}}
+\author{}
+\date{2026-09-07}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+
+\begin{abstract}
+Generation 4 (G4) is a two-dimensional, single-cell mechanism-calibration platform in
+micrometres, nanonewtons, and seconds. It fixes the cell first, calibrates an elastic
+bead--spring collagen network, traces crosslink-mediated force transmission, adds stochastic
+motor--clutch failure, and finally releases rigid-cell translation and rotation. G4 v1 is the
+short-time prototype. G4 v2 extends the observation window and exposes small displacements and
+fast rupture events without inflating the physical parameters. This document distinguishes
+implemented equations from modelling assumptions and literature-supported mechanisms. G4 is not
+yet a calibrated three-dimensional tumour-migration prediction.
+\end{abstract}
+
+\keylabel
+\begin{equation}
+ \zeta_b\dot{\rv}_i=
+ \Fv_i^{\mathrm{stretch}}+\Fv_i^{\mathrm{bend}}+\Fv_i^{\mathrm{xlink}}
+ +\Fv_i^{\mathrm{rep}}+\Fv_i^{\mathrm{active}} .
+ \label{eq:backbone}
+\end{equation}
+Equation~\eqref{eq:backbone} is the common G4 mechanical backbone: inertia-free collagen beads
+move according to elastic, contact, and active forces divided by bead drag.
+
+\tableofcontents
+
+\section{Positioning and stage logic}
+
+G4 was introduced because earlier generations mixed changes in network geometry, anchoring,
+contact, and cell mobility. G4 instead follows a controlled inheritance rule: once a mechanism is
+accepted, the next stage changes one major ingredient while retaining the previous mechanics.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.15\textwidth}p{0.29\textwidth}p{0.45\textwidth}}
+\toprule
+Stage & New test & Primary interpretation \\
+\midrule
+G4A & One-factor elastic calibration with a fixed cell & Sensitivity of displacement, traction,
+radial order, and boundary response to one coefficient at a time. \\
+G4B & Crosslink-graph transmission & Whether non-contact fibres move only through retained
+elastic connections. \\
+G4C & Independent versus shared-load clutch failure & Binding, loading, rupture cascades,
+complete site loss, traction drop, and fibre recoil. \\
+G4D & Release rigid-cell translation and rotation & Whether asymmetric collagen reactions are
+sufficient to generate motion without prescribed polarity. \\
+\bottomrule
+\end{longtable}
+
+G4 v1 runs for two to five minutes and reveals the controls, but many indirect displacements are
+subpixel and many clutch events occur between saved frames. G4 v2 retains the same single-cell
+concept and parameter language while using two-hour elastic and moving-cell runs, a 30-minute
+clutch overview, and a 20-second event microscope sampled every 0.1 seconds.
+
+\section{Collagen network mechanics shared by G4A--D}
+
+Each collagen fibre is a connected chain of visible beads. Consecutive beads carry axial force;
+triplets resist changes in curvature; retained intersections couple material points on different
+fibres. Only beads in the outer boundary band are anchored in the main condition.
+
+\subsection{Overdamped update}
+
+For every non-fixed bead,
+\begin{equation}
+ \rv_i(t+\Delta t)=\rv_i(t)+\frac{\Delta t}{\zeta_b}\Fv_i^{\mathrm{total}},
+ \qquad \rv_i(t)=\rv_i^0\quad (i\in\mathcal B_{\mathrm{fixed}}).
+ \label{eq:euler}
+\end{equation}
+Bead drag controls the transient speed. It dissipates motion but stores no elastic energy.
+The bonds and crosslinks store energy. G4 contains no standard-linear-solid element, inertia,
+thermal Brownian forcing, or permanent remodelling.
+
+\subsection{Axial stretch and compression softening}
+
+For a bond from bead $i$ to $j$,
+\begin{align}
+ \mathbf d_{ij}&=\rv_j-\rv_i, & \ell_{ij}&=\lVert\mathbf d_{ij}\rVert,
+ & e_{ij}&=\ell_{ij}-\ell_{ij}^0,\\
+ \Fv_{i\leftarrow j}^{\mathrm{stretch}}&=k_{ij}e_{ij}\ev_{ij},
+ &\ev_{ij}&=\mathbf d_{ij}/\ell_{ij},
+ &k_{ij}&=
+ \begin{cases}
+ EA/\ell_{ij}^0,&e_{ij}\ge 0,\\
+ \rho EA/\ell_{ij}^0,&e_{ij}<0.
+ \end{cases}
+ \label{eq:stretch}
+\end{align}
+The baseline compression ratio is $\rho=0.10$. Tension therefore uses the full axial stiffness,
+whereas compression is softened to represent collagen microbuckling.
+
+\subsection{Discrete bending}
+
+The curvature stencil for an interior triplet is
+\begin{equation}
+ \Delta\boldsymbol\kappa_i=
+ (\rv_{i-1}-2\rv_i+\rv_{i+1})-\boldsymbol\kappa_i^0,
+ \qquad
+ U_b=\frac12\sum_i\frac{EI}{\bar\ell_i^{,3}}
+ \lVert\Delta\boldsymbol\kappa_i\rVert^2.
+ \label{eq:bend}
+\end{equation}
+The reference curvature $\boldsymbol\kappa_i^0$ is the initial fibre shape. The bending
+multiplier changes $EI$ without changing the axial rigidity $EA$.
+
+\subsection{Permanent material-point crosslinks}
+
+For an intersection located at fractions $\alpha_a$ and $\alpha_b$ along two host bonds,
+\begin{align}
+ \mathbf p_a&=(1-\alpha_a)\rv_{a_1}+\alpha_a\rv_{a_2},
+ &\mathbf p_b&=(1-\alpha_b)\rv_{b_1}+\alpha_b\rv_{b_2},\\
+ \Fv_x&=k_x\big[(\mathbf p_b-\mathbf p_a)-\mathbf d_x^0\big].
+ \label{eq:xlink}
+\end{align}
+Interpolation weights distribute $\Fv_x$ back to the four host beads. The link resists
+separation but is freely hinged: it does not prescribe the angle between fibres. G4 crosslinks
+do not rupture or re-form.
+
+\section{G4A: one-factor mechanics calibration}
+
+G4A keeps the cell fixed and compares the same initial collagen geometry while varying one
+coefficient at a time. The left panel is the baseline control; the right panel is the selected
+variant. Both use the same cell position, candidate intersections, duration, and random seed.
+
+Candidate intersections receive stored uniform marks $u_j$. Crosslink probability changes the
+network through a nested rule:
+\keylabel
+\begin{equation}
+ \text{retain link }j \quad\Longleftrightarrow\quad u_j<p_x,
+ \qquad u_j\sim\mathcal U(0,1),
+ \label{eq:nested}
+\end{equation}
+so increasing $p_x$ adds links without reshuffling the links already present at lower $p_x$.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}p{0.28\textwidth}p{0.38\textwidth}}
+\toprule
+Coefficient & Equation location & Expected effect when increased \\
+\midrule
+Total pull $F_{\mathrm{pull}}$ & Active contact force & More direct loading until stiffness or
+geometry limits dominate. \\
+Bending multiplier & $EI$ in Eq.~\eqref{eq:bend} & Fibres resist rotation and straightening. \\
+Collagen modulus $E$ & $EA$ and $EI$ & Axial extension and usually local displacement decrease. \\
+Bead drag $\zeta_b$ & Eqs.~\eqref{eq:backbone}--\eqref{eq:euler} & Transients slow; the final
+elastic equilibrium should not change. \\
+Crosslink probability $p_x$ & Eq.~\eqref{eq:nested} & More force paths, with possible additional
+rotational constraint. \\
+Crosslink stiffness $k_x$ & Eq.~\eqref{eq:xlink} & Each retained link transmits separation force
+more strongly. \\
+Contact width $\sigma_c$ & Eq.~\eqref{eq:weights} & The same finite pull is spread more evenly
+among eligible contacts. \\
+\bottomrule
+\end{longtable}
+
+The mobile-boundary control releases outer anchors only in the comparison panel. It identifies
+whole-network translation that might otherwise be mistaken for local remodelling. The G4 v2
+elastic overview is two hours with sparse display frames; the solver step remains
+$\Delta t=0.05\unit{s}$, so display sampling does not change the physics.
+
+\section{Hybrid cell--collagen coupling}
+
+The closest material point on each candidate bead-to-bead segment is computed first. A point is
+eligible only when it lies inside a finite surface-contact shell. Gaussian weights are normalized
+only over this eligible set $\mathcal C$:
+\keylabel
+\begin{align}
+ d_m&=\lVert\mathbf p_m-\rv_c\rVert-R,
+ &0&\le d_m\le w_c,\\
+ w_m&=\frac{\exp(-d_m^2/\sigma_c^2)}
+ {\displaystyle\sum_{n\in\mathcal C}\exp(-d_n^2/\sigma_c^2)}.
+ \label{eq:weights}
+\end{align}
+The baseline uses $w_c=3\unit{\mu m}$ and $\sigma_c=1.5\unit{\mu m}$. The Gaussian therefore
+distributes a finite local pull; it is not evaluated over the whole ECM.
+
+The active force and its interpolation to the two host beads are
+\begin{align}
+ \Fv_m^{\mathrm{active}}
+ &=F_{\mathrm{pull}}w_m\frac{\rv_c-\mathbf p_m}{\lVert\rv_c-\mathbf p_m\rVert},\\
+ (\Fv_i^{\mathrm{active}},\Fv_j^{\mathrm{active}})
+ &=\big((1-\alpha_m)\Fv_m^{\mathrm{active}},\alpha_m\Fv_m^{\mathrm{active}}\big).
+ \label{eq:active}
+\end{align}
+Using a material point avoids bead-resolution artefacts and preserves both total force and its
+first moment along the bond.
+
+Beads cannot penetrate the rigid circular cell:
+\begin{equation}
+ \delta_i=\max\big(0,R+c-\lVert\rv_i-\rv_c\rVert\big),\qquad
+ \Fv_i^{\mathrm{rep}}=k_{\mathrm{rep}}\delta_i
+ \frac{\rv_i-\rv_c}{\lVert\rv_i-\rv_c\rVert}.
+ \label{eq:rep}
+\end{equation}
+This one-sided penalty is contact, not adhesion.
+
+\section{G4B: crosslink-mediated indirect realignment}
+
+Only direct-contact fibres receive Eq.~\eqref{eq:active}. Every non-contact fibre receives zero
+Gaussian force. Fibres are classified by shortest path through the retained crosslink graph:
+\keylabel
+\begin{equation}
+ d_{\mathrm{graph}}(f,\mathcal C_{\mathrm{direct}})\in\{0,1,2+,\infty\}.
+ \label{eq:graph}
+\end{equation}
+Here $0$ denotes direct contact, $1$ one retained crosslink hop, $2+$ a longer connected path,
+and $\infty$ an unconnected fibre. An indirect fibre moves because deformation of a direct fibre
+separates the linked material points, Eq.~\eqref{eq:xlink} produces equal-and-opposite force, and
+the neighbouring fibre redistributes that force through its own stretching and bending.
+
+For nematic orientation, a fibre pointing at $\theta$ is equivalent to one pointing at
+$\theta+\pi$. The implemented orientation summaries are
+\begin{align}
+ \theta_f&=\frac12\operatorname{atan2}
+ \left(\langle\sin 2\theta_e\rangle,\langle\cos 2\theta_e\rangle\right),\\
+ \Delta\theta_f&=\frac12\operatorname{atan2}
+ \left(\sin 2(\theta_f-\theta_f^0),\cos 2(\theta_f-\theta_f^0)\right),\\
+ u_f&=\frac{1}{N_f}\sum_{i\in f}\lVert\rv_i-\rv_i^0\rVert.
+ \label{eq:metrics}
+\end{align}
+Each graph class reports displacement and orientation distributions. In the no-crosslink
+negative control, non-contact transmitted motion should collapse toward the unconnected class.
+
+\section{G4C: motor--clutch loading and stochastic slippage}
+
+G4C replaces deterministic attachment with effective clutches that bind, load, rupture, and
+rebind while the cell remains fixed. Actin flow slows with site load, and relative motion loads a
+Hookean clutch:
+\keylabel
+\begin{equation}
+ v_a=v_0\max\!\left(0,1-\frac{F_{\mathrm{site}}}{F_{\mathrm{stall}}}\right),
+ \qquad
+ \dot x=\max(0,v_a-v_{\mathrm{sub}}),
+ \qquad f=k_cx.
+ \label{eq:motor}
+\end{equation}
+
+The Bell slip-bond law gives a continuous force-dependent hazard rather than a deterministic
+``too long'' threshold:
+\begin{equation}
+ k_{\mathrm{off}}(f)=k_{\mathrm{off}}^0\exp\!\left(\frac{f}{F_b}\right),
+ \quad
+ P_{\mathrm{off}}=1-\exp[-k_{\mathrm{off}}(f)\Delta t],
+ \quad
+ P_{\mathrm{on}}=1-\exp(-k_{\mathrm{on}}\Delta t).
+ \label{eq:bell}
+\end{equation}
+
+In the independent baseline,
+\begin{equation}
+ F_{\mathrm{site}}=\sum_{j\in\mathrm{bound}}k_cx_j.
+ \label{eq:independent}
+\end{equation}
+One rupture removes only that clutch. The whole attachment persists while at least one clutch is
+bound.
+
+In the shared-load alternative, if $i$ of $N$ clutches remain bound,
+\keylabel
+\begin{equation}
+ f_i=\frac{F_{\mathrm{site}}}{i},\qquad
+ r_i=i k_{\mathrm{off}}^0
+ \exp\!\left(\frac{F_{\mathrm{site}}}{iF_b}\right),\qquad
+ g_i=(N-i)k_{\mathrm{on}}.
+ \label{eq:shared}
+\end{equation}
+After a rupture, fewer survivors carry the site load, increasing force per survivor and the Bell
+off-rate. Rebinding may rescue the site. Complete failure is the first passage to $i=0$.
+The implementation also assumes
+\begin{equation}
+ K_{\mathrm{site}}=Nk_c\quad(i>0),\qquad
+ F_{\mathrm{site}}=K_{\mathrm{site}}x_{\mathrm{site}},
+ \label{eq:bundle}
+\end{equation}
+which holds the fully-bound bundle stiffness until the site is completely lost. This is an
+explicit coarse-grained closure, not a molecular identity.
+
+The effective defaults are $N=12$, $k_c=2\unit{nN/\mu m}$,
+$k_{\mathrm{on}}=0.055\unit{s^{-1}}$, $k_{\mathrm{off}}^0=0.018\unit{s^{-1}}$,
+$F_b=1.5\unit{nN}$, $v_0=0.025\unit{\mu m/s}$, and
+$F_{\mathrm{stall}}=8\unit{nN/site}$. They describe effective bundles, not twelve counted
+integrin molecules.
+
+\section{G4D: reaction-driven rigid-cell motion}
+
+G4D retains the G4C shared-load mechanics and releases only cell translation and rotation.
+\keylabel
+\begin{equation}
+ \gamma_c\dot{\rv}_c=-\sum_m\Fv_m^{\mathrm{cell\to ECM}}.
+ \label{eq:translation}
+\end{equation}
+The cell receives the equal-and-opposite reaction to the traction it applies to collagen. No
+$+x$ force, preferred velocity, or hardcoded polarity probability is supplied. Rotation obeys
+\begin{equation}
+ \gamma_\theta\dot\phi=
+ \sum_m(\mathbf a_m-\rv_c)\times[-\Fv_m^{\mathrm{cell\to ECM}}],
+ \qquad
+ \gamma_\theta=\chi\gamma_cR^2.
+ \label{eq:rotation}
+\end{equation}
+Heterogeneous collagen geometry, different force paths, and stochastic site lifetimes create a
+spatial traction imbalance. The fixed and moving panels share the network and random proposals;
+only rigid-body degrees of freedom differ. Contacts are periodically refreshed as the cell and
+network move; a bound site retains its material attachment until release.
+
+\section{How to read the visualization}
+
+Collagen is shown as coloured curves with small beads connected by axial bonds. Orange marks the
+direct-contact graph class, blue one-hop fibres, and purple two-plus-hop fibres. Gold diamonds or
+short connectors are permanent elastic crosslinks. Clutch spokes are bound effective clutches;
+red marks are clutch rupture events, not fibre or crosslink breaking.
+
+Thin green lines are displacement vectors, not collagen, force links, or crosslinks:
+\keylabel
+\begin{equation}
+ \Delta\rv_i=\rv_i(t)-\rv_i(0),\qquad
+ \rv_i^{\mathrm{display}}=\rv_i(0)+M\Delta\rv_i,
+ \qquad M\in\{1,10,50\}.
+ \label{eq:display}
+\end{equation}
+Only the green vector length is magnified. True bead and fibre positions remain at $1\times$.
+One-hop mean displacement may be only $10^{-3}$--$10^{-2}\unit{\mu m}$ in a
+$180\unit{\mu m}$ full-field view, so local zoom and numerical readouts are required.
+
+\section{Parameter provenance and calibration boundaries}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}p{0.25\textwidth}p{0.40\textwidth}}
+\toprule
+Parameter & Baseline or range & Interpretation status \\
+\midrule
+Domain / fibres & $180\unit{\mu m}$ / 99 & Inherited G2-scale fixture; not image-derived density. \\
+Cell radius & $10\unit{\mu m}$ & Single-cell fixture; replace with experiment-specific segmentation. \\
+Fibre length / diameter & 20--$80\unit{\mu m}$ / $0.30\unit{\mu m}$ & Effective fibre scale, not a molecular fibril. \\
+Collagen modulus & $3\unit{MPa}$ & Mechanism-first choice, not a tissue-matched fit. \\
+Bending multiplier & 0.10, 0.25, 0.50, 1.0 & Sensitivity separated from axial stiffness. \\
+Crosslink probability & 0, 0.20, 0.35, 0.60 & Topology sensitivity; a 2-D crossing is not automatically a biological weld. \\
+Crosslink stiffness & 5, 10, 25, $75\unit{nN/\mu m}$ & Effective link-compliance sensitivity. \\
+Bead drag & 90, 180, $360\unit{nN\,s/\mu m}$ & Transient sensitivity; requires time-resolved fitting. \\
+Total pull & 12, 24, $48\unit{nN}$ & Mechanism range; not fitted cell traction. \\
+Contact shell / $\sigma_c$ & $3\unit{\mu m}$ / $1.5\unit{\mu m}$ & Hybrid local-contact starting choice. \\
+Cell drag & $600\unit{nN\,s/\mu m}$ & Effective mobility; requires ensemble calibration. \\
+\bottomrule
+\end{longtable}
+
+\section{Verification gates, limitations, and references}
+
+The required verification gates are: time-step convergence between $0.05$ and
+$0.025\unit{s}$; zero traction with no bound clutch; collapse of non-contact transmitted motion
+when crosslinks are removed; traceable one-hop force paths; increasing shared-load hazard as
+$i$ decreases at fixed site load; complete site loss only at $i=0$; agreement among rupture logs,
+traction drops, and animation frames; and paired fixed/moving runs that differ only in cell
+degrees of freedom.
+
+G4 is limited to a 2-D projection, one rigid circular cell, linear permanent crosslinks, and
+mechanism-first effective parameters. It does not include a nucleus, deformable protrusions,
+three-dimensional pores, crosslink turnover, fibre sliding, damage, strain stiffening, SLS
+relaxation, proteolysis, proliferation, or biochemical polarity.
+
+\subsection*{Key references}
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+\item Lee et al. (2014), \emph{PLOS ONE} 9:e111896. doi:10.1371/journal.pone.0111896.
+\item Abhilash et al. (2014), \emph{Biophysical Journal} 107:1829--1840. doi:10.1016/j.bpj.2014.08.029.
+\item Wang et al. (2014), \emph{Biophysical Journal} 107:2592--2603. doi:10.1016/j.bpj.2014.09.044.
+\item Notbohm et al. (2015), \emph{Journal of the Royal Society Interface}. arXiv:1407.3510.
+\item Bell (1978), \emph{Science} 200:618--627. doi:10.1126/science.347575.
+\item Bangasser and Odde (2013), \emph{Cellular and Molecular Bioengineering} 6:449--459.
+\item Riching et al. (2014), \emph{Biophysical Journal} 107:2546--2558. PMCID: PMC4255204.
+\item Erdmann and Schwarz (2004), arXiv:cond-mat/0403552.
+\item Gao, Qian, and Chen (2011), \emph{Journal of the Royal Society Interface} 8:1217--1232.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Claim boundary.} G4 can separate elastic parameter sensitivity,
+crosslink-mediated indirect motion, clutch failure, and reaction-driven rigid-cell motion. It
+cannot yet predict whole-tumour invasion.
+
+\end{document}

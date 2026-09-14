@@ -1,0 +1,413 @@
+% !TEX program = tectonic
+\documentclass[10.5pt]{article}
+\usepackage{newtxtext,newtxmath}
+\usepackage[a4paper,margin=0.86in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs,longtable,array}
+\usepackage{xcolor,enumitem,titlesec}
+\usepackage[hidelinks,colorlinks=true,linkcolor=blue!55!black,urlcolor=teal!60!black]{hyperref}
+
+\definecolor{g5}{HTML}{C65335}
+\definecolor{teal}{HTML}{267B72}
+\newcommand{\rv}{\mathbf r}
+\newcommand{\cv}{\mathbf c}
+\newcommand{\Fv}{\mathbf F}
+\newcommand{\ev}{\widehat{\mathbf e}}
+\newcommand{\keylabel}{\par\smallskip\noindent\textcolor{g5}{\textbf{KEY EQUATION}}\par\vspace{-5pt}}
+\newcommand{\unit}[1]{\,\mathrm{#1}}
+\setlist[itemize]{leftmargin=1.35em,itemsep=2pt,topsep=3pt}
+\titleformat{\section}{\Large\bfseries\color{black!85}}{\thesection}{0.55em}{}
+\titleformat{\subsection}{\large\bfseries\color{teal}}{\thesubsection}{0.55em}{}
+\allowdisplaybreaks
+
+\title{\vspace{-1.2cm}\textbf{The Generation-5 Tumour-Organoid Model}\\[3pt]
+\large Theory, Governing Equations, Lineage from G4, and Ablation Logic\\[6pt]
+\normalsize\textnormal{Motor--clutch collagen-remodelling project}}
+\author{}
+\date{2026-09-07}
+
+\begin{document}
+\maketitle
+\vspace{-1cm}
+
+\begin{abstract}
+Generation 5 (G5) scales the validated single-cell motor--clutch and bead--spring collagen
+framework to a multicellular tumour organoid. The clean conceptual change is one cell to many
+mechanically interacting cell disks. This requires organoid geometry, cell--cell repulsion and
+adhesion, repeated cell--ECM contact bookkeeping, and collective migration metrics. Tensile
+strain stiffening, leader-cell heterogeneity, and crosslink topology plasticity are separate
+hypotheses that should be activated by ablation rather than hidden in the baseline. The model is
+two-dimensional and coarse-grained; its parameters are mechanism-first until calibrated against
+organoid experiments.
+\end{abstract}
+
+\keylabel
+\begin{equation}
+ \zeta_b\dot{\rv}_i=
+ \Fv_i^{\mathrm{stretch}}+\Fv_i^{\mathrm{bend}}+\Fv_i^{\mathrm{xlink}}
+ +\sum_a\Fv_{ia}^{\mathrm{rep}}+
+ \sum_a\Fv_{ia}^{\mathrm{cell\to ECM}}.
+ \label{eq:backbone}
+\end{equation}
+The collagen equation remains the common backbone. G5 changes the number of cells and the
+coupling terms, not the unit system.
+
+\tableofcontents
+
+\section{Lineage: what is inherited and what is new}
+
+G5 inherits the G2/G4 bead-chain geometry, axial stretch, discrete bending, compression
+softening, outer-boundary anchoring, permanent elastic crosslinks, local material-point contact,
+and optional Bell motor--clutch kinetics. The genuinely required additions are multiple rigid
+cell disks, cell--cell mechanics, per-cell contact ownership, and collective outcomes.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.16\textwidth}p{0.28\textwidth}p{0.45\textwidth}}
+\toprule
+Stage & New mechanism & Primary question \\
+\midrule
+G5A & $N$ cell disks plus cohesion & Is the organoid stable before cell--ECM pulling? \\
+G5B & Many cells pull one shared ECM & Does collective contraction increase radial collagen
+alignment? \\
+G5C & Tensile strain stiffening & Does nonlinear recruitment extend the deformation halo? \\
+G5D & Reaction-driven cell motion & Does cell--cell adhesion select collective versus
+single-cell escape? \\
+G5E & Crosslink rupture and re-welding & Does topology change preserve remodelling after
+unloading? \\
+\bottomrule
+\end{longtable}
+
+The clean G5 baseline is multicellular disks, cell--cell adhesion, inherited elastic collagen,
+and inherited clutch mechanics. Strain stiffening, leader cells, and crosslink plasticity are
+explicit switches. This separation keeps G4 collagen calibration conceptually distinct from the
+multicellular consequences introduced in G5.
+
+\section{Inherited collagen mechanics}
+
+Every collagen fibre is a connected sequence of beads. Visible lines join consecutive beads,
+and crosslinks join material points on different fibres. The outer boundary is anchored so local
+remodelling is not confused with rigid translation of the whole network.
+
+For non-fixed beads,
+\begin{equation}
+ \rv_i(t+\Delta t)=\rv_i(t)+\frac{\Delta t}{\zeta_b}\Fv_i^{\mathrm{total}}.
+ \label{eq:euler}
+\end{equation}
+There is no inertia and no standard-linear-solid element. Drag controls transient speed; elastic
+terms store energy.
+
+For an axial bond,
+\begin{align}
+ e_{ij}&=\ell_{ij}-\ell_{ij}^0,
+ &\Fv_{i\leftarrow j}^{\mathrm{stretch}}&=k_{ij}e_{ij}\ev_{ij},\\
+ k_{ij}&=
+ \begin{cases}
+ EA/\ell_{ij}^0,&e_{ij}\ge0,\\
+ \rho EA/\ell_{ij}^0,&e_{ij}<0,
+ \end{cases}
+ &\ev_{ij}&=(\rv_j-\rv_i)/\ell_{ij}.
+ \label{eq:stretch}
+\end{align}
+Compression remains soft ($\rho<1$), representing microbuckling rather than an equally stiff
+compression spring.
+
+For bending,
+\begin{equation}
+ \Delta\boldsymbol\kappa_i=
+ (\rv_{i-1}-2\rv_i+\rv_{i+1})-\boldsymbol\kappa_i^0,
+ \qquad
+ (\Fv_{i-1}^{b},\Fv_i^{b},\Fv_{i+1}^{b})
+ =k_b(-\Delta\boldsymbol\kappa_i,2\Delta\boldsymbol\kappa_i,-\Delta\boldsymbol\kappa_i).
+ \label{eq:bending}
+\end{equation}
+
+A freely hinged crosslink joining two material points obeys
+\begin{align}
+ \mathbf p_a&=(1-\alpha_a)\rv_i+\alpha_a\rv_j,\\
+ \Fv_x&=k_x\big[(\mathbf p_b-\mathbf p_a)-\mathbf d_{x,0}\big].
+ \label{eq:xlink}
+\end{align}
+The link transmits separation force without prescribing the crossing angle.
+
+\section{G5A: multicellular scaffold and resting balance}
+
+Cell centres are placed on a hexagonal lattice with rest pitch
+$d_0=18\unit{\mu m}$. Each rigid disk has radius $R_c=9\unit{\mu m}$, and centres inside the
+organoid target radius are retained. Collagen is excluded from the union of cell disks plus a
+clearance region.
+
+Let $d=\lVert\cv_b-\cv_a\rVert$ and
+$\ev_{ab}=(\cv_b-\cv_a)/d$. The pairwise force on cell $a$ from cell $b$ is
+\keylabel
+\begin{equation}
+ \Fv_{a\leftarrow b}^{cc}=
+ \begin{cases}
+ -k_{\mathrm{rep}}(d_0-d)\ev_{ab},&d<d_0,\\
+ k_{\mathrm{adh}}s_{ab}(d-d_0)\ev_{ab},&d_0\le d<d_0+r_{\mathrm{adh}},\\
+ \mathbf 0,&d\ge d_0+r_{\mathrm{adh}},
+ \end{cases}
+ \qquad s_{ab}=\min(s_a,s_b).
+ \label{eq:cellcell}
+\end{equation}
+Repulsion prevents overlap and finite-range adhesion supplies coarse tissue cohesion. The
+strength $k_{\mathrm{adh}}$ is an effective organoid-scale parameter, not a direct cadherin
+single-bond stiffness. At $d=d_0$, the pair force vanishes.
+
+Cell--collagen exclusion generalizes the G4 penalty to all cells:
+\begin{equation}
+ \delta_{ia}=\max\big(0,R_c+c-\lVert\rv_i-\cv_a\rVert\big),\qquad
+ \Fv_i^{\mathrm{rep}}=\sum_a k_{\mathrm{rep,ECM}}\delta_{ia}
+ \frac{\rv_i-\cv_a}{\lVert\rv_i-\cv_a\rVert}.
+ \label{eq:multirep}
+\end{equation}
+The G5A gate is a stable non-overlapping organoid that neither collapses nor disperses before
+active traction is introduced.
+
+\section{G5B: fixed organoid pulling a shared collagen network}
+
+For cell $a$ and fibre material point $\mathbf p_{af}$, contact is eligible only inside a finite
+surface shell. Gaussian weights are normalized over the eligible set $\mathcal C(a)$:
+\keylabel
+\begin{align}
+ s_{af}&=\lVert\mathbf p_{af}-\cv_a\rVert-R_c,
+ &0&\le s_{af}\le w_c,\\
+ w_{af}&=\frac{\exp(-s_{af}^2/\sigma_c^2)}
+ {\displaystyle\sum_{g\in\mathcal C(a)}\exp(-s_{ag}^2/\sigma_c^2)}.
+ \label{eq:contact}
+\end{align}
+The inward pull from cell $a$ is
+\begin{equation}
+ \Fv_{af}^{\mathrm{cell\to ECM}}
+ =F_a w_{af}\frac{\cv_a-\mathbf p_{af}}
+ {\lVert\cv_a-\mathbf p_{af}\rVert}.
+ \label{eq:pull}
+\end{equation}
+Linear shape functions distribute this point force to the two host beads. A non-contact fibre
+receives no second Gaussian pull; it can move only through crosslink force transmission and its
+own stretching and bending. Removing crosslinks is therefore the causal negative control.
+
+Radial alignment is measured on each fibre edge by
+\keylabel
+\begin{equation}
+ S_{r,e}=2(\mathbf t_e\cdot\ev_{r,e})^2-1,
+ \qquad
+ S_r(q)=\frac{1}{N_q}\sum_{e\in q}S_{r,e}.
+ \label{eq:radial}
+\end{equation}
+$S_r=+1$ is radial, $S_r=0$ isotropic, and $S_r=-1$ tangential. Reporting distance shells
+separates near-field reorientation from a whole-network average.
+
+\section{G5C: tensile strain-stiffening ablation}
+
+The optional nonlinear constitutive law changes only tensile bonds:
+\keylabel
+\begin{equation}
+ \varepsilon=\frac{e}{\ell_0},\qquad
+ k_t(\varepsilon)=k_{t,0}
+ \min\!\left(C_{\max},\exp\!\frac{\varepsilon}{\varepsilon_{\mathrm{ref}}}\right)
+ \quad(\varepsilon\ge0),
+ \qquad
+ k(\varepsilon<0)=\rho k_{t,0}.
+ \label{eq:stiffening}
+\end{equation}
+Current defaults use $\varepsilon_{\mathrm{ref}}=0.06$ and $C_{\max}=12$ as exploratory
+guards. A taut bond becomes stiffer and can recruit a longer load-bearing tract. The clean
+comparison switches strain stiffening off and on while holding network, pull, cells, and seed
+fixed. If most strains remain only one to five percent, the nonlinear branch is only weakly
+engaged; a small effect is then a statement about the current loading regime, not a rejection of
+collagen nonlinearity.
+
+\section{Motor--clutch kinetics in a multicellular setting}
+
+When clutch dynamics are enabled, every cell is divided into angular contact sectors and every
+occupied sector contains an effective clutch bundle. G5 reuses G4 kinetics but repeats them over
+many cells and preserves site ownership for reaction-force bookkeeping.
+
+Motor loading follows
+\keylabel
+\begin{equation}
+ v_{\mathrm{act}}=v_0\max\!\left(0,1-\frac{F_{\mathrm{site}}}{F_{\mathrm{stall}}}\right),
+ \qquad
+ \dot x=\max(0,v_{\mathrm{act}}-v_{\mathrm{sub}}),
+ \qquad f_j=k_cx_j.
+ \label{eq:motor}
+\end{equation}
+
+Bell slip-bond rupture and rebinding are
+\begin{equation}
+ k_{\mathrm{off}}(f)=k_{\mathrm{off}}^0\exp\!\left(\frac{f}{F_b}\right),
+ \quad P_{\mathrm{off}}=1-\exp[-k_{\mathrm{off}}(f)\Delta t],
+ \quad P_{\mathrm{on}}=1-\exp(-k_{\mathrm{on}}\Delta t).
+ \label{eq:bell}
+\end{equation}
+The independent hypothesis uses
+\begin{equation}
+ F_{\mathrm{site}}=\sum_{j\in\mathrm{bound}}k_cx_j,
+ \label{eq:independent}
+\end{equation}
+whereas the equal-load-sharing hypothesis uses
+\begin{equation}
+ f_i=\frac{F_{\mathrm{site}}}{i},\qquad
+ r_i=i k_{\mathrm{off}}^0\exp\!\left(\frac{F_{\mathrm{site}}}{iF_b}\right).
+ \label{eq:shared}
+\end{equation}
+An empty angular sector cannot bind or load a clutch. This active-mask guard prevents phantom
+traction against nonexistent collagen. Bell rupture of a cell--fibre clutch produces adhesion
+slippage; Bell rupture of a fibre--fibre crosslink in G5E changes ECM topology. They are separate
+processes with separate parameters.
+
+\section{G5D: collective invasion versus single-cell escape}
+
+Every rigid cell disk moves under its cell--ECM reaction force and cell--cell mechanics:
+\keylabel
+\begin{equation}
+ \zeta_c\dot{\cv}_a=
+ \Fv_a^{\mathrm{reaction}}+
+ \sum_{b\ne a}\Fv_{a\leftarrow b}^{cc},
+ \qquad
+ \Fv_a^{\mathrm{reaction}}=-\sum_{s\in a}\Fv_s^{\mathrm{cell\to ECM}}.
+ \label{eq:cellmotion}
+\end{equation}
+A cell reels collagen inward; the opposite reaction tends to pull the cell toward the gripped
+ECM. Adhesion resists separation. The velocity is capped when necessary:
+\begin{equation}
+ \mathbf v_a=\Fv_a^{\mathrm{net}}/\zeta_c,\qquad
+ \lVert\mathbf v_a\rVert>v_{\max}\Rightarrow
+ \mathbf v_a\leftarrow v_{\max}\frac{\mathbf v_a}{\lVert\mathbf v_a\rVert}.
+ \label{eq:speedcap}
+\end{equation}
+High adhesion favours cohesion; low adhesion permits cell--ECM reaction to separate individual
+cells more easily. ``Invasion'' in this model means outward displacement arising from this
+force competition, not a complete biological tissue-invasion programme.
+
+Optional leader heterogeneity is imposed on selected outer cells:
+\begin{equation}
+ s_a=s_{\mathrm{leader}}<1,\qquad
+ k_{\mathrm{adh},ab}=k_{\mathrm{adh}}\min(s_a,s_b),\qquad
+ F_a^{\mathrm{pull}}=\lambda_aF^{\mathrm{pull}}.
+ \label{eq:leader}
+\end{equation}
+This is a modelling hypothesis; the current outermost-fraction selection is deterministic and is
+not an emergent EMT mechanism.
+
+\section{G5E: crosslink topology plasticity}
+
+Loaded fibre--fibre crosslinks may rupture with a Bell-type hazard:
+\keylabel
+\begin{equation}
+ k_{\mathrm{off},x}(F_x)=k_{\mathrm{off},x}^0
+ \exp\!\left(\frac{F_x}{F_{b,x}}\right),
+ \qquad
+ P_{\mathrm{rupture}}=1-
+ \exp[-k_{\mathrm{off},x}(F_x)\Delta t_x].
+ \label{eq:xrupture}
+\end{equation}
+Current defaults $k_{\mathrm{off},x}^0=2\times10^{-4}\unit{s^{-1}}$ and
+$F_{b,x}=3\unit{nN}$ are explicit assumptions pending calibration. When a new crossing is
+accepted, its current configuration becomes stress free:
+\begin{equation}
+ \mathbf d_{x,0}\leftarrow\mathbf p_b(t)-\mathbf p_a(t),
+ \qquad\text{with re-weld acceptance probability }p_{\mathrm{reform}}.
+ \label{eq:reweld}
+\end{equation}
+Changing which fibres are welded and where the new rest state is created is topology-changing
+remodelling, not SLS stress relaxation.
+
+Topology memory and residual response are summarized by
+\begin{align}
+ \kappa_{\mathrm{topo}}&=1-
+ \frac{|L_0\cap L_T|}{|L_0|},\\
+ \kappa_{\mathrm{rms}}&=u_{\mathrm{residual}}/u_{\mathrm{peak}},\\
+ \kappa_{\mathrm{order}}&=
+ \frac{S_{\mathrm{final}}-S_0}{S_{\mathrm{peak}}-S_0}.
+ \label{eq:memory}
+\end{align}
+$\kappa_{\mathrm{topo}}$ is the cleanest topology metric. Residual displacement alone can be
+confounded by slow elastic relaxation and near-zero modes.
+
+\section{Ablation logic}
+
+An ablation is a matched comparison in which one mechanism is removed or activated while the
+initial network, seed, duration, and other parameters remain fixed:
+\keylabel
+\begin{equation}
+ \Delta Y_{(-m)}=Y_{\mathrm{baseline}}-Y_{\mathrm{mechanism}\ m\ \mathrm{removed}}.
+ \label{eq:ablation}
+\end{equation}
+$Y$ may be invasion distance, cohesion, radial order, displacement reach, traction, or topology
+memory. The comparison attributes effects inside the model; it does not by itself establish an
+experimental effect size.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}p{0.33\textwidth}p{0.35\textwidth}}
+\toprule
+Ablation & Mechanism isolated & Primary readout \\
+\midrule
+No clutch & Active cell--fibre loading & Invasion, traction, and slip events. \\
+No adhesion & Organoid cohesion & Dispersion, escaped-cell fraction, and collective integrity. \\
+No crosslinks & Network force transmission & Indirect displacement, radial order, and invasion. \\
+Stiffening off/on & Nonlinear tensile recruitment & Alignment and displacement reach. \\
+Plasticity off/on & Topology memory & $\kappa_{\mathrm{topo}}$ and post-unload persistence. \\
+Leaders off/on & Prescribed cell heterogeneity & Leader displacement and follower cohesion. \\
+\bottomrule
+\end{longtable}
+
+In the current matched two-hour runs, approximate reported displacement/invasion is
+$25\unit{\mu m}$ for the clutch baseline, $4.7\unit{\mu m}$ with no clutch,
+$68\unit{\mu m}$ with no adhesion but worse cohesion, $7.7\unit{\mu m}$ with no crosslinks,
+$24\unit{\mu m}$ with strain stiffening, and $25\unit{\mu m}$ with plasticity. These are
+single-model outputs, not experimental effect sizes; ensembles and calibration are required.
+
+\section{Parameter map and evidence boundaries}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}p{0.24\textwidth}p{0.41\textwidth}}
+\toprule
+Parameter & Current default & Role and status \\
+\midrule
+Cell radius $R_c$ & $9\unit{\mu m}$ & Single-cell scale, not a fit to one cell line. \\
+Organoid centre radius & $63\unit{\mu m}$ & Two-dimensional core geometry. \\
+Cell spacing $d_0$ & $18\unit{\mu m}$ & Touching hexagonal disks and zero pair force. \\
+Cell repulsion / adhesion & 40 / $6\unit{nN/\mu m}$ & Effective non-overlap and cohesion parameters. \\
+Adhesion range & $6\unit{\mu m}$ & Finite-neighbour interaction assumption. \\
+Collagen modulus & $3\unit{MPa}$ & Inherited softened mechanism-first choice. \\
+Crosslink stiffness & $10\unit{nN/\mu m}$ & Effective link penalty. \\
+Fibres / domain & 420 / $440\unit{\mu m}$ & Organoid-scale computational network. \\
+Crosslink retain fraction & 0.85 & Generator connectivity target, not G4's probability mechanism. \\
+Pull per cell & $12\unit{nN}$ & Constant-pull branch only. \\
+Bead time step & $0.05\unit{s}$ & Inherited numerical resolution. \\
+Cell drag / speed cap & $400\unit{nN\,s/\mu m}$ / $0.02\unit{\mu m/s}$ & Effective mobility and numerical/biological guard. \\
+\bottomrule
+\end{longtable}
+
+The inherited effective clutch defaults are $N=12$, $k_c=2\unit{nN/\mu m}$,
+$k_{\mathrm{on}}=0.055\unit{s^{-1}}$, $k_{\mathrm{off}}^0=0.018\unit{s^{-1}}$,
+$F_b=1.5\unit{nN}$, $v_0=0.025\unit{\mu m/s}$, and
+$F_{\mathrm{stall}}=8\unit{nN/site}$. G4 crosslink probability and G5 crosslink retention
+fraction are different constructions and should not be compared as one biological density.
+
+G5 remains a 2-D rigid-disk model without cell deformation, a nucleus, division, death, growth
+pressure, proteolysis, nutrient fields, three-dimensional pore confinement, or an emergent
+organoid polarity field. Several coefficients are exploratory. Matched ensembles and sensitivity
+analysis are required before biological prediction.
+
+\subsection*{Key references}
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+\item Lee et al. (2014), \emph{PLOS ONE} 9:e111896. doi:10.1371/journal.pone.0111896.
+\item Abhilash et al. (2014), \emph{Biophysical Journal} 107:1829--1840. doi:10.1016/j.bpj.2014.08.029.
+\item Wang et al. (2014), \emph{Biophysical Journal} 107:2592--2603. doi:10.1016/j.bpj.2014.09.044.
+\item Bell (1978), \emph{Science} 200:618--627. doi:10.1126/science.347575.
+\item Bangasser and Odde (2013), \emph{Cellular and Molecular Bioengineering} 6:449--459.
+\item Erdmann and Schwarz (2004), arXiv:cond-mat/0403552.
+\item Ilina and Friedl (2020), \emph{Nature Cell Biology}. doi:10.1038/s41556-020-0552-6.
+\item Steinwachs et al. (2016), \emph{Nature Methods} 13:171--176. doi:10.1038/nmeth.3685.
+\item Mark et al. (2020), \emph{eLife} 9:e51912.
+\item Nam et al. (2016), \emph{Biophysical Journal} 111:2296--2308.
+\item Wisdom et al. (2018), \emph{Nature Communications}. doi:10.1038/s41467-018-06641-z.
+\item Kim/Ahn et al. (2019), \emph{Acta Biomaterialia} 84:280. PMID:30500449.
+\item Carey et al. (2016), \emph{Integrative Biology} 8:821--835. doi:10.1039/C6IB00030D.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Claim boundary.} G5 is a controlled 2-D mechanism platform showing how
+inherited clutch traction, cell--cell cohesion, and crosslinked collagen jointly produce
+different organoid behaviours. It is not yet a predictive digital twin of tumour invasion.
+
+\end{document}

@@ -11,6 +11,11 @@ The interactive page is
 [`docs/g4-v2.html`](../../docs/g4-v2.html).  It lazy-loads exact Python results;
 the browser contains no second mechanics implementation.
 
+The complete theory guide—with the G4 lineage, governing equations,
+stage-specific assumptions, parameter provenance, visualization legend and
+evidence boundaries—is
+[`docs/theory/g4_model_theory.pdf`](../../docs/theory/g4_model_theory.pdf).
+
 ## The user request this version records
 
 1. Extend time far enough to see cell-induced collagen changes without making
