@@ -30,7 +30,7 @@ window.VERSION_EVIDENCE = {
   'g4-v4-b':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-c':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-d':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
-  'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'pending-review'},
+  'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'d49858b'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -41,7 +41,7 @@ window.VERSION_EVIDENCE = {
 
 window.EXPERIMENT_LOG = [
   {
-    date:'2026-09-15',generation:'G4',version:'G4 v4E E0–E3',branch:'revision/g4-v4e-contact-guided-single-cell',commit:'pending-review',
+    date:'2026-09-15',generation:'G4',version:'G4 v4E E0–E3',branch:'revision/g4-v4e-contact-guided-single-cell',commit:'d49858b',
     parent:'G4 v4D moving constant-radius single cell (d5639a1)',
     question:'Can a one-sided radial collagen cue plus a collagen-aligned probing protrusion convert G4D wandering into persistent single-cell migration?',
     change:'Added a centroid- and length-preserving local radial tract, explicit material-point choice, one probing-protrusion maturation clock, temporary front memory and natural Bell-law rear release. E0, E1, E2 and E3 keep the same force and clutch budget.',
