@@ -1,0 +1,142 @@
+{
+  "duration_seconds": 600.0,
+  "status": "short audit; full-clock gates remain exploratory",
+  "timestep": [
+    {
+      "dt": 0.05,
+      "D_cue": 4.221725411630951,
+      "persistence": 0.8728683695103928,
+      "front_event_order": [
+        "front_established"
+      ]
+    },
+    {
+      "dt": 0.025,
+      "D_cue": 4.828123802026248,
+      "persistence": 0.9269735440689745,
+      "front_event_order": [
+        "front_established"
+      ]
+    }
+  ],
+  "radius": [
+    {
+      "radius": 8.0,
+      "D_cue": 1.7825460491332261,
+      "D_cue_over_R": 0.22281825614165326,
+      "persistence": 0.9143431454296825
+    },
+    {
+      "radius": 10.0,
+      "D_cue": 4.221725411630951,
+      "D_cue_over_R": 0.4221725411630951,
+      "persistence": 0.8728683695103928
+    },
+    {
+      "radius": 12.0,
+      "D_cue": -3.483066246163253,
+      "D_cue_over_R": -0.2902555205136044,
+      "persistence": 0.8184223512455275
+    }
+  ],
+  "guidance_sensitivity": {
+    "tract_angular_sd": [
+      {
+        "value_deg": 15.0,
+        "D_cue": 4.221725411630951,
+        "persistence": 0.8728683695103928
+      },
+      {
+        "value_deg": 30.0,
+        "D_cue": 3.929081147446863,
+        "persistence": 0.890461986955505
+      }
+    ],
+    "front_maturation": [
+      {
+        "value_seconds": 60.0,
+        "D_cue": 4.290325536285276,
+        "persistence": 0.877814477725134
+      },
+      {
+        "value_seconds": 120.0,
+        "D_cue": 4.221725411630951,
+        "persistence": 0.8728683695103928
+      },
+      {
+        "value_seconds": 180.0,
+        "D_cue": 4.221725411630951,
+        "persistence": 0.8728683695103928
+      }
+    ],
+    "beta_alignment_and_memory": [
+      {
+        "value": 0.0,
+        "D_cue": 5.100272449973101,
+        "persistence": 0.8459449554001727
+      },
+      {
+        "value": 1.0,
+        "D_cue": 2.626888191686847,
+        "persistence": 0.5750196430547057
+      },
+      {
+        "value": 2.0,
+        "D_cue": 4.221725411630951,
+        "persistence": 0.8728683695103928
+      },
+      {
+        "value": 4.0,
+        "D_cue": 4.225420491738417,
+        "persistence": 0.8932167611600832
+      }
+    ]
+  },
+  "cue_rotation": [
+    {
+      "cue_angle_deg": 0.0,
+      "projected_displacement": 4.221725411630951,
+      "world_displacement": [
+        4.221725411630951,
+        2.343671728152106
+      ]
+    },
+    {
+      "cue_angle_deg": 90.0,
+      "projected_displacement": -5.683663634280632,
+      "world_displacement": [
+        3.6396096558889,
+        -5.683663634280632
+      ]
+    },
+    {
+      "cue_angle_deg": 180.0,
+      "projected_displacement": 1.246679549468168,
+      "world_displacement": [
+        -1.246679549468168,
+        0.6421404406509104
+      ]
+    }
+  ],
+  "domain": [
+    {
+      "domain_size": 180.0,
+      "n_fibers": 240,
+      "near_delta_radial_order": -0.009138373476906055,
+      "D_cue": 4.221725411630951
+    },
+    {
+      "domain_size": 240.0,
+      "n_fibers": 427,
+      "near_delta_radial_order": -0.09759857907262487,
+      "D_cue": 6.355355675471505
+    }
+  ],
+  "gates": {
+    "timestep_preserves_direction": true,
+    "timestep_preserves_front_event_order": true,
+    "cue_rotation_all_positive_projection": false,
+    "domain_near_cell_change_below_five_percent": false
+  },
+  "domain_relative_change": 0.9063677610500249
+}
