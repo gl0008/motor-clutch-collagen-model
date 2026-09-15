@@ -6,6 +6,7 @@ window.REPOSITORY_BRANCHES = [
   {name:'generation/g4',role:'Generation 4 checkpoint',state:'preserved',description:'Permanent G4 branch at the long-time and multiscale v2 evidence state.'},
   {name:'revision/g4-v3-random-to-aligned',role:'G4 v3 parent',state:'preserved',description:'Random finite-fibre mechanics benchmark preserved independently from the biological-cell interpretation.'},
   {name:'revision/g4-v4-single-cell-force-alignment',role:'G4 v4 review',state:'current',description:'Literature-gated constant-radius single-cell force–alignment model and website.'},
+  {name:'revision/g4-v4e-contact-guided-single-cell',role:'G4 v4E review',state:'current',description:'Additive E0–E3 matrix-cue and protrusion-memory experiment; G4 v4A–D remains frozen.'},
   {name:'generation/g5',role:'Generation 5 checkpoint',state:'preserved',description:'Permanent G5 model branch at the current molecular-clutch and ablation evidence state.'},
   {name:'agent/g5-organoid-plan',role:'G5 working history',state:'active history',description:'The model-development branch remains visible after merge so its experiment sequence can be audited.'},
   {name:'codex/model-evolution-notebook',role:'Notebook working history',state:'active history',description:'The website-development branch remains visible after merge so documentation changes can be audited.'}
@@ -29,6 +30,7 @@ window.VERSION_EVIDENCE = {
   'g4-v4-b':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-c':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-d':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
+  'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'pending-review'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -38,6 +40,16 @@ window.VERSION_EVIDENCE = {
 };
 
 window.EXPERIMENT_LOG = [
+  {
+    date:'2026-09-15',generation:'G4',version:'G4 v4E E0–E3',branch:'revision/g4-v4e-contact-guided-single-cell',commit:'pending-review',
+    parent:'G4 v4D moving constant-radius single cell (d5639a1)',
+    question:'Can a one-sided radial collagen cue plus a collagen-aligned probing protrusion convert G4D wandering into persistent single-cell migration?',
+    change:'Added a centroid- and length-preserving local radial tract, explicit material-point choice, one probing-protrusion maturation clock, temporary front memory and natural Bell-law rear release. E0, E1, E2 and E3 keep the same force and clutch budget.',
+    result:'The 20-seed six-hour build is a retained negative result. E3 mean Dcue is −3.904 µm with 95% CI [−13.060, 5.252], so the cue-direction gate is not passed. Mean persistence rises from 0.104 in E0 to 0.247 in E2 and 0.197 in E3, but the present tract does not reliably direct that persistent motion.',
+    limitation:'The short audit passes timestep direction/event order but fails cue rotation and the <5% domain gate; radius 12 µm also changes projected direction. Guidance gains, 120 s memory and no-rear-rebinding-after-natural-failure remain provisional assumptions.',
+    next:'Treat this as an exploratory negative result. Test whether tract geometry changes encountered-contact availability before adding new biology; do not increase force or select an extreme seed.',
+    evidence:[{label:'Interactive G4 v4E laboratory',href:'g4-v4e.html'},{label:'Paper and assumption ledger',href:'https://github.com/gl0008/motor-clutch-collagen-model/tree/revision/g4-v4e-contact-guided-single-cell/generations/g4_v4e_contact_guided_single_cell'}]
+  },
   {
     date:'2026-09-14',generation:'G4',version:'G4 v4 A–D',branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1',
     parent:'G4 v3 random-to-aligned mechanics benchmark (4757bdf)',

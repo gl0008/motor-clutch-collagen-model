@@ -1,0 +1,182 @@
+{
+  "version": "G4 v4E \u00b7 contact-guided persistent single-cell migration",
+  "quick": 0,
+  "duration": 21600.0,
+  "representative_seed": 45,
+  "topology": {
+    "eligible_attempts": 6,
+    "tract_fibers": 6,
+    "max_contour_length_change": 0.0,
+    "centers_and_lengths_rule": "centroid-preserving rigid rotation; invalid rotations skipped",
+    "random_crosslink_probability": 0.35,
+    "cue_crosslink_probability": 0.35,
+    "probability_adjustment_reason": "predeclared topology matching only",
+    "topology_comparison": {
+      "link_density_relative_difference": 0.002358,
+      "connected_fraction_relative_difference": 0.004444,
+      "within_five_percent": 1
+    }
+  },
+  "ensemble": {
+    "d_control": {
+      "D_cue": {
+        "mean": -9.64191,
+        "ci95": [
+          -19.709389,
+          0.42557
+        ]
+      },
+      "persistence": {
+        "mean": 0.103688,
+        "ci95": [
+          0.046703,
+          0.160673
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.635175,
+        "ci95": [
+          0.613121,
+          0.657228
+        ]
+      },
+      "D_cue_positive_ci": false
+    },
+    "matrix_cue": {
+      "D_cue": {
+        "mean": -2.763643,
+        "ci95": [
+          -8.422414,
+          2.895127
+        ]
+      },
+      "persistence": {
+        "mean": 0.085272,
+        "ci95": [
+          0.057419,
+          0.113124
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.626715,
+        "ci95": [
+          0.606374,
+          0.647055
+        ]
+      },
+      "D_cue_positive_ci": false
+    },
+    "protrusion_guidance": {
+      "D_cue": {
+        "mean": -2.206182,
+        "ci95": [
+          -15.108672,
+          10.696307
+        ]
+      },
+      "persistence": {
+        "mean": 0.247351,
+        "ci95": [
+          0.174286,
+          0.320416
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.634587,
+        "ci95": [
+          0.620735,
+          0.64844
+        ]
+      },
+      "D_cue_positive_ci": false
+    },
+    "combined": {
+      "D_cue": {
+        "mean": -3.903809,
+        "ci95": [
+          -13.05956,
+          5.251942
+        ]
+      },
+      "persistence": {
+        "mean": 0.197364,
+        "ci95": [
+          0.156487,
+          0.238242
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.610437,
+        "ci95": [
+          0.589295,
+          0.63158
+        ]
+      },
+      "D_cue_positive_ci": false
+    }
+  },
+  "gates": {
+    "E0_projected_ci_contains_zero": true,
+    "E2_no_fixed_world_axis": true,
+    "E3_positive_cue_displacement": false,
+    "negative_results_are_retained": 1
+  },
+  "representative_metrics": {
+    "d_control": {
+      "D_cue": -66.748213,
+      "net_displacement": 74.761509,
+      "path_length": 180.562498,
+      "persistence": 0.414048,
+      "contact_guidance_Ct": 0.573776,
+      "final_direction_angle": -2.674353,
+      "front_establishments": 0,
+      "front_losses": 0,
+      "ruptures": 73121,
+      "site_failures": 1343,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0
+    },
+    "matrix_cue": {
+      "D_cue": -5.893112,
+      "net_displacement": 25.56763,
+      "path_length": 146.979244,
+      "persistence": 0.173954,
+      "contact_guidance_Ct": 0.58263,
+      "final_direction_angle": 1.803379,
+      "front_establishments": 0,
+      "front_losses": 0,
+      "ruptures": 72708,
+      "site_failures": 1224,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0
+    },
+    "protrusion_guidance": {
+      "D_cue": -8.273653,
+      "net_displacement": 16.498576,
+      "path_length": 125.628151,
+      "persistence": 0.131329,
+      "contact_guidance_Ct": 0.633976,
+      "final_direction_angle": 2.096101,
+      "front_establishments": 1,
+      "front_losses": 0,
+      "ruptures": 72146,
+      "site_failures": 1080,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0
+    },
+    "combined": {
+      "D_cue": -7.813984,
+      "net_displacement": 19.899329,
+      "path_length": 125.458459,
+      "persistence": 0.158613,
+      "contact_guidance_Ct": 0.615257,
+      "final_direction_angle": 1.974336,
+      "front_establishments": 1,
+      "front_losses": 0,
+      "ruptures": 71961,
+      "site_failures": 1066,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0
+    }
+  }
+}

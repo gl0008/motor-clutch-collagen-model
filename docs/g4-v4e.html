@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 v4E · Contact-guided persistent migration</title>
+  <link rel="stylesheet" href="g4-v4e.css?v=1">
+  <style>.event-lab canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#f7f4ec}.eyebrow.dark{color:var(--orange);margin:0 0 4px}.event-lab h2{margin:.1rem 0}</style>
+  <script>window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']]},svg:{fontCache:'global'}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="g4-v4e-manifest.js?v=1"></script>
+  <script defer src="g4-v4e-validation.js?v=1"></script>
+  <script defer src="g4-v4e.js?v=1"></script>
+</head>
+<body>
+  <header class="hero">
+    <nav><a href="index.html">Model notebook</a><a href="g4-v4.html">Frozen G4 v4A–D</a><a href="https://github.com/gl0008/motor-clutch-collagen-model/tree/main/generations/g4_v4e_contact_guided_single_cell">Source notes</a></nav>
+    <p class="eyebrow">Generation 4 · additive revision E</p>
+    <h1>Can collagen contact turn wandering into persistent migration?</h1>
+    <p class="lede">The cell remains a fixed-radius single MDA-MB-231 cell. E0–E3 add a one-sided radial collagen tract and a contact-created front memory one factor at a time. No global polarization and no extra force are used.</p>
+    <div id="buildStatus" class="status">Loading generated experiment…</div>
+  </header>
+
+  <main>
+    <section class="question card">
+      <div><span class="tag direct">Primary question</span><h2>E0 vs E3</h2><p>Does a local radial matrix cue plus a biologically motivated protrusion response increase cue-axis displacement and path persistence relative to inherited G4D wandering?</p></div>
+      <div class="clock"><strong>6 h</strong><span>single-cell observation</span><strong>0.05 s</strong><span>physics timestep</span><strong>10 min</strong><span>overview frame</span></div>
+    </section>
+
+    <section class="lab card">
+      <div class="toolbar">
+        <button id="play">Play</button><button id="step">Step</button><button id="reset">Reset</button>
+        <label>Time <input id="time" type="range" min="0" max="1" value="0"><output id="timeLabel">0 h</output></label>
+        <label>Speed <select id="speed"><option value="900">0.5×</option><option value="450" selected>1×</option><option value="180">2.5×</option></select></label>
+        <label class="check"><input id="ghost" type="checkbox" checked> initial ghost</label>
+        <label class="check"><input id="links" type="checkbox" checked> crosslinks</label>
+        <label class="check"><input id="components" type="checkbox"> force components</label>
+      </div>
+      <div class="compare">
+        <article class="panel"><label>Left condition <select id="leftMode"></select></label><canvas id="leftCanvas" width="720" height="620"></canvas><div id="leftMetrics" class="metrics"></div><div id="leftWhy" class="why"></div></article>
+        <article class="panel"><label>Right condition <select id="rightMode"></select></label><canvas id="rightCanvas" width="720" height="620"></canvas><div id="rightMetrics" class="metrics"></div><div id="rightWhy" class="why"></div></article>
+      </div>
+      <div class="legend">
+        <span><i class="fiber"></i>random collagen bead-chain</span><span><i class="tract"></i>radial-cue fiber</span><span><i class="cross"></i>permanent elastic crosslink</span><span><i class="probe"></i>probing protrusion</span><span><i class="front"></i>front memory</span><span><i class="total"></i>total ECM force</span><span><i class="para"></i>parallel</span><span><i class="perp"></i>perpendicular</span>
+      </div>
+      <p class="scale-note">Geometry and cell path are drawn at true scale. Force/velocity arrows have a capped display scale and do not alter the simulation.</p>
+    </section>
+
+    <section class="card event-lab">
+      <div>
+        <p class="eyebrow dark">Event microscope</p>
+        <h2>Five-minute pull–slip–rebind window</h2>
+        <p>This close view starts at the first complete site failure or front establishment. It stores one frame per second so a disappearing clutch site cannot be hidden by the 10-minute overview sampling.</p>
+      </div>
+      <div class="toolbar">
+        <label>Condition <select id="eventMode"></select></label>
+        <button id="eventPlay">Play</button>
+        <label>Event time <input id="eventTime" type="range" min="0" max="1" value="0"><output id="eventTimeLabel">0 s</output></label>
+      </div>
+      <canvas id="eventCanvas" width="1180" height="520"></canvas>
+      <div id="eventMetrics" class="why"></div>
+      <p class="scale-note">Each spoke is one currently bound effective clutch. A red × marks a site that fell from bound to zero during the preceding one-second interval; a green ring marks binding after a zero-bound state.</p>
+    </section>
+
+    <section class="card">
+      <h2>Four cumulative conditions</h2>
+      <div class="conditions">
+        <article><b>E0 · G4D control</b><p>Random ECM + inherited relocation. Establishes wandering with no fixed +x bias.</p></article>
+        <article><b>E1 · Matrix cue only</b><p>Only a right-side 60° radial tract is added. Tests whether geometry alone is sufficient.</p></article>
+        <article><b>E2 · Protrusion guidance only</b><p>Random ECM + collagen-tangent selection + temporary front memory. The front must vary across world coordinates between seeds.</p></article>
+        <article><b>E3 · Combined</b><p>Radial tract + protrusion response. This is the predeclared main hypothesis, not a hand-picked animation.</p></article>
+      </div>
+      <div id="ensemble" class="ensemble"></div>
+    </section>
+
+    <section class="card equations">
+      <h2>Equations actually used</h2>
+      <article class="key"><span>Retained G4D mechanics</span>\[\zeta_b\dot{\mathbf r}_i=\mathbf F_i^{stretch}+\mathbf F_i^{bend}+\mathbf F_i^{crosslink}+\mathbf F_i^{contact}+\mathbf F_i^{steric}\]\[\zeta_c\dot{\mathbf r}_c=-\sum_s\mathbf F_s^{cell\to ECM}\]</article>
+      <article class="key"><span>New material-point selection</span>\[P_s=\frac{I_sw_s\exp\!\left[\beta_a(\hat{\mathbf t}_s\cdot\hat{\mathbf e}_s)^2+\beta_m\hat{\mathbf p}\cdot\hat{\mathbf e}_s\right]}{\sum_qI_qw_q\exp\!\left[\beta_a(\hat{\mathbf t}_q\cdot\hat{\mathbf e}_q)^2+\beta_m\hat{\mathbf p}\cdot\hat{\mathbf e}_q\right]}\]</article>
+      <article><span>Retained clutch loading and Bell rupture</span>\[\dot x_s=v_0\max\!\left(0,1-\frac{F_s}{F_{stall}}\right)-\mathbf v_{ECM,s}\cdot\hat{\boldsymbol\ell}_s,\qquad F_s=k_cx_s\]\[k_{off}(F_s)=k_{off}^0\exp\!\left(\frac{F_s}{F_b}\right)\]</article>
+      <article><span>Predeclared endpoints</span>\[D_{cue}=[\mathbf r_c(T)-\mathbf r_c(0)]\cdot\hat{\mathbf e}_{cue},\qquad P=\frac{D_{net}}{L_{path}},\qquad C_t=\left\langle|\hat{\mathbf v}_c\cdot\hat{\mathbf t}_{contact}|\right\rangle\]</article>
+    </section>
+
+    <section class="card">
+      <h2>Numerical and coordinate-bias audit</h2>
+      <div id="validation"><p>Loading the predeclared validation checks…</p></div>
+    </section>
+
+    <section class="card evidence">
+      <h2>What is evidence, and what is an assumption?</h2>
+      <div class="evidence-grid">
+        <article><span class="tag direct">Direct mechanism support</span><h3>Aligned collagen can guide MDA-MB-231 migration</h3><p>Riching et al. found more persistent motion and constrained protrusions along aligned collagen. Carey et al. observed radially aligned fibers stabilize and enlarge nearby probing protrusions.</p></article>
+        <article><span class="tag indirect">Indirect support</span><h3>A successful protrusion can define a front</h3><p>Aligned matrices reduce protrusion number and prolong the dominant protrusion, but the exact 120 s memory clock is not measured by these papers.</p></article>
+        <article><span class="tag assumption">Model assumption</span><h3>Natural rear release, then no rear rebinding</h3><p>Rear clutches are never forced to break. They follow the same Bell law; only after a complete natural site failure is its next search restricted to the forward half-plane.</p></article>
+        <article><span class="tag assumption">Provisional parameters</span><h3>Probability gains and cone widths</h3><p>\(\beta_a=\beta_m=2\), 45° front cone, 15° tract SD, and 120 s memory are declared sensitivity variables—not literature-fitted values.</p></article>
+      </div>
+      <ul id="references"></ul>
+    </section>
+
+    <section class="card however">
+      <h2>However — what v4E still cannot claim</h2>
+      <p>v4E tests whether two plausible single-cell mechanisms are sufficient in this 2D elastic network. It does not model a deformable cell, organoid surface-only traction, leader cells, crosslink rupture, plastic remodeling, proteolysis, or 3D steric confinement. A positive result is a mechanism demonstration; a negative E1/E2/E3 result is retained rather than hidden or repaired with larger forces.</p>
+    </section>
+  </main>
+</body>
+</html>

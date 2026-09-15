@@ -32,6 +32,7 @@ should only be copied into the repository when redistribution rights are clear.
 | G4 v2 C | R5–R7, R27–R28 | Bell rupture, independent versus shared-load cluster hypotheses, force redistribution and collective failure |
 | G4 v2 D | R6–R9, R15 | same shared-load mechanics with only reaction-driven cell translation/rotation released |
 | G4 v4 A–D | [version-specific paper ledger](../generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md) | random-to-aligned observations, cavity mechanics benchmark, MDA-MB-231 observation clocks, force-direction analysis, motor–clutch loading, shared-load failure and the explicit limits of every citation |
+| G4 v4E E0–E3 | [version-specific paper ledger](../generations/g4_v4e_contact_guided_single_cell/PAPER_LEDGER.md) | MDA-MB-231 contact guidance, local radial collagen, probing-protrusion persistence, and a strict separation between supported mechanism and provisional selection/memory rules |
 | G5 A–E | R1–R6, R8, R11–R13, R15–R16, R23, R27–R28 plus the G5 literature files | inherited bead–spring collagen and clutch; multicellular cohesion; radial alignment; nonlinear tensile recruitment; reaction-driven collective/single-cell invasion; crosslink-topology plasticity |
 | Separate future U937 track | R14 | outward protrusive path opening; deliberately not mixed into G2 pulling |
 
@@ -145,6 +146,11 @@ starting ECM, cell type, geometry, observation duration, supported claim and
 unsupported claim all matter to that revision. Use the
 [`PAPER_LEDGER.md`](../generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md)
 entry rather than treating a bibliography item as blanket validation.
+
+G4 v4E has its own narrower ledger at
+[`PAPER_LEDGER.md`](../generations/g4_v4e_contact_guided_single_cell/PAPER_LEDGER.md).
+It records which observations support collagen-guided protrusion persistence
+and which exact probability, memory and rebinding choices remain assumptions.
 
 ## Evidence boundary
 

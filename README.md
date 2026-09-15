@@ -194,6 +194,19 @@ loading, shared-load site failure and released-cell translation cumulatively.
 The source and access record is in
 [`PAPER_LEDGER.md`](generations/g4_v4_single_cell_force_alignment/PAPER_LEDGER.md).
 
+**G4 v4E** is a new additive branch; it does not edit v4A–D. It asks whether
+G4D wandering becomes persistent when a one-sided radial collagen tract is
+combined with a protrusion that prefers a real, locally aligned collagen
+material point and matures into a temporary front. Four matched E0–E3
+conditions separate matrix cue from protrusion memory without changing the
+motor or force budget. The 20-seed, six-hour result is deliberately retained as
+a negative result: E3 does not produce significantly positive cue-axis motion,
+although the protrusion-guidance conditions increase mean path persistence.
+The cue-rotation and domain-size audit also remains unresolved, so this stage
+is exploratory rather than a validated migration mechanism. See the
+[`implementation and assumption ledger`](generations/g4_v4e_contact_guided_single_cell/)
+and the [interactive v4E laboratory](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4e.html).
+
 ## Generation 5 — tumour organoid remodels and invades collagen
 
 Generation 5 scales the single-cell core up to a multicellular **organoid**: N motor–clutch
