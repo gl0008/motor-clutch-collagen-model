@@ -79,10 +79,13 @@ def headline(outdir="output"):
     Path(outdir).mkdir(exist_ok=True)
     # locked R0 baseline: default organoid scale (~43 cells), softened collagen, shared
     # clutch, G4D drag/speed.  2 h simulated so cells actually translate a visible amount.
-    # moderate organoid scale (~19-22 cells) so the 2 h run completes reliably on a
-    # memory-tight machine; full 7200 s simulated so cells translate a visible amount.
-    cfg = r0_config(organoid_radius=45.0, n_fibers=260, n_corona_fibers=90, domain_size=360.0,
-                    duration=7200.0, sample_interval=60.0, total_pull_force=24.0)
+    # ISOTROPIC-RANDOM network (run_r0_invasion default network_mode="random"): ~19 cells,
+    # ~400 fibres for grip/percolation at this scale (t=0 radial order ~0, not corona-biased),
+    # so the radial reorganisation is a genuine OUTPUT.  New filenames (does NOT overwrite the
+    # earlier corona-network r0_diagnostic_2h.*).
+    cfg = r0_config(organoid_radius=40.0, n_fibers=400, domain_size=340.0, boundary_width=6.0,
+                    generation_attempts=20, duration=7200.0, sample_interval=60.0,
+                    total_pull_force=24.0)
     t0 = time.time()
     out = run_r0_invasion(cfg, seed=23, snapshots=True)
     frames = out["frames"]
@@ -103,16 +106,16 @@ def headline(outdir="output"):
         f["mean_cell_radial_disp"], f["max_cell_disp"], _reach_um(f)))
 
     edges = out["edges"]
-    np.savez_compressed(f"{outdir}/r0_diagnostic_2h.npz",
+    np.savez_compressed(f"{outdir}/r0_diagnostic_random_2h.npz",
                         bead_snapshots=out["bead_snapshots"], cell_snapshots=out["cell_snapshots"],
                         edges=edges, centers0=out["centers0"], centers_final=out["centers_final"],
                         spaghetti=np.asarray(spa),
                         max_force_pair_residual=resid)
     span = float(np.max(np.abs(out["bead_snapshots"][0]))) * 1.02
     gif = viz.animate_invasion(
-        out["bead_snapshots"], out["cell_snapshots"], edges, f"{outdir}/r0_diagnostic_2h.gif",
+        out["bead_snapshots"], out["cell_snapshots"], edges, f"{outdir}/r0_diagnostic_random_2h.gif",
         cell_radius=cfg.cell_radius, span=span, fps=8,
-        title="G5-R0 force-consistent invasion (2 h): coherent strain, force-pair=0 (personal testing)")
+        title="G5-R0 force-consistent invasion (2 h, ISOTROPIC-random ECM): coherent strain, force-pair=0 (personal testing)")
     print("wrote", gif)
     return out
 

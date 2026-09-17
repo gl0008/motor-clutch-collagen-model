@@ -67,6 +67,7 @@ from generations.g5_organoid.model import (  # noqa: E402
     cell_candidate_fibers,
     _project_site_forces,
     _clutch_step,
+    _clutch_counter_uniforms,
     _new_clutch_state,
     _clutch_active_mask,
     cell_cell_forces,
@@ -74,6 +75,8 @@ from generations.g5_organoid.model import (  # noqa: E402
     radial_alignment_profile,
 )
 from common.model import Network, NetworkSpec, connectivity_report  # noqa: E402
+from generations.g4_v2_multiscale.model import (  # noqa: E402  (R2: per-site-stall clutch step)
+    bell_off_rate, shared_load_hazard)
 
 
 # =================================================================================
@@ -373,7 +376,7 @@ def floppiness_index(network) -> float:
 # =================================================================================
 def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = False,
                     adhesion_scale=None, pair_rule: str = "min",
-                    network_mode: str = "random") -> dict:
+                    network_mode: str = "random", site_stall=None) -> dict:
     """Force-consistent multicellular Stage-D-with-clutch invasion (the G5-R0 gate).
 
     Ports G4D's ``run_motor_clutch`` loop ORDER to M cells: sample frame -> clutch step
@@ -393,8 +396,10 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
         cfg = r0_config()
 
     # network_mode "random" = G4D-style ISOTROPIC network (t=0 radial order ~0, the honest
-    # default; radial alignment is an OUTPUT); "corona" = legacy model.make_organoid (biased).
-    _builder = make_random_organoid if network_mode == "random" else make_organoid
+    # default; radial alignment is an OUTPUT); "cued" = isotropic + a one-sided imposed radial
+    # tract (R2, opt-in, explicitly NOT swirling); "corona" = legacy model.make_organoid (biased).
+    _builder = {"random": make_random_organoid, "cued": make_cued_organoid}.get(
+        network_mode, make_organoid)
     network, centers, gap_radius, report = _builder(cfg, seed=seed)
     centers = centers.copy()
     centers0 = centers.copy()
@@ -413,6 +418,10 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
     cc_force = ((lambda ctr: _cell_cell_forces_geomean(ctr, cfg, adh_scale))
                 if pair_rule == "geomean"
                 else (lambda ctr: cell_cell_forces(ctr, cfg, adh_scale)))
+    # site_stall (R2): None -> global F_stall (R0/R1); array or callable(centers0,cfg) ->
+    # per-site F_stall (leaders' higher motor capacity).  Resolve the callable now.
+    if callable(site_stall):
+        site_stall = np.asarray(site_stall(centers0, cfg), dtype=float)
     candidates = cell_candidate_fibers(network, centers, reach)
     patches, _site_centers = organoid_clutch_patches(network, centers, cfg, candidates)  # INITIAL only
     S = len(patches)
@@ -483,9 +492,15 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
         if step == nsteps:
             break
 
-        # 1) clutch bundles load / Bell-slip / rebind (reused g4_v2 law via model._clutch_step)
-        _, site_force, breaks, binds, site_fail = _clutch_step(
-            cfg, state, substrate, step, active_mask)
+        # 1) clutch bundles load / Bell-slip / rebind (reused g4_v2 law via model._clutch_step).
+        # site_stall (R2) = per-site F_stall so leaders' higher traction EMERGES from the
+        # force-velocity law v=v0(1-F/F_stall); None -> global cfg.motor_stall_per_site (R0/R1).
+        if site_stall is None:
+            _, site_force, breaks, binds, site_fail = _clutch_step(
+                cfg, state, substrate, step, active_mask)
+        else:
+            _, site_force, breaks, binds, site_fail = _clutch_step_stall(
+                cfg, state, substrate, step, active_mask, site_stall)
 
         # 2) project the emergent clutch traction onto the ECM
         active = _project_site_forces(network, patches, site_force)
@@ -526,6 +541,7 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
 
     return {
         "config": asdict(cfg),
+        "clutch_per_cell_final": np.linalg.norm(reaction, axis=1),  # per-cell |reaction| (R2 leader vs follower)
         "centers0": centers0,
         "centers_final": centers,
         "organoid_center": organoid_center,
@@ -565,6 +581,23 @@ class G5RevisionConfig(OrganoidConfig):
     emt_assignment: str = "random"     # "random" (matched, seeded) | "boundary" (outer-enriched control)
     emt_seed: int = 12345
     emt_pair_rule: str = "min"         # "min" (weakest-member) | "geomean" (sensitivity control)
+
+    # --- R2: static leader NUMBER + LOCATION (functional role, decoupled from EMT) ---
+    n_leaders: int = 0                 # number of ACTIVE leader cells (0 -> R1 baseline, no boost)
+    leader_location: str = "cue_front" # "cue_front" (localized adjacent front on the cue side) |
+                                       #   "perimeter" (outermost n_leaders spread around; control)
+    leader_stall_factor: float = 1.0   # leaders' per-site F_stall multiple (>1 = higher motor
+                                       #   capacity -> higher EMERGENT traction; Reffay 2014)
+    budget_mode: str = "matched_total" # "matched_total" (total leader stall budget fixed vs N_L:
+                                       #   isolates number/geometry) | "fixed_per_leader" (each leader
+                                       #   keeps leader_stall_factor; total grows with N_L)
+    # --- R2: opt-in one-sided imposed radial ECM cue (EXPLICIT assumption, NOT swirling) ---
+    radial_cue: bool = False           # off -> isotropic random (default); on -> one-sided tract
+    cue_angle: float = 0.0             # rad, azimuth of the cue front
+    cue_half_width: float = 0.6        # rad, angular half-width of the cue sector
+    cue_band: float = 40.0             # um, radial thickness of the cued near-field band
+    cue_angular_sd: float = 0.35       # rad, jitter of the imposed radial tract (v4E)
+    cue_seed: int = 404
 
 
 def r1_config(base: OrganoidConfig | None = None, **overrides) -> "G5RevisionConfig":
@@ -695,4 +728,327 @@ def run_r1_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
     out["emt_phenotype"] = emt_phenotype(out["centers0"], cfg)
     out["emt_fraction"] = float(cfg.emt_fraction)
     out["emt_adhesion_factor"] = float(cfg.emt_adhesion_factor)
+    return out
+
+
+# =================================================================================
+# R2 -- static leader NUMBER + LOCATION (functional role; per-site motor capacity)
+# =================================================================================
+# Leaders are a FUNCTIONAL role (front-cell traction), separate from EMT phenotype (R1).
+# Their larger traction EMERGES from a higher PER-SITE F_stall via the force-velocity law
+# v = v0 (1 - F/F_stall) (Chan & Odde 2008), NOT a post-hoc force multiply.  These are
+# stall-aware copies of g4_v2 _independent_step / _shared_step: byte-identical to the
+# originals except ``cfg.motor_stall_per_site`` -> the per-site ``stall`` array.  Reffay 2014
+# (front cells exert larger traction) motivates leader_stall_factor>1 (a modelling choice).
+def _independent_step_stall(cfg, state, substrate_speed, u_on, u_off, stall):
+    force_before = cfg.clutch_stiffness * state.extension * state.bound
+    traction_before = force_before.sum(axis=1)
+    actin_speed = cfg.unloaded_actin_speed * np.maximum(0.0, 1.0 - traction_before / stall)
+    relative = np.maximum(0.0, actin_speed - substrate_speed)
+    state.extension[state.bound] += cfg.dt * np.repeat(
+        relative[:, None], cfg.n_clutches_per_site, axis=1)[state.bound]
+    force = cfg.clutch_stiffness * state.extension
+    breaks = state.bound & (u_off < 1.0 - np.exp(-bell_off_rate(force, cfg) * cfg.dt))
+    before_count = state.bound.sum(axis=1)
+    state.bound[breaks] = False
+    state.extension[breaks] = 0.0
+    on_probability = 1.0 - math.exp(-cfg.clutch_on_rate * cfg.dt)
+    binds = (~state.bound) & (u_on < on_probability)
+    state.bound[binds] = True
+    state.extension[binds] = 0.0
+    after_break_count = before_count - breaks.sum(axis=1)
+    site_failures = (before_count > 0) & (after_break_count == 0)
+    state.cumulative_slips += int(breaks.sum())
+    state.cumulative_site_failures += int(site_failures.sum())
+    force = cfg.clutch_stiffness * state.extension * state.bound
+    return force, force.sum(axis=1), breaks, binds, site_failures
+
+
+def _shared_step_stall(cfg, state, substrate_speed, u_on, u_off, stall):
+    before_count = state.bound.sum(axis=1)
+    site_stiffness = cfg.n_clutches_per_site * cfg.clutch_stiffness
+    traction_before = np.where(before_count > 0, site_stiffness * state.site_extension, 0.0)
+    actin_speed = cfg.unloaded_actin_speed * np.maximum(0.0, 1.0 - traction_before / stall)
+    relative = np.maximum(0.0, actin_speed - substrate_speed)
+    state.site_extension[before_count > 0] += cfg.dt * relative[before_count > 0]
+    site_force = np.where(before_count > 0, site_stiffness * state.site_extension, 0.0)
+    _pf, per_rate, _ = shared_load_hazard(site_force, before_count, cfg)
+    breaks = state.bound & (u_off < 1.0 - np.exp(-per_rate[:, None] * cfg.dt))
+    state.bound[breaks] = False
+    after_break_count = state.bound.sum(axis=1)
+    site_failures = (before_count > 0) & (after_break_count == 0)
+    state.site_extension[site_failures] = 0.0
+    on_probability = 1.0 - math.exp(-cfg.clutch_on_rate * cfg.dt)
+    binds = (~state.bound) & (u_on < on_probability)
+    state.bound[binds] = True
+    after_count = state.bound.sum(axis=1)
+    state.site_extension[after_count == 0] = 0.0
+    site_force = np.where(after_count > 0, site_stiffness * state.site_extension, 0.0)
+    per_force = np.divide(site_force, np.maximum(after_count, 1), dtype=float)
+    force = state.bound * per_force[:, None]
+    state.cumulative_slips += int(breaks.sum())
+    state.cumulative_site_failures += int(site_failures.sum())
+    return force, site_force, breaks, binds, site_failures
+
+
+def _clutch_step_stall(cfg, state, substrate, step, active_mask, site_stall):
+    """model._clutch_step with a per-site F_stall array (R2).  Same empty-sector masking."""
+    S = state.bound.shape[0]
+    u_on = _clutch_counter_uniforms(cfg, step, 0, S)
+    u_off = _clutch_counter_uniforms(cfg, step, 1, S)
+    if active_mask is not None:
+        empty = ~active_mask
+        u_on[empty] = 2.0
+        state.bound[empty] = False
+        state.extension[empty] = 0.0
+        state.site_extension[empty] = 0.0
+    stall = np.maximum(np.asarray(site_stall, dtype=float), 1e-9)
+    if cfg.clutch_mode == "shared":
+        return _shared_step_stall(cfg, state, substrate, u_on, u_off, stall)
+    return _independent_step_stall(cfg, state, substrate, u_on, u_off, stall)
+
+
+def leader_ids(centers: np.ndarray, cfg) -> np.ndarray:
+    """Cell indices of the n_leaders leaders (deterministic).
+
+    ``leader_location="cue_front"``: a LOCALIZED adjacent front -- among the outer (boundary)
+    cells, the n_leaders whose outward azimuth is nearest ``cue_angle``.  ``"perimeter"``: the
+    outermost n_leaders spread around the whole rim (control).  Empty when n_leaders<=0.
+    """
+    centers = np.asarray(centers, dtype=float)
+    M = len(centers)
+    n = int(getattr(cfg, "n_leaders", 0))
+    if n <= 0 or M == 0:
+        return np.zeros(0, dtype=int)
+    n = min(n, M)
+    radii = np.linalg.norm(centers, axis=1)
+    if getattr(cfg, "leader_location", "cue_front") == "perimeter":
+        return np.argsort(-radii)[:n]
+    outer = np.argsort(-radii)[:max(n, int(round(0.5 * M)))]
+    ang = np.arctan2(centers[outer, 1], centers[outer, 0])
+    dang = np.abs(np.arctan2(np.sin(ang - cfg.cue_angle), np.cos(ang - cfg.cue_angle)))
+    return outer[np.argsort(dang)[:n]]
+
+
+def leader_site_stall(centers: np.ndarray, cfg) -> np.ndarray:
+    """Per-site F_stall (length M*n_sec): base for followers, elevated for leader sites.
+
+    ``budget_mode="fixed_per_leader"``: leader sites = base*leader_stall_factor (total front
+    capacity GROWS with N_L).  ``"matched_total"``: the TOTAL leader stall budget is held
+    CONSTANT vs N_L -- leader sites = base*leader_stall_factor/N_L -- so more leaders each get
+    proportionally less, isolating leader NUMBER/geometry from total front traction (at large
+    N_L a matched-total leader can drop toward/below base -- the intended budget trade-off).
+    """
+    centers = np.asarray(centers, dtype=float)
+    M = len(centers)
+    n_sec = cfg.n_contact_sectors
+    base = float(cfg.motor_stall_per_site)
+    stall = np.full(M * n_sec, base)
+    lead = leader_ids(centers, cfg)
+    if len(lead) == 0:
+        return stall
+    f = float(getattr(cfg, "leader_stall_factor", 1.0))
+    per = base * f / len(lead) if getattr(cfg, "budget_mode", "matched_total") == "matched_total" else base * f
+    for c in lead:
+        stall[int(c) * n_sec:(int(c) + 1) * n_sec] = per
+    return stall
+
+
+def _nematic_rotation(source: float, target: float) -> float:
+    """Signed rotation source->target modulo pi (fibre orientation is headless)."""
+    delta = math.atan2(math.sin(target - source), math.cos(target - source))
+    if delta > math.pi / 2:
+        delta -= math.pi
+    elif delta < -math.pi / 2:
+        delta += math.pi
+    return delta
+
+
+def _cue_positions(positions, fibers, fixed, centers, cfg, organoid_outer):
+    """Impose a ONE-SIDED radial tract by centroid-preserving, LENGTH-PRESERVING rigid
+    rotation of eligible near-field fibres (port of v4E ``make_radial_tract_spec``,
+    model.py:124).  Eligible = not boundary-anchored, centroid in the cue sector
+    (``cue_angle`` +/- ``cue_half_width``) and radial band [organoid_outer, +cue_band].
+    Rotations that would enter a cell disk or leave the box are SKIPPED, never clipped, so no
+    hidden length change is introduced.  Returns ``(new_positions, tract_fids, report)``.  The
+    cue is an EXPLICIT temporary assumption, NOT swirling-derived (Kolade sees no swirling).
+    """
+    pts = np.asarray(positions, dtype=float).copy()
+    orig_pts = np.asarray(positions, dtype=float)
+    fixed = np.asarray(fixed, dtype=bool)
+    half = 0.5 * cfg.domain_size
+    void = cfg.cell_radius + cfg.cell_clearance
+    rng = np.random.default_rng(int(getattr(cfg, "cue_seed", 404)))
+    tract: list = []
+    attempts = 0
+    lo, hi = organoid_outer, organoid_outer + cfg.cue_band
+    for fid, ids_list in enumerate(fibers):
+        ids = np.asarray(ids_list, dtype=int)
+        if bool(np.any(fixed[ids])):
+            continue
+        seg = pts[ids]
+        centroid = seg.mean(axis=0)
+        r = float(np.linalg.norm(centroid))
+        if r < lo or r > hi:
+            continue
+        polar = math.atan2(float(centroid[1]), float(centroid[0]))
+        if abs(math.atan2(math.sin(polar - cfg.cue_angle),
+                          math.cos(polar - cfg.cue_angle))) > cfg.cue_half_width:
+            continue
+        attempts += 1
+        tangent = seg[-1] - seg[0]
+        source = math.atan2(float(tangent[1]), float(tangent[0]))
+        target = polar + float(rng.normal(0.0, cfg.cue_angular_sd))
+        delta = _nematic_rotation(source, target)
+        rot = np.array([[math.cos(delta), -math.sin(delta)], [math.sin(delta), math.cos(delta)]])
+        proposed = centroid + (seg - centroid) @ rot.T
+        dmin = np.sqrt(np.min(np.sum((proposed[:, None, :] - centers[None, :, :]) ** 2, axis=2), axis=1))
+        if float(dmin.min()) < void - 1e-8 or float(np.max(np.abs(proposed))) > half + 1e-8:
+            continue
+        pts[ids] = proposed
+        tract.append(fid)
+
+    def contour(P):
+        return np.array([float(np.linalg.norm(np.diff(P[np.asarray(i, dtype=int)], axis=0), axis=1).sum())
+                         for i in fibers])
+    dL = float(np.max(np.abs(contour(pts) - contour(orig_pts)))) if fibers else 0.0
+    return pts, tract, {"eligible_attempts": attempts, "tract_fibers": len(tract),
+                        "max_contour_length_change": dL}
+
+
+def make_cued_organoid(cfg, seed=None):
+    """:func:`make_random_organoid` + a one-sided imposed radial tract (R2, opt-in).
+
+    Identical isotropic build, then :func:`_cue_positions` rotates the eligible cue-sector
+    near-field fibres toward radial (length-preserving) BEFORE the Network is built, so the
+    cued geometry is the rest state.  The cue is an EXPLICIT assumption, NOT swirling-derived.
+    Returns ``(network, centers, gap_radius, report)`` with ``report["cue"]``.
+    """
+    cfg.validate()
+    centers = hex_centers(cfg.organoid_radius, cfg.cell_spacing)
+    organoid_outer = float(np.max(np.linalg.norm(centers, axis=1))) + cfg.cell_radius
+    gap_radius = organoid_outer + cfg.gap
+    base = cfg.seed if seed is None else int(seed)
+    best = (-1, -1.0, None, None)
+    for attempt in range(cfg.generation_attempts):
+        seed_used = base + 7919 * attempt
+        spec = _random_isotropic_spec(cfg, centers, seed_used)
+        pts, _tract, cue_report = _cue_positions(spec.positions, spec.fibers, spec.fixed,
+                                                 centers, cfg, organoid_outer)
+        spec = NetworkSpec(pts, spec.fibers, spec.fixed, spec.contact_fibers, seed_used)
+        network = Network(spec, cfg, crosslinks=[])
+        network.crosslinks = build_crosslinks_grid(network)
+        network.refresh_crosslink_arrays()
+        if cfg.crosslink_fraction < 1.0 and network.crosslinks:
+            rng = np.random.default_rng(seed_used + 101)
+            keep = rng.random(len(network.crosslinks)) < cfg.crosslink_fraction
+            network.crosslinks = [x for x, k in zip(network.crosslinks, keep) if k]
+            network.refresh_crosslink_arrays()
+        report = connectivity_report(network)
+        report["cue"] = cue_report
+        score = float(report["connected_fraction"])
+        cc = 1 if report["contact_fibers_connected"] else 0
+        if (cc, score) > (best[0], best[1]):
+            best = (cc, score, network, report)
+        if report["contact_fibers_connected"] and score >= cfg.required_connected_fraction:
+            return network, centers, gap_radius, report
+    if best[2] is not None:
+        return best[2], centers, gap_radius, best[3]
+    raise RuntimeError("cued organoid network percolation gate failed")
+
+
+# --- R2 morphology metrics (documented modelling choices) -------------------------
+def aspect_ratio(centers: np.ndarray) -> float:
+    """Organoid elongation: sqrt(max/min principal variance of the cell cloud) (>=1)."""
+    c = np.asarray(centers, dtype=float)
+    if len(c) < 2:
+        return 1.0
+    w = np.linalg.eigvalsh(np.cov((c - c.mean(0)).T))
+    w = np.maximum(w, 1e-12)
+    return float(np.sqrt(w.max() / w.min()))
+
+
+def leader_follower_separation(centers: np.ndarray, centers0: np.ndarray, cfg) -> float:
+    """Mean OUTWARD advance along the cue axis of leaders minus followers (um).  >0 = leaders
+    lead the front; the follower_lag is the same signed quantity (leaders ahead of followers)."""
+    c = np.asarray(centers, dtype=float)
+    c0 = np.asarray(centers0, dtype=float)
+    lead = leader_ids(c0, cfg)
+    if len(lead) == 0 or len(c) == 0:
+        return 0.0
+    axis = np.array([math.cos(cfg.cue_angle), math.sin(cfg.cue_angle)])
+    adv = (c - c0) @ axis
+    mask = np.zeros(len(c), dtype=bool)
+    mask[lead] = True
+    lead_adv = float(adv[mask].mean())
+    foll_adv = float(adv[~mask].mean()) if (~mask).any() else 0.0
+    return lead_adv - foll_adv
+
+
+def follower_lag(centers: np.ndarray, centers0: np.ndarray, cfg) -> float:
+    """Alias of :func:`leader_follower_separation` (how far followers lag the leaders, um)."""
+    return leader_follower_separation(centers, centers0, cfg)
+
+
+def strand_metrics(centers: np.ndarray, cfg):
+    """Strand readout: connected chains of PROTRUDING cells (radius > median + cell_spacing)
+    linked within the adhesion cutoff.  Returns (n_strands, mean_len_cells, max_len_cells)."""
+    c = np.asarray(centers, dtype=float)
+    M = len(c)
+    if M == 0:
+        return 0, 0.0, 0
+    radii = np.linalg.norm(c, axis=1)
+    idx = np.flatnonzero(radii > (np.median(radii) + cfg.cell_spacing))
+    if len(idx) == 0:
+        return 0, 0.0, 0
+    cutoff = cfg.cell_spacing + cfg.cc_adhesion_range
+    d = np.linalg.norm(c[idx][None, :, :] - c[idx][:, None, :], axis=2)
+    adj = (d > 0.0) & (d <= cutoff)
+    seen = np.zeros(len(idx), dtype=bool)
+    sizes: list = []
+    for s0 in range(len(idx)):
+        if seen[s0]:
+            continue
+        stack = [s0]
+        seen[s0] = True
+        sz = 0
+        while stack:
+            u = stack.pop()
+            sz += 1
+            for v in np.flatnonzero(adj[u]):
+                if not seen[v]:
+                    seen[v] = True
+                    stack.append(int(v))
+        sizes.append(sz)
+    return len(sizes), float(np.mean(sizes)), int(max(sizes))
+
+
+def run_r2_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool = False) -> dict:
+    """R2: force-consistent invasion with LOCALIZED leaders (number + location) whose higher
+    traction EMERGES from per-site motor capacity (:func:`leader_site_stall`), optionally on a
+    one-sided imposed radial cue (``radial_cue``).  EMT (R1 adhesion) is a SEPARATE knob: by
+    default leaders are NOT low-adhesion (set ``emt_fraction`` for the coupled control).
+    Force-pair stays 0.  Returns the R0/R1 dict + leader ids, per-site stall, cue report, and
+    strand / leader-follower / aspect metrics.
+    """
+    if cfg is None:
+        cfg = r1_config()
+    net_mode = "cued" if getattr(cfg, "radial_cue", False) else "random"
+    adh = emt_phenotype if float(getattr(cfg, "emt_fraction", 0.0)) > 0.0 else None
+    boost = (int(getattr(cfg, "n_leaders", 0)) > 0
+             and float(getattr(cfg, "leader_stall_factor", 1.0)) != 1.0)
+    ss = leader_site_stall if boost else None
+    out = run_r0_invasion(cfg, seed=seed, snapshots=snapshots, adhesion_scale=adh,
+                          pair_rule=getattr(cfg, "emt_pair_rule", "min"),
+                          network_mode=net_mode, site_stall=ss)
+    c0, cf = out["centers0"], out["centers_final"]
+    out["leader_ids"] = leader_ids(c0, cfg).tolist()
+    out["site_stall"] = leader_site_stall(c0, cfg) if boost else None
+    out["cue_report"] = out.get("connectivity", {}).get("cue")
+    n_strands, mean_len, max_len = strand_metrics(cf, cfg)
+    out["strand_count"] = int(n_strands)
+    out["strand_mean_len"] = float(mean_len)
+    out["strand_max_len"] = int(max_len)
+    out["leader_follower_separation"] = leader_follower_separation(cf, c0, cfg)
+    out["aspect_ratio"] = aspect_ratio(cf)
     return out
