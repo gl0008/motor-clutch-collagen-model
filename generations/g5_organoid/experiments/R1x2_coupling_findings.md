@@ -38,9 +38,31 @@ produce it. **R3 (energy-based leader switching, Zhang 2019) is therefore the PE
 the front advancing as the front leaders fatigue (drain motor energy) and fresher followers take over —
 not a prerequisite for strand *formation*. This sharpens R3's purpose.
 
+## Phase map — cc_adhesion × n_leaders (25 runs, 1500 s, cued, fixed_per_leader stall ×6)
+`output/r1x2_phasemap.png` (+ `.npz`). **Directionality = leader-follower separation (µm):**
+
+| cc \ N_L | 0 | 1 | 2 | 3 | 5 |
+|--:|--:|--:|--:|--:|--:|
+| 1 | 0.00 | +6.54 | **+8.00** | +4.66 | −0.60 |
+| 2 | 0.00 | +2.24 | +4.46 | +1.20 | +0.24 |
+| 4 | 0.00 | +2.57 | +3.66 | +1.24 | −0.55 |
+| 6 | 0.00 | +3.17 | +3.51 | +2.09 | +0.40 |
+| 8 | 0.00 | +1.75 | +2.15 | +0.44 | −0.01 |
+
+- **The directional-leading regime = LOW adhesion (cc 1–2) + FEW concentrated leaders (N_L 1–2)**
+  (peak +8.0 µm at cc=1, N_L=2). N_L=5 collapses to ~0 (too many leaders → no distinct front vs
+  followers); high adhesion dims it (cohesion resists leading).
+- **force-pair residual = 0 across ALL 25 cells.**
+- `aspect_ratio` (1.04–1.13) and `detached_fraction` (0) are **flat at 1500 s** — elongation and
+  escape are 2 h effects (see the 2 h headline above: aspect 1.28, detached 0.21 at cc=1.5). The
+  1500 s phase map isolates DIRECTIONALITY (leader-follower separation), the metric that is already
+  sensitive at this timescale.
+
 ## Reproduce
 ```bash
 python generations/g5_organoid/experiments/r1x2_coupling.py sweep      # cc x leaders (1200 s)
 python generations/g5_organoid/experiments/r1x2_coupling.py headline   # 2 h gifs (leaders red)
+python generations/g5_organoid/experiments/r1x2_phasemap.py            # 5x5 phase map + heatmaps
 ```
-GIFs: `output/r1x2_lowadh_leaders_2h.gif`, `output/r1x2_lowadh_control_2h.gif`.
+GIFs: `output/r1x2_lowadh_leaders_2h.gif`, `output/r1x2_lowadh_control_2h.gif`;
+figure: `output/r1x2_phasemap.png`.
