@@ -599,6 +599,23 @@ class G5RevisionConfig(OrganoidConfig):
     cue_angular_sd: float = 0.35       # rad, jitter of the imposed radial tract (v4E)
     cue_seed: int = 404
 
+    # --- R3: energy-based DYNAMIC leader switching (persistence layer; Zhang 2019) ---
+    # off -> static R2 leaders.  On: a front leader that keeps doing reel work DRAINS a
+    # per-cell energy; below energy_off it DEMOTES and a fresher front-follower (E>energy_on)
+    # is PROMOTED (relay handoff).  n_leaders = MAX simultaneous active leaders.
+    leader_switching: bool = False
+    energy_E0: float = 1.0             # resting per-cell energy (dimensionless)
+    energy_tau_rec: float = 300.0      # s, recovery time toward E0 when idle
+    energy_cap: float = 130.0          # nN*um of motor work per unit energy drained (drain rate).
+                                       #   Calibrated so at the typical R3 regime (cued, low adhesion,
+                                       #   ~x6 leader; measured P_leader~0.34, P_follower~0.17 nN*um/s)
+                                       #   the steady energy E*=E0-P*tau_rec/cap puts an ACTIVE leader
+                                       #   below energy_off (~0.25) but followers above energy_on (~0.63)
+                                       #   -> leader lifetime ~minutes (Zhang 2019 ORDER, compressed for
+                                       #   demonstration; calibrated to LIFETIME, not measured ATP).
+    energy_on: float = 0.5             # promote a candidate only if E > energy_on ...
+    energy_off: float = 0.3            # ... demote an active leader when E < energy_off (hysteresis)
+
 
 def r1_config(base: OrganoidConfig | None = None, **overrides) -> "G5RevisionConfig":
     """G5RevisionConfig with the R0 baseline (shared clutch, G4D drag/speed, elastic)
@@ -1052,3 +1069,289 @@ def run_r2_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
     out["leader_follower_separation"] = leader_follower_separation(cf, c0, cfg)
     out["aspect_ratio"] = aspect_ratio(cf)
     return out
+
+
+# =================================================================================
+# R3 -- energy-based DYNAMIC leader switching (the PERSISTENCE layer; Zhang 2019)
+# =================================================================================
+# A front leader that keeps doing mechanical (reel) work DRAINS a per-cell energy; when it
+# drops below a threshold the leader DEMOTES and a fresher front-follower (higher energy,
+# gripping) is PROMOTED -- a relay-like handoff (Zhang et al. 2019: leader replacement in
+# MDA-MB-231 spheroid/organoid collagen invasion, energy-depletion driven, leader lifetime
+# ~120-480 min).  MODELLING CHOICE + explicit HYPOTHESIS: the motor mechanical power
+# P = sum_s F_s * v_motor,s is used as an ATP-consumption PROXY -- it is NOT a measured or
+# calibrated equation.  The energy params are calibrated to leader LIFETIME (so a handoff is
+# visible within a run; here compressed to ~minutes vs Zhang's 120-480 min ORDER for
+# demonstration), NOT to measured ATP.  EMT phenotype (adhesion) is UNCHANGED by switching.
+# Built on the R2 localized-leader / per-site-stall machinery; force-pair stays 0.
+def motor_power_per_cell(cfg, patches, site_force, site_stall, n_sec, M):
+    """Per-cell motor mechanical power (ATP-consumption PROXY -- a HYPOTHESIS):
+    ``P_i = sum_{s in i} F_s * v_motor,s`` with ``v_motor,s = v0*max(0, 1 - F_s/F_stall,s)``
+    (the SAME force-velocity law the clutch step uses; Chan & Odde 2008).  Gripping loaded
+    sites only; a non-gripping cell has ``P = 0``.  Units nN*um/s."""
+    v0 = float(cfg.unloaded_actin_speed)
+    stall = np.maximum(np.asarray(site_stall, dtype=float), 1e-9)
+    P = np.zeros(M)
+    for s, patch in enumerate(patches):
+        if patch is None or site_force[s] <= 0.0:
+            continue
+        v = v0 * max(0.0, 1.0 - float(site_force[s]) / float(stall[s]))
+        P[s // n_sec] += float(site_force[s]) * v
+    return P
+
+
+def _front_pool_mask(centers, cfg):
+    """Boolean mask of FRONT-eligible cells: the outer (boundary) cells, restricted to the
+    cue sector (|azimuth - cue_angle| <= cue_half_width) when ``leader_location='cue_front'``
+    (all outer cells for ``'perimeter'``)."""
+    centers = np.asarray(centers, dtype=float)
+    M = len(centers)
+    mask = np.zeros(M, dtype=bool)
+    if M == 0:
+        return mask
+    radii = np.linalg.norm(centers, axis=1)
+    outer = np.argsort(-radii)[:max(1, int(round(0.5 * M)))]
+    if getattr(cfg, "leader_location", "cue_front") == "perimeter":
+        mask[outer] = True
+        return mask
+    ang = np.arctan2(centers[outer, 1], centers[outer, 0])
+    d = np.abs(np.arctan2(np.sin(ang - cfg.cue_angle), np.cos(ang - cfg.cue_angle)))
+    mask[outer[d <= cfg.cue_half_width]] = True
+    return mask
+
+
+def update_active_leaders(centers, energy, current_leaders, gripping_mask, cfg):
+    """Dynamic active-leader set with HYSTERESIS (Zhang 2019 relay).  A candidate must be a
+    FRONT cell (:func:`_front_pool_mask`) AND currently gripping collagen.  A current leader
+    STAYS active until its energy < ``energy_off`` (or it loses grip / leaves the front) then
+    DEMOTES; free slots (< ``n_leaders``) are filled by the highest-energy eligible candidate
+    with energy > ``energy_on`` (PROMOTE).  ``energy_on > energy_off`` prevents flip-flop.
+    Returns ``(active_ids sorted, events)`` where events is a list of ``('demote'|'promote', cell)``."""
+    M = len(centers)
+    n_max = int(getattr(cfg, "n_leaders", 0))
+    if n_max <= 0 or M == 0:
+        return np.zeros(0, dtype=int), []
+    eligible = _front_pool_mask(centers, cfg) & np.asarray(gripping_mask, dtype=bool)
+    E = np.asarray(energy, dtype=float)
+    e_on = float(cfg.energy_on)
+    e_off = float(cfg.energy_off)
+    events = []
+    active = []
+    for c in [int(x) for x in current_leaders]:
+        if eligible[c] and E[c] >= e_off:
+            active.append(c)
+        else:
+            events.append(("demote", c))
+    if len(active) < n_max:
+        cand = [int(c) for c in np.flatnonzero(eligible)
+                if int(c) not in active and E[c] > e_on]
+        cand.sort(key=lambda c: -E[c])
+        for c in cand[: n_max - len(active)]:
+            active.append(int(c))
+            events.append(("promote", int(c)))
+    return np.asarray(sorted(active), dtype=int), events
+
+
+def _site_stall_from_ids(active_ids, cfg, M):
+    """Per-site F_stall (length ``M*n_sec``) elevating the CURRENT active leaders -- dynamic
+    version of :func:`leader_site_stall` (same matched_total / fixed_per_leader budget)."""
+    n_sec = cfg.n_contact_sectors
+    base = float(cfg.motor_stall_per_site)
+    stall = np.full(M * n_sec, base)
+    ids = [int(c) for c in active_ids]
+    if not ids:
+        return stall
+    f = float(getattr(cfg, "leader_stall_factor", 1.0))
+    per = (base * f / len(ids)
+           if getattr(cfg, "budget_mode", "matched_total") == "matched_total" else base * f)
+    for c in ids:
+        stall[c * n_sec:(c + 1) * n_sec] = per
+    return stall
+
+
+def run_r3_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool = False) -> dict:
+    """R3: force-consistent invasion with ENERGY-BASED DYNAMIC leader switching (persistence).
+
+    Each step the per-cell motor power ``P`` (ATP proxy; a HYPOTHESIS) drains a per-cell energy
+    ``E`` that recovers toward ``energy_E0`` with ``energy_tau_rec``; the ACTIVE leader set is
+    recomputed with hysteresis (:func:`update_active_leaders`) so a drained front leader hands
+    off to a fresher front-follower, and the per-site ``F_stall`` is rebuilt from the CURRENT
+    leaders.  ``leader_switching=False`` -> identical to :func:`run_r2_invasion`.  Force-pair
+    stays 0.  Imposed cue NOT swirling; EMT adhesion unchanged by switching.  Personal testing."""
+    if cfg is None:
+        cfg = r1_config()
+    if not getattr(cfg, "leader_switching", False):
+        return run_r2_invasion(cfg, seed=seed, snapshots=snapshots)
+
+    net_mode = "cued" if getattr(cfg, "radial_cue", False) else "random"
+    _builder = {"random": make_random_organoid, "cued": make_cued_organoid}.get(
+        net_mode, make_random_organoid)
+    network, centers, gap_radius, report = _builder(cfg, seed=seed)
+    centers = centers.copy()
+    centers0 = centers.copy()
+    M = len(centers)
+    n_sec = cfg.n_contact_sectors
+    organoid_center = np.zeros(2)
+    stepper = OrganoidStepper(network, centers)
+    reach = cfg.cell_radius + cfg.contact_width + 2.0
+    # R1 EMT adhesion hook; leaders are NOT auto-low-adhesion (phenotype separate from role)
+    adh = emt_phenotype if float(getattr(cfg, "emt_fraction", 0.0)) > 0.0 else None
+    adh_scale = (leader_adhesion_scale(centers0, cfg) if adh is None
+                 else np.asarray(adh(centers0, cfg), dtype=float))
+    cc_force = ((lambda ctr: _cell_cell_forces_geomean(ctr, cfg, adh_scale))
+                if getattr(cfg, "emt_pair_rule", "min") == "geomean"
+                else (lambda ctr: cell_cell_forces(ctr, cfg, adh_scale)))
+    candidates = cell_candidate_fibers(network, centers, reach)
+    patches, _sc = organoid_clutch_patches(network, centers, cfg, candidates)
+    S = len(patches)
+    active_mask = _clutch_active_mask(patches)
+    state = _new_clutch_state(S, cfg)
+    substrate = np.zeros(S)
+    site_force = np.zeros(S)
+    v_cell = np.zeros((M, 2))
+    reaction = np.zeros((M, 2))
+    n_relocations = 0
+
+    # R3 energy + dynamic leaders (seed with the R2 static pick)
+    energy = np.full(M, float(cfg.energy_E0))
+    active_leaders = [int(c) for c in leader_ids(centers0, cfg)]
+    n_switches = 0
+    switch_log: list = []
+    leader_since = {c: 0.0 for c in active_leaders}
+    cue_axis = np.array([math.cos(cfg.cue_angle), math.sin(cfg.cue_angle)])
+
+    nsteps = int(round(cfg.duration / cfg.dt))
+    every = max(1, int(round(cfg.sample_interval / cfg.dt)))
+    contact_every = max(1, int(round(cfg.contact_update_interval / cfg.dt)))
+    frames: list = []
+    bead_snaps: list = []
+    cell_snaps: list = []
+    max_residual = 0.0
+
+    def front_advance():
+        fp = _front_pool_mask(centers0, cfg)
+        return float(np.mean((centers[fp] - centers0[fp]) @ cue_axis)) if fp.any() else 0.0
+
+    def sample_frame(time):
+        prof = radial_alignment_profile(network, organoid_center)
+        clutch_ecm = np.zeros((M, 2))
+        for s, patch in enumerate(patches):
+            if patch is None or site_force[s] <= 0.0:
+                continue
+            clutch_ecm[s // n_sec] += site_force[s] * patch.normal_in
+        residual = float(np.max(np.linalg.norm(reaction + clutch_ecm, axis=1))) if M else 0.0
+        lead_E = [float(energy[c]) for c in active_leaders]
+        return {
+            "time": time,
+            "global_radial_order": prof["global_radial_order"],
+            "mean_cell_radial_disp": float(np.mean(
+                np.linalg.norm(centers, axis=1) - np.linalg.norm(centers0, axis=1))),
+            "max_cell_disp": float(np.max(np.linalg.norm(centers - centers0, axis=1))),
+            "radius_of_gyration": radius_of_gyration(centers),
+            "detached_fraction": detached_fraction(centers, cfg),
+            "lcc_fraction": largest_connected_component_fraction(centers, cfg),
+            "force_pair_residual": residual,
+            "floppiness_index": floppiness_index(network),
+            "total_traction": float(site_force.sum()),
+            # R3:
+            "active_leaders": list(active_leaders),
+            "n_active_leaders": len(active_leaders),
+            "energy_min": float(energy.min()),
+            "energy_mean": float(energy.mean()),
+            "leader_energy_mean": float(np.mean(lead_E)) if lead_E else 0.0,
+            "n_switches": int(n_switches),
+            "front_advance": front_advance(),
+            "leader_follower_separation": leader_follower_separation(centers, centers0, cfg),
+        }
+
+    for step in range(nsteps + 1):
+        time = step * cfg.dt
+        if step % every == 0:
+            fr = sample_frame(time)
+            max_residual = max(max_residual, fr["force_pair_residual"])
+            frames.append(fr)
+            if snapshots:
+                bead_snaps.append(network.r.copy())
+                cell_snaps.append(centers.copy())
+        if step == nsteps:
+            break
+
+        # dynamic per-site F_stall from the CURRENT active leaders (rebuilt every step)
+        site_stall = _site_stall_from_ids(active_leaders, cfg, M)
+
+        # 1) clutch step (per-site stall) -> emergent traction
+        _, site_force, breaks, binds, site_fail = _clutch_step_stall(
+            cfg, state, substrate, step, active_mask, site_stall)
+        # 2) project onto ECM
+        active = _project_site_forces(network, patches, site_force)
+        # 3) force-pair reaction + capped overdamped motion
+        reaction = per_cell_clutch_reaction(patches, site_force, n_sec, M)
+        f_cell = reaction + cc_force(centers)
+        v_cell = f_cell / cfg.cell_drag
+        speed = np.linalg.norm(v_cell, axis=1)
+        over = speed > cfg.max_cell_speed
+        if np.any(over):
+            v_cell[over] *= (cfg.max_cell_speed / speed[over])[:, None]
+        centers += cfg.dt * v_cell
+        stepper.centers[:] = centers
+        # 4) ECM step + relative substrate speed
+        stepper.step(active, cfg.dt)
+        site_centers = np.repeat(centers, n_sec, axis=0)
+        v_cell_per_site = np.repeat(v_cell, n_sec, axis=0)
+        substrate = _relative_substrate_speeds_mc(
+            network, stepper.velocity, patches, site_centers, v_cell_per_site)
+        if step and step % contact_every == 0:
+            candidates = cell_candidate_fibers(network, centers, reach)
+        # 5) event-driven relocation + reset of fully-failed sites
+        if np.any(site_fail):
+            for s in np.flatnonzero(site_fail):
+                c = int(s // n_sec)
+                newp = _relocate_site(network, centers[c], patches, int(s), c,
+                                      n_sec, candidates[c], cfg)
+                if newp is not None:
+                    patches[int(s)] = newp
+                _reset_site_state(state, int(s))
+                n_relocations += 1
+            active_mask = _clutch_active_mask(patches)
+
+        # --- R3: energy update (ATP proxy) + dynamic leader switching ---
+        P = motor_power_per_cell(cfg, patches, site_force, site_stall, n_sec, M)
+        energy += cfg.dt * ((cfg.energy_E0 - energy) / cfg.energy_tau_rec - P / cfg.energy_cap)
+        np.clip(energy, 0.0, None, out=energy)
+        gripping = active_mask.reshape(M, n_sec).any(axis=1)
+        new_active, events = update_active_leaders(centers, energy, active_leaders, gripping, cfg)
+        for kind, c in events:
+            switch_log.append((float(time), kind, int(c)))
+            if kind == "promote":
+                n_switches += 1
+                leader_since[c] = float(time)
+        active_leaders = [int(c) for c in new_active]
+
+    lifetimes = [float(cfg.duration - leader_since.get(c, cfg.duration)) for c in active_leaders]
+    ns, ml, mx = strand_metrics(centers, cfg)
+    return {
+        "config": asdict(cfg),
+        "centers0": centers0, "centers_final": centers,
+        "organoid_center": organoid_center, "connectivity": report,
+        "n_cells": M, "n_beads": len(network.r), "n_fibers": len(network.fibers),
+        "n_clutch_sites": S, "clutch_mode": cfg.clutch_mode,
+        "max_force_pair_residual": float(max_residual),
+        "cumulative_slips": int(state.cumulative_slips),
+        "cumulative_site_failures": int(state.cumulative_site_failures),
+        "n_relocations": int(n_relocations),
+        "frames": frames,
+        "bead_snapshots": np.asarray(bead_snaps) if snapshots else None,
+        "cell_snapshots": np.asarray(cell_snaps) if snapshots else None,
+        "final_positions": network.r.copy(), "initial_positions": network.r0.copy(),
+        "edges": network.edges.copy(),
+        # R3 summary
+        "n_switches": int(n_switches),
+        "switch_log": switch_log,
+        "final_active_leaders": list(active_leaders),
+        "initial_leaders": [int(c) for c in leader_ids(centers0, cfg)],
+        "final_leader_lifetimes": lifetimes,
+        "energy_final": energy.copy(),
+        "strand_count": int(ns), "strand_mean_len": float(ml), "strand_max_len": int(mx),
+        "aspect_ratio": aspect_ratio(centers),
+        "leader_follower_separation": leader_follower_separation(centers, centers0, cfg),
+    }
