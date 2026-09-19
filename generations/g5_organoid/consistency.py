@@ -581,6 +581,10 @@ class G5RevisionConfig(OrganoidConfig):
     emt_assignment: str = "random"     # "random" (matched, seeded) | "boundary" (outer-enriched control)
     emt_seed: int = 12345
     emt_pair_rule: str = "min"         # "min" (weakest-member) | "geomean" (sensitivity control)
+    emt_traction_factor: float = 1.0   # partial-EMT cells' per-site motor-stall multiplier
+                                       #   (biology audit B: EMT raises traction/protrusion too, not
+                                       #   adhesion alone). 1.0 = R1 adhesion-only (decoupled); >1 =
+                                       #   COUPLED EMT-leader (same cells loosen junctions AND pull harder)
 
     # --- R2: static leader NUMBER + LOCATION (functional role, decoupled from EMT) ---
     n_leaders: int = 0                 # number of ACTIVE leader cells (0 -> R1 baseline, no boost)
@@ -647,6 +651,38 @@ def emt_phenotype(centers: np.ndarray, cfg) -> np.ndarray:
         idx = rng.choice(M, size=n, replace=False)
     scale[idx] = float(getattr(cfg, "emt_adhesion_factor", 0.5))
     return scale
+
+
+def emt_cell_ids(centers: np.ndarray, cfg) -> np.ndarray:
+    """Indices of the partial-EMT cells -- the SAME selection as :func:`emt_phenotype`
+    (so the low-adhesion cells and the coupled high-traction cells coincide)."""
+    centers = np.asarray(centers, dtype=float)
+    M = len(centers)
+    n = int(round(float(getattr(cfg, "emt_fraction", 0.0)) * M))
+    if n <= 0:
+        return np.zeros(0, dtype=int)
+    if getattr(cfg, "emt_assignment", "random") == "boundary":
+        return np.argsort(-np.linalg.norm(centers, axis=1))[:n]
+    rng = np.random.default_rng(int(getattr(cfg, "emt_seed", 12345)))
+    return np.asarray(sorted(rng.choice(M, size=n, replace=False)), dtype=int)
+
+
+def emt_site_stall(centers: np.ndarray, cfg) -> np.ndarray:
+    """Per-site F_stall (length M*n_sec): partial-EMT cells get ``emt_traction_factor`` x base.
+
+    Biology audit (B): a real partial-EMT cell raises traction / protrusive matrix-pulling, not
+    cell-cell adhesion alone; and leaders often ARE partial-EMT cells (biorxiv 2025).  So the
+    COUPLED variant boosts the SAME cells that :func:`emt_phenotype` weakens.  ``emt_traction_factor
+    == 1.0`` -> all base -> decoupled (identical to the R1 adhesion-only path)."""
+    n_sec = cfg.n_contact_sectors
+    base = float(cfg.motor_stall_per_site)
+    M = len(centers)
+    stall = np.full(M * n_sec, base)
+    f = float(getattr(cfg, "emt_traction_factor", 1.0))
+    if f != 1.0:
+        for c in emt_cell_ids(centers, cfg):
+            stall[int(c) * n_sec:(int(c) + 1) * n_sec] = base * f
+    return stall
 
 
 def _cell_cell_forces_geomean(centers: np.ndarray, cfg: OrganoidConfig,
@@ -745,6 +781,35 @@ def run_r1_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
     out["emt_phenotype"] = emt_phenotype(out["centers0"], cfg)
     out["emt_fraction"] = float(cfg.emt_fraction)
     out["emt_adhesion_factor"] = float(cfg.emt_adhesion_factor)
+    return out
+
+
+def run_coupled_emt_invasion(cfg: "G5RevisionConfig" = None, seed=None,
+                             snapshots: bool = False) -> dict:
+    """COUPLED EMT-leader variant (biology-audit motivated): the SAME partial-EMT cells get
+    BOTH reduced cell-cell adhesion (:func:`emt_phenotype`) AND elevated per-site motor stall
+    (:func:`emt_site_stall`, via ``emt_traction_factor``) -- i.e. the partial-EMT cells ARE the
+    high-traction leaders, matching the biology that leaders are often partial-EMT cells that
+    loosen junctions AND pull harder / protrude more (biorxiv 2025; BIOLOGY_AUDIT.md Q4/B).
+
+    ``emt_traction_factor == 1.0`` reduces EXACTLY to :func:`run_r1_invasion` (adhesion-only),
+    so the two are a clean decoupled-vs-coupled comparison at matched emt_fraction/adhesion.
+    Force-pair stays 0 (traction still emerges from the clutch force-velocity law, not a
+    post-hoc multiply).  Runs on the isotropic-random network (or cued if ``radial_cue``).
+    """
+    if cfg is None:
+        cfg = r1_config()
+    net_mode = "cued" if getattr(cfg, "radial_cue", False) else "random"
+    ss = emt_site_stall if float(getattr(cfg, "emt_traction_factor", 1.0)) != 1.0 else None
+    out = run_r0_invasion(cfg, seed=seed, snapshots=snapshots,
+                          adhesion_scale=emt_phenotype,
+                          pair_rule=getattr(cfg, "emt_pair_rule", "min"),
+                          network_mode=net_mode, site_stall=ss)
+    out["emt_phenotype"] = emt_phenotype(out["centers0"], cfg)
+    out["emt_cell_ids"] = emt_cell_ids(out["centers0"], cfg).tolist()
+    out["emt_fraction"] = float(cfg.emt_fraction)
+    out["emt_adhesion_factor"] = float(cfg.emt_adhesion_factor)
+    out["emt_traction_factor"] = float(getattr(cfg, "emt_traction_factor", 1.0))
     return out
 
 
