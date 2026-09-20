@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 v4F_new · v4E → v4F lineage audit</title>
+  <meta name="description" content="A complete audit of every mechanics, numerical, initial-condition and presentation change between G4 v4E and v4F.">
+  <style>
+    :root{--ink:#17252b;--muted:#5b6b70;--paper:#f5f1e8;--card:#fffdf8;--line:#d8d1c4;--orange:#d85736;--teal:#287f78;--blue:#315d8c;--gold:#b37a17;--red:#a53e39;--green:#40754e}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue)}
+    nav{display:flex;gap:18px;flex-wrap:wrap;padding:15px max(24px,calc((100vw - 1180px)/2));background:#183038;color:white}nav a{color:white;text-decoration:none;font-weight:650}
+    header{padding:64px max(24px,calc((100vw - 1180px)/2)) 46px;background:linear-gradient(130deg,#173139,#285a5a);color:white}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:.78rem;font-weight:800;color:#ffb18e}h1{font-size:clamp(2.2rem,5vw,4.4rem);line-height:1.03;margin:.25rem 0 1rem;max-width:980px}header p{max-width:830px;font-size:1.15rem;color:#e3eeee}
+    main{max-width:1180px;margin:0 auto;padding:26px 24px 80px}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:26px;margin:20px 0;box-shadow:0 6px 20px #283d3b0c}h2{font-size:1.55rem;margin:.1rem 0 1rem}h3{margin:.2rem 0 .4rem}.verdict{border-left:7px solid var(--red)}.verdict strong{color:var(--red)}
+    .summary-grid,.rule-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.summary-grid article,.rule-grid article{padding:16px;border:1px solid var(--line);border-radius:12px;background:#fff}.yes{border-left:5px solid var(--green)!important}.no{border-left:5px solid var(--red)!important}.partial{border-left:5px solid var(--gold)!important}.tag{display:inline-block;border-radius:999px;padding:3px 9px;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}.requested{background:#e5f3ef;color:#17655f}.added{background:#fff0d5;color:#795011}.presentation{background:#e9eef8;color:#315d8c}
+    .chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.chain span{padding:8px 11px;border:1px solid var(--line);border-radius:9px;background:white}.chain b{color:var(--orange)}
+    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.92rem}th,td{padding:11px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#eee8dc;position:sticky;top:0}td:first-child{white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700}.changed{font-weight:760;color:var(--red)}
+    .bars{display:grid;grid-template-columns:110px 1fr 1fr;gap:10px 14px;align-items:center}.bars .head{font-weight:800}.bar{height:23px;border-radius:4px;min-width:3px;position:relative}.bar.e{background:#869daf}.bar.f{background:#d96c4c}.bar span{position:absolute;left:calc(100% + 7px);top:1px;font-size:.78rem;white-space:nowrap}.warning{padding:15px 17px;border-radius:11px;background:#fff0e8;border:1px solid #e9a287;color:#733421}.claim{display:grid;grid-template-columns:1fr 1fr;gap:16px}.claim article{border-radius:12px;padding:17px}.allow{background:#eaf5eb;border:1px solid #9fc7a6}.deny{background:#fbeae8;border:1px solid #d8a09b}.claim ul{margin:.5rem 0 0;padding-left:20px}
+    footer{max-width:1180px;margin:auto;padding:0 24px 50px;color:var(--muted)}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eee9df;padding:1px 5px;border-radius:5px}
+    @media(max-width:760px){.summary-grid,.rule-grid,.claim{grid-template-columns:1fr}.bars{grid-template-columns:74px 1fr}.bars .head:nth-child(3),.bars .bar.f{grid-column:2}.chain b{transform:rotate(90deg)}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Research notebook</a>
+    <a href="g4-v4e.html">Frozen v4E</a>
+    <a href="g4-v4f.html">Frozen v4F</a>
+    <a href="https://github.com/gl0008/motor-clutch-collagen-model/tree/main/generations/g4_v4f_new_lineage_audit">F_new source audit</a>
+  </nav>
+  <header>
+    <div class="eyebrow">Generation 4 · audit-only F_new</div>
+    <h1>What actually changed from v4E to v4F?</h1>
+    <p>F_new adds no physics and reruns no simulation. It preserves both historical versions and makes every requested, implementation-added, numerical, initial-condition and presentation change visible.</p>
+  </header>
+  <main>
+    <section class="card verdict">
+      <h2>Short answer</h2>
+      <p><strong>v4F was not a clean one-factor rerun of v4E.</strong> The Git ancestry is correct and the published scalar parameters were retained, but nine relevant changes were bundled. Therefore the dramatic trajectory difference cannot be attributed to steric reaction alone—or to any other single change.</p>
+    </section>
+
+    <section class="card">
+      <h2>Comparison validity</h2>
+      <div class="summary-grid">
+        <article class="yes"><h3>✓ Correct ancestry</h3><p>v4F descends from the preserved v4E checkpoint.</p></article>
+        <article class="yes"><h3>✓ Scalar defaults retained</h3><p>Motor, clutch, cell-drag and guidance values match; v4F adds a 5 s contact-search interval.</p></article>
+        <article class="no"><h3>✕ Not parent–child OFAT</h3><p>Mechanics, RNG, initial contacts, contact reach, front selection and update order changed.</p></article>
+        <article class="partial"><h3>△ Within-v4F contrasts</h3><p>E0–E3 use a common v4F baseline, but the existing timestep, rotation and domain limitations remain.</p></article>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Exact preserved lineage</h2>
+      <div class="chain"><span>d49858b · v4E model</span><b>→</b><span>c1248c2 · v4E evidence</span><b>→</b><span>921e8fc · v4F model</span><b>→</b><span>75d7dd9 · v4F evidence</span><b>→</b><span>f26751c · merge</span></div>
+      <p>The audit concern is not missing history. It is that the child model contained more changes than the short label communicated.</p>
+    </section>
+
+    <section class="card">
+      <h2>Complete change register</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Type</th><th>What changed</th><th>Was it explicitly requested?</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>REQ-001</td><td><span class="tag requested">Mechanics</span></td><td>Cell receives the equal-and-opposite collagen steric reaction.</td><td>Yes</td><td class="changed">Changes cell force balance.</td></tr>
+          <tr><td>REQ-002</td><td><span class="tag requested">Mechanics</span></td><td>Failed sites search current material points around the moving cell; unavailable sites retry every 5 s.</td><td>Yes; 5 s clock added by implementation</td><td class="changed">Changes which collagen can be engaged.</td></tr>
+          <tr><td>REQ-003</td><td><span class="tag requested">Design</span></td><td>E0/E1 relocation loses old-tangent memory; front memory exists only in E2/E3.</td><td>Yes</td><td class="changed">Changes the control dynamics.</td></tr>
+          <tr><td>HARM-001</td><td><span class="tag added">Harmonisation</span></td><td>E0/E1 gain the same 5 µm probing reach as E2/E3.</td><td>No—implementation-added</td><td class="changed">Expands the control contact set.</td></tr>
+          <tr><td>NUM-001</td><td><span class="tag added">RNG fix</span></td><td>Counter-based RNG tuple mixing is rewritten to remove seed–clutch-index aliasing.</td><td>No—implementation-added</td><td class="changed">All stochastic histories can change.</td></tr>
+          <tr><td>NUM-002</td><td><span class="tag added">Bias fix</span></td><td>All mature sites compete to establish the front instead of fixed site 0.</td><td>No—implementation-added</td><td class="changed">Changes front emergence.</td></tr>
+          <tr><td>INIT-001</td><td><span class="tag added">Initial state</span></td><td>All four conditions use evenly distributed initial contacts; v4E guided cases used weighted contacts.</td><td>No—implementation-added</td><td class="changed">Parent and child no longer share initial contacts.</td></tr>
+          <tr><td>NUM-003</td><td><span class="tag added">Integrator</span></td><td>ECM and cell are advanced from the same tₙ geometry.</td><td>No—implementation-added</td><td class="changed">Changes the deterministic trajectory.</td></tr>
+          <tr><td>PRES-001</td><td><span class="tag presentation">Presentation</span></td><td>Representative seed changes 45 → 51; selection changes from E3-typical to jointly typical E0–E3.</td><td>No—implementation-added</td><td>The displayed networks are not matched.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="card">
+      <h2>Why the published animations look so different</h2>
+      <div class="bars" aria-label="Published representative net displacement comparison">
+        <div class="head">Condition</div><div class="head">v4E · seed 45</div><div class="head">v4F · seed 51</div>
+        <div>E0</div><div class="bar e" style="width:100%"><span>74.762 µm</span></div><div class="bar f" style="width:.54%"><span>0.405 µm</span></div>
+        <div>E1</div><div class="bar e" style="width:34.2%"><span>25.568 µm</span></div><div class="bar f" style="width:1.56%"><span>1.165 µm</span></div>
+        <div>E2</div><div class="bar e" style="width:22.1%"><span>16.499 µm</span></div><div class="bar f" style="width:5.72%"><span>4.276 µm</span></div>
+        <div>E3</div><div class="bar e" style="width:26.6%"><span>19.899 µm</span></div><div class="bar f" style="width:5.62%"><span>4.200 µm</span></div>
+      </div>
+      <p class="warning"><b>Do not read these bars as a steric-effect experiment.</b> The two demonstrations use different seeds/networks, stochastic streams, initial contacts, contact reach, front selection and integration order.</p>
+    </section>
+
+    <section class="card">
+      <h2>Scientific wording boundary</h2>
+      <div class="claim">
+        <article class="allow"><h3>Claims we can make</h3><ul><li>v4F repairs several identifiable omissions in v4E.</li><li>v4F includes two-way contact reaction and current-position contact search.</li><li>Within v4F, E1 and E2 are single additions to the shared v4F baseline; E3 is the declared combination.</li></ul></article>
+        <article class="deny"><h3>Claims we cannot make</h3><ul><li>“Steric reaction alone changed E0 from 74.8 to 0.4 µm.”</li><li>“v4F is the same v4E run plus one term.”</li><li>“The side-by-side v4E/v4F animations use the same seed and network.”</li></ul></article>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Contract for every future version</h2>
+      <div class="rule-grid">
+        <article><h3>1 · Declare one change</h3><p>Name the exact parent commit and a changed-component allowlist before running.</p></article>
+        <article><h3>2 · Freeze the lineage view</h3><p>Use seed 45, the same geometry, initial contacts and RNG version unless one is the declared variable.</p></article>
+        <article><h3>3 · Separate inference</h3><p>Use matched seeds 41–60 for ensemble inference. Do not choose a new primary seed because its child animation looks typical.</p></article>
+        <article><h3>4 · Isolate corrections</h3><p>RNG, integrator, front-index and initial-condition corrections each become their own microstage and commit.</p></article>
+      </div>
+    </section>
+  </main>
+  <footer>F_new is an audit record, not a replacement model. Frozen v4E and v4F remain available from the navigation links above.</footer>
+</body>
+</html>

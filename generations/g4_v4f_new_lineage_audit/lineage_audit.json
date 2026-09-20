@@ -1,0 +1,200 @@
+{
+  "audit_id": "G4-v4F_new",
+  "title": "G4 v4E to v4F lineage audit",
+  "audit_type": "documentation_only",
+  "new_physics": false,
+  "simulation_rerun": false,
+  "replaces_historical_results": false,
+  "lineage": {
+    "parent_implementation": "d49858b1000eab4297810e2e5c7ffc3c3447fa83",
+    "parent_evidence": "c1248c2",
+    "child_implementation": "921e8fcea32801c1c8c325c95a052e81b92b3084",
+    "child_evidence": "75d7dd979b4e1712c3ba42a732c2fc08658f0e2f",
+    "merge_commit": "f26751c2b5bc14cb18fe7694a4b3b7d11ef6ee5e",
+    "ancestry_valid": true
+  },
+  "comparison_verdict": {
+    "parent_child_one_factor": false,
+    "within_v4f_e0_e3_matched_baseline": true,
+    "representative_visuals_same_seed": false,
+    "representative_visuals_same_network": false,
+    "stochastic_stream_unchanged": false,
+    "initial_contacts_unchanged": false,
+    "scalar_defaults_preserved_except_search_interval": true,
+    "causal_statement": "The v4E to v4F outcome is compound and cannot be attributed to steric reaction, dynamic contact search, or any other single change."
+  },
+  "preserved_manifest_parameters": {
+    "dt_s": [0.05, 0.05],
+    "cell_radius_um": [10.0, 10.0],
+    "cell_drag_nN_s_per_um": [600.0, 600.0],
+    "clutches_per_site": [12, 12],
+    "clutch_stiffness_nN_per_um": [2.0, 2.0],
+    "on_rate_per_s": [0.055, 0.055],
+    "off_rate_zero_per_s": [0.018, 0.018],
+    "bell_force_nN": [1.5, 1.5],
+    "stall_force_per_site_nN": [8.0, 8.0],
+    "probing_reach_um": [5.0, 5.0],
+    "front_maturation_s": [120.0, 120.0],
+    "front_loss_s": [120.0, 120.0],
+    "beta_alignment": [2.0, 2.0],
+    "beta_memory": [2.0, 2.0],
+    "contact_search_interval_s": [null, 5.0]
+  },
+  "changes": [
+    {
+      "id": "FNEW-REQ-001",
+      "category": "requested_mechanics",
+      "name": "two_way_steric_reaction",
+      "requested_status": "explicitly_requested",
+      "dynamics": true,
+      "rng": false,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "Collagen received steric penalty but the moving cell did not receive its reaction.",
+      "child": "The cell receives the equal-and-opposite sum of collagen steric forces.",
+      "causal_boundary": "The linear rigid-circle penalty and stiffness are provisional; this change was not isolated from the other changes."
+    },
+    {
+      "id": "FNEW-REQ-002",
+      "category": "requested_mechanics",
+      "name": "current_position_dynamic_contact_search",
+      "requested_status": "explicitly_requested",
+      "dynamics": true,
+      "rng": false,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "Relocation selected from a candidate set defined around the initial cell/network state.",
+      "child": "Failed/unavailable sites search the current deformed network around the current cell, with 5 s retry.",
+      "causal_boundary": "Geometric update was requested; the 5 s retry interval is a provisional implementation assumption."
+    },
+    {
+      "id": "FNEW-REQ-003",
+      "category": "requested_experimental_design",
+      "name": "memoryless_e0_e1",
+      "requested_status": "explicitly_requested",
+      "dynamics": true,
+      "rng": false,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "Unguided relocation retained the old attachment tangent.",
+      "child": "E0/E1 relocation uses Gaussian distance weight only; front memory exists only in E2/E3.",
+      "causal_boundary": "This improves the within-v4F factor definition but changes the parent baseline."
+    },
+    {
+      "id": "FNEW-HARM-001",
+      "category": "baseline_harmonisation",
+      "name": "shared_probing_reach",
+      "requested_status": "implementation_added",
+      "dynamics": true,
+      "rng": false,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "E0/E1 had zero extra probing reach; E2/E3 had 5 um.",
+      "child": "All four conditions use contact width plus 5 um probing reach.",
+      "causal_boundary": "Control contact availability changes across the parent-child comparison."
+    },
+    {
+      "id": "FNEW-NUM-001",
+      "category": "numerical_correction",
+      "name": "independent_counter_rng_mixing",
+      "requested_status": "implementation_added",
+      "dynamics": true,
+      "rng": true,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "Counter address used additive seed and item terms, producing a seed-item alias.",
+      "child": "Seed, step, channel and item use distinct 64-bit multiplicative/XOR mixing.",
+      "causal_boundary": "All stochastic rupture, binding, relocation and front histories can change."
+    },
+    {
+      "id": "FNEW-NUM-002",
+      "category": "bias_correction",
+      "name": "all_site_front_competition",
+      "requested_status": "implementation_added",
+      "dynamics": true,
+      "rng": true,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "Only site 0 could mature into the front.",
+      "child": "All sufficiently mature bound sites compete with alignment-weighted selection.",
+      "causal_boundary": "Removes an index/angular-order bias but changes the biological front-selection rule."
+    },
+    {
+      "id": "FNEW-INIT-001",
+      "category": "initial_condition_correction",
+      "name": "matched_even_initial_contacts",
+      "requested_status": "implementation_added",
+      "dynamics": true,
+      "rng": false,
+      "initial_state": true,
+      "presentation_only": false,
+      "parent": "Guided cases used weighted initial sites; controls used evenly distributed surface sites.",
+      "child": "All E0-E3 cases start from evenly distributed surface sites.",
+      "causal_boundary": "Within-v4F matching improves, but the v4E-v4F initial states are not identical."
+    },
+    {
+      "id": "FNEW-NUM-003",
+      "category": "integrator_correction",
+      "name": "same_time_level_cell_ecm_update",
+      "requested_status": "implementation_added",
+      "dynamics": true,
+      "rng": false,
+      "initial_state": false,
+      "presentation_only": false,
+      "parent": "Cell position advanced before the ECM update.",
+      "child": "ECM and cell increments are evaluated from the same t_n geometry; cell position advances afterward.",
+      "causal_boundary": "Removes operator splitting but changes the full deterministic trajectory."
+    },
+    {
+      "id": "FNEW-PRES-001",
+      "category": "presentation_and_statistics",
+      "name": "representative_seed_and_summary_change",
+      "requested_status": "implementation_added",
+      "dynamics": false,
+      "rng": false,
+      "initial_state": false,
+      "presentation_only": true,
+      "parent": "Representative seed 45 selected as typical for E3.",
+      "child": "Representative seed 51 selected jointly across E0-E3; paired contrasts and new telemetry were added.",
+      "causal_boundary": "The two published animations are not a same-network visual comparison."
+    }
+  ],
+  "published_representative_runs": {
+    "v4e": {
+      "seed": 45,
+      "net_displacement_um": {
+        "E0": 74.761509,
+        "E1": 25.56763,
+        "E2": 16.498576,
+        "E3": 19.899329
+      }
+    },
+    "v4f": {
+      "seed": 51,
+      "net_displacement_um": {
+        "E0": 0.405236,
+        "E1": 1.164977,
+        "E2": 4.275842,
+        "E3": 4.199775
+      }
+    }
+  },
+  "future_contract": {
+    "lineage_visual_seed": 45,
+    "ensemble_seeds": [41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60],
+    "representative_reselection_in_primary_lineage_view": false,
+    "separate_microstages": [
+      "rng_algorithm",
+      "integrator_order",
+      "front_site_selection",
+      "initial_contacts"
+    ],
+    "required_snapshots": [
+      "full_config",
+      "geometry_hash",
+      "initial_contact_hash",
+      "rng_version",
+      "changed_component_allowlist"
+    ]
+  }
+}

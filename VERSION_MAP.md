@@ -26,8 +26,8 @@ v1 short-time       ⇢ v2 long-time      → v3/v4 rebuild       ⇢ guidance r
 A mechanics           A mechanics         v3 random ECM          v4E guidance test
 ↓                     ↓                   ↓                      ↓
 B transmission        B transmission      v4A controls           v4F corrected OFAT
-↓                     ↓                   ↓
-C clutch              C clutch            v4B force direction
+↓                     ↓                   ↓                      ↓
+C clutch              C clutch            v4B force direction    v4F_new lineage audit
 ↓                     ↓                   ↓
 D motion              D motion            v4C clutch cycling
                       └─→ G5 branch        ↓
@@ -78,6 +78,13 @@ and persistence without selecting a reproducible direction. The matrix-cue
 effect is not supported, and timestep-direction, 180-degree cue-rotation and
 domain gates remain not passed; v4F is therefore preserved as an exploratory
 mechanism result rather than accepted directional migration.
+G4 v4F_new adds no mechanics and reruns no simulation. It audits the v4E → v4F
+transition and records that v4F bundled requested steric/contact corrections
+with contact-reach harmonisation, an RNG correction, a front-index correction,
+matched initial contacts, an integrator-order correction and a different
+representative seed. The parent-child result is therefore not a one-factor
+comparison. F_new also establishes a fixed lineage seed, a separate matched
+ensemble and mandatory microstages for future numerical corrections.
 Generation 5 first runs G5-0A scale-transfer, G5-0B cell-number-only and G5-0C
 adhesion controls with the G4 molecular clutch frozen. Its A–E sequence then
 adds the organoid scaffold, collective contraction, strain stiffening,
@@ -122,6 +129,7 @@ can compare them, but it never replaces their permanent checkpoints.
 | `revision/g4-v4-single-cell-force-alignment` | G4 v4 literature-grounded fixed-radius single-cell branch | current review branch |
 | `revision/g4-v4e-contact-guided-single-cell` | G4 v4E one-sided matrix cue + contact-created front-memory branch | current review branch |
 | `revision/g4-v4f-corrected-ofat-guidance` | G4 v4F corrected shared baseline + OFAT guidance branch | current review branch |
+| `revision/g4-v4f-new-lineage-audit` | Audit-only record of every v4E → v4F change; no new physics | preserve after review |
 | `agent/g5-organoid-plan` | G5-0A–0C lineage controls, molecular-clutch organoid A–E, mode comparison and ablation | preserve staged results; merge after review |
 | `codex/model-evolution-notebook` | Human-readable website and experiment-record development | preserve documentation history after merge |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
@@ -162,6 +170,7 @@ is still the stable scientific checkpoint.
 | G4 v4 A–D | [`generations/g4_v4_single_cell_force_alignment/`](generations/g4_v4_single_cell_force_alignment/) | [single-cell force–alignment lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4.html) | current review branch |
 | G4 v4E E0–E3 | [`generations/g4_v4e_contact_guided_single_cell/`](generations/g4_v4e_contact_guided_single_cell/) | [contact-guided persistence lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4e.html) | additive review branch |
 | G4 v4F E0–E3 | [`generations/g4_v4f_corrected_ofat_guidance/`](generations/g4_v4f_corrected_ofat_guidance/) | [corrected OFAT guidance lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f.html) | corrected review branch |
+| G4 v4F_new audit | [`generations/g4_v4f_new_lineage_audit/`](generations/g4_v4f_new_lineage_audit/) | [v4E → v4F lineage audit](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f-new.html) | audit-only branch |
 | G5-0A / 0B / 0C | [`generations/g5_organoid/lineage.py`](generations/g5_organoid/lineage.py) | [scale-transfer, cell-number and adhesion controls](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#lineage-controls) | latest lineage audit |
 | G5 A–E | [`generations/g5_organoid/`](generations/g5_organoid/) | [organoid stages](https://gl0008.github.io/motor-clutch-collagen-model/g5.html) | implemented organoid sequence |
 | G5D v2 / v3 | [`generations/g5_organoid/`](generations/g5_organoid/) | [current adhesion modes and preserved leader-traction test](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#leader-update) | current mode comparison + earlier ablation |
@@ -169,8 +178,8 @@ is still the stable scientific checkpoint.
 
 ## Rule for adding a future model
 
-1. Name the parent version, create a new directory, and create a separate
-   `generation/gN` branch; never replace an earlier generation or version directory.
+1. Name the exact parent commit, create a new directory, and create a separate
+   generation/revision branch; never replace an earlier version directory.
 2. Put its purpose, changed assumptions, complete equations, evidence boundary,
    run instructions, tests and result interpretation in that directory's
    `README.md`.
@@ -184,7 +193,12 @@ is still the stable scientific checkpoint.
    Declare whether its map edge adds an experimental block, revises the same
    question, or creates a parallel branch; never infer lineage from array or
    commit order.
-7. After tests pass, merge to `main`, retain the generation and important working
+7. Before running a parent-child comparison, declare an allowlist of changed
+   components and snapshot the full configuration, geometry hash, initial-contact
+   hash and RNG version. Use a fixed lineage seed separately from the ensemble.
+8. Treat an RNG, integrator, initial-condition or index-bias correction as its
+   own microstage; do not bundle it with a biological mechanism.
+9. After tests pass, merge to `main`, retain the generation and important working
    branches, and create an immutable model tag when a release is declared.
 
 These rules preserve every result, including negative results, and prevent a
