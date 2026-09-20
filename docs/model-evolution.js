@@ -97,6 +97,33 @@
     </section>`;
   }
 
+  function verticalEdge(edge={}){
+    return `<div class="vertical-edge"><span aria-hidden="true">↓</span><small>${escapeHtml(edge.label || 'next stage')}</small></div>`;
+  }
+
+  function horizontalChange(change={}){
+    const validTypes=['stage','revision','evidence','branch'];
+    const type=validTypes.includes(change.type)?change.type:'stage';
+    return `<div class="horizontal-change change-${type}"><span aria-hidden="true">→</span><b>${escapeHtml(change.label || 'Why a new release?')}</b><p>${escapeHtml(change.text || '')}</p></div>`;
+  }
+
+  function renderReleaseColumn(column){
+    const contents=column.branches?`
+      <div class="axis-branch-root">${relationshipNode(column.branchRoot)}<div class="vertical-fork"><span>branches into</span></div></div>
+      <div class="axis-branch-list">${column.branches.map(branch=>`
+        <article><div><b>${escapeHtml(branch.name)}</b><small>${escapeHtml(branch.relation)}</small></div>${relationshipNode(branch.node)}</article>`).join('')}</div>`:
+      `<div class="vertical-sequence">${column.nodes.map((node,index)=>`${relationshipNode(node)}${index<column.nodes.length-1?verticalEdge(column.verticalEdges?.[index]):''}`).join('')}</div>`;
+    return `<article class="release-column">
+      <header><span>Major model release</span><h4>${escapeHtml(column.label)}</h4><b>${escapeHtml(column.title)}</b><p>${escapeHtml(column.description)}</p></header>
+      ${contents}
+      ${column.branchOut?`<aside class="column-branch-out"><span aria-hidden="true">↘</span><div><b>${escapeHtml(column.branchOut.label)}</b><p>${escapeHtml(column.branchOut.text)}</p></div></aside>`:''}
+    </article>`;
+  }
+
+  function renderAxisMap(map){
+    return `<div class="axis-scroll-hint"><span aria-hidden="true">↔</span> Scroll horizontally to follow major releases; read each column downward.</div><div class="axis-map-scroll"><div class="axis-map">${map.columns.map((column,index)=>`${index?horizontalChange(column.change):''}${renderReleaseColumn(column)}`).join('')}</div></div>`;
+  }
+
   function renderVersionEvolution(groupId){
     const group=groups.find(item=>item.id===groupId);
     const map=relationships[groupId];
@@ -106,14 +133,21 @@
         <div><b>Relationships within ${escapeHtml(group.label)}</b><h3>${escapeHtml(map.title)}</h3></div>
         <span>${escapeHtml(map.note)}</span>
       </div>
-      <div class="relationship-key" aria-label="Relationship legend">
-        <span class="key-stage"><i></i>Adds the next experimental block</span>
-        <span class="key-revision"><i></i>Revises the same question</span>
-        <span class="key-branch"><i></i>Parallel branch</span>
-      </div>
-      <div class="relationship-map">
-        ${map.sections.map(section=>section.type==='branch'?renderBranchSection(section):renderTrackSection(section)).join('')}
-      </div>`;
+      ${map.axis==='columns'?`
+        <div class="relationship-key axis-key" aria-label="Map directions">
+          <span class="key-stage"><i></i>Across → major model change and its cause</span>
+          <span class="key-revision"><i></i>Down ↓ stages inside that release</span>
+          <span class="key-branch"><i></i>Fork = parallel experiments</span>
+        </div>
+        ${renderAxisMap(map)}`:`
+        <div class="relationship-key" aria-label="Relationship legend">
+          <span class="key-stage"><i></i>Adds the next experimental block</span>
+          <span class="key-revision"><i></i>Revises the same question</span>
+          <span class="key-branch"><i></i>Parallel branch</span>
+        </div>
+        <div class="relationship-map">
+          ${map.sections.map(section=>section.type==='branch'?renderBranchSection(section):renderTrackSection(section)).join('')}
+        </div>`}`;
   }
 
   function renderFilters(){

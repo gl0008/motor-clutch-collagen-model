@@ -147,56 +147,83 @@ window.EVOLUTION_RELATIONSHIPS={
     ]
   },
   g4:{
-    title:'Repeated experiment blocks plus a later single-cell branch',
-    note:'A, B, C and D are experimental blocks. The vertical history is v1 → v2 for the same question; the later v3/v4 line is a separate single-cell ECM refinement branch. It should not be read as one fourteen-step chain.',
-    sections:[
-      {type:'tracks',label:'The same four questions improved from v1 to v2',note:'Each row compares the short-time implementation with its long-time or event-resolved revision.',tracks:[
-        {name:'A · ECM mechanics',description:'Fixed-cell mechanics calibration.',nodes:['g4-v1-a','g4-v2-a'],edges:[{type:'revision',label:'longer observation + multiscale readout'}]},
-        {name:'B · Transmission',description:'Crosslink-mediated indirect motion.',nodes:['g4-v1-b','g4-v2-b'],edges:[{type:'revision',label:'long-time + mobile-boundary controls'}]},
-        {name:'C · Clutch failure',description:'Loading, slip and recoil.',nodes:['g4-v1-c','g4-v2-c'],edges:[{type:'revision',label:'resolve events + compare load sharing'}]},
-        {name:'D · Cell motion',description:'Reaction-driven translation and rotation.',nodes:['g4-v1-d','g4-v2-d'],edges:[{type:'revision',label:'two-hour matched motion controls'}]}
-      ]},
-      {type:'branch',layout:'stacked',label:'After G4 v2, the scientific path forked',root:{label:'G4 v2 A–D',title:'Long-time single-cell calibration laboratory',status:'branch point; the alternative branch becomes G5'},arms:[
-        {name:'Single-cell ECM refinement',description:'Rebuild the ECM, then add biological-cell mechanics one controlled block at a time.',relation:'G4 branch',nodes:['g4-v3','g4-v4-a','g4-v4-b','g4-v4-c','g4-v4-d'],edges:[
-          {type:'stage',label:'separate cavity from biological cell'},
-          {type:'stage',label:'add finite-band force direction'},
-          {type:'stage',label:'add clutch cycling'},
-          {type:'stage',label:'release translation'}
-        ]},
-        {name:'Multicellular scale-up',description:'The other v2 outcome was not another G4 letter; it became the separate G5 generation.',relation:'new-generation branch',nodes:[{label:'G5',title:'Many-cell organoid model',status:'continue in the outer generation map'}]}
-      ]},
-      {type:'tracks',label:'G4 v4D then opens a guidance revision path',note:'This path begins at v4D—not directly at the older v2 branch point.',tracks:[
-        {name:'Guidance revisions',description:'Preserve v4D, test guidance in v4E, then repair the common mechanics and re-test in v4F.',nodes:['g4-v4-d','g4-v4-e','g4-v4-f'],edges:[
-          {type:'stage',label:'add cue + contact-created memory'},
-          {type:'revision',label:'correct sterics, contact search and control memory'}
-        ]}
-      ]}
+    title:'Major releases across; experimental stages down',
+    note:'Read left to right for the large model revisions. Read top to bottom within a column for how A, B, C and D build inside that release.',
+    axis:'columns',
+    columns:[
+      {
+        label:'G4 v1',title:'Short-time calibration laboratory',description:'The first A–D experiment sequence.',
+        nodes:['g4-v1-a','g4-v1-b','g4-v1-c','g4-v1-d'],verticalEdges:[
+          {label:'test crosslink paths'},
+          {label:'add clutch loading and slip'},
+          {label:'release cell motion'}
+        ]
+      },
+      {
+        label:'G4 v2',title:'Long-time and multiscale revision',description:'The same A–D questions with longer clocks and resolved events.',
+        change:{type:'revision',label:'Why v2?',text:'Short-time views hid physical motion and individual failures. v2 keeps the A–D logic but extends time, adds multiscale readouts and resolves clutch events.'},
+        nodes:['g4-v2-a','g4-v2-b','g4-v2-c','g4-v2-d'],verticalEdges:[
+          {label:'test graph-path transmission'},
+          {label:'resolve clutch failures'},
+          {label:'release matched long-time motion'}
+        ],
+        branchOut:{label:'Separate generation branch',text:'The multicellular scale-up leaves G4 here and becomes G5; it is not another G4 letter.'}
+      },
+      {
+        label:'G4 v3 / v4',title:'Random ECM and biological-cell rebuild',description:'A new ECM parent followed by controlled biological-cell mechanics.',
+        change:{type:'stage',label:'Why rebuild?',text:'The deterministic small ECM could not support a biological single-cell interpretation. v3 rebuilds the matrix; v4 separates the cavity benchmark from a constant-radius cell.'},
+        nodes:['g4-v3','g4-v4-a','g4-v4-b','g4-v4-c','g4-v4-d'],verticalEdges:[
+          {label:'separate cavity from biological cell'},
+          {label:'add finite-band force direction'},
+          {label:'add continued clutch cycling'},
+          {label:'release only translation'}
+        ]
+      },
+      {
+        label:'G4 v4E / v4F',title:'Contact-guidance revisions',description:'Preserve v4D, test guidance, then repair the shared baseline and re-test.',
+        change:{type:'revision',label:'Why guidance?',text:'v4D wanders without a persistent direction. v4E tests matrix cue plus contact-created memory; v4F corrects sterics, contact search and control memory.'},
+        nodes:['g4-v4-e','g4-v4-f'],verticalEdges:[
+          {label:'repair shared mechanics and repeat OFAT'}
+        ]
+      }
     ]
   },
   g5:{
-    title:'Two paths converge, then the invasion baseline branches',
-    note:'The 0-series audits inheritance from G4. A–D build the organoid model. Both support the molecular-clutch invasion baseline; later D, E and ablation records test different questions and are not one linear upgrade chain.',
-    sections:[
-      {type:'tracks',label:'Two evidence paths converge on G5D v1',note:'The repeated G5D v1 node marks a scientific convergence, not a duplicated model.',tracks:[
-        {name:'Lineage controls',description:'Freeze inherited physics, then isolate cell number and adhesion.',nodes:['g5-0a','g5-0b','g5-0c','g5-d'],edges:[
-          {type:'stage',label:'vary cell number only'},
-          {type:'stage',label:'release cells; remove adhesion'},
-          {type:'evidence',label:'supports the matched invasion baseline'}
-        ]},
-        {name:'Core construction',description:'Build the organoid, traction, matrix response and released-cell baseline.',nodes:['g5-a','g5-b','g5-c','g5-d'],edges:[
-          {type:'stage',label:'add collective traction'},
-          {type:'stage',label:'test stiffness and stiffening'},
-          {type:'stage',label:'release the organoid'}
-        ]}
-      ]},
-      {type:'tracks',label:'The D invasion question has its own revision history',tracks:[
-        {name:'Invasion modes',description:'The model changes only the invasion question while preserving the other G5 blocks.',nodes:['g5-d','g5-d2'],edges:[{type:'revision',label:'separate adhesion-controlled modes'}]}
-      ]},
-      {type:'branch',label:'G5D v2 opens three parallel mechanism tests',root:'g5-d2',arms:[
-        {name:'Leader traction',description:'Archived high-traction leader test; retained as a negative result.',relation:'parallel mechanism test',nodes:['g5-d3']},
-        {name:'Crosslink plasticity',description:'Tests topology memory without claiming faster invasion.',relation:'parallel mechanism test',nodes:['g5-e']},
-        {name:'One-factor ablation',description:'Removes or adds one mechanism around the collective baseline.',relation:'parallel mechanism test',nodes:['g5-ablation']}
-      ]}
+    title:'Major evidence blocks across; each block develops down',
+    note:'Read left to right for the large G5 changes. Read downward for the controls or stages inside each block. The final column is a fork, not a sequence.',
+    axis:'columns',
+    columns:[
+      {
+        label:'G5 A–C',title:'Core organoid construction',description:'Build the multicellular scaffold, collective pull and matrix-response test.',
+        nodes:['g5-a','g5-b','g5-c'],verticalEdges:[
+          {label:'add collective traction'},
+          {label:'test stiffness and stiffening'}
+        ]
+      },
+      {
+        label:'G5 0-series',title:'G4 → G5 lineage audit',description:'Freeze inherited physics and isolate scale, cell number and adhesion.',
+        change:{type:'evidence',label:'Why audit lineage?',text:'The first G5 implementation changed several factors together. The 0-series asks what transfers from G4 before attributing effects to multicellularity.'},
+        nodes:['g5-0a','g5-0b','g5-0c'],verticalEdges:[
+          {label:'vary cell number only'},
+          {label:'release cells; remove adhesion'}
+        ]
+      },
+      {
+        label:'G5D',title:'Molecular-clutch invasion revisions',description:'The core build and lineage controls converge on the invasion baseline.',
+        change:{type:'stage',label:'Why G5D?',text:'Use the audited molecular clutch and adhesion roles to define a matched invasion baseline, then revise only the invasion-mode question.'},
+        nodes:['g5-d','g5-d2'],verticalEdges:[
+          {label:'separate adhesion-controlled modes'}
+        ]
+      },
+      {
+        label:'From G5D v2',title:'Parallel mechanism tests',description:'Three separate questions branch from the same invasion comparison.',
+        change:{type:'branch',label:'Why branch?',text:'Leader traction, crosslink plasticity and the mechanism ablation test different hypotheses. None is the linear successor of another.'},
+        branchRoot:'g5-d2',branches:[
+          {name:'Leader traction',relation:'parallel test',node:'g5-d3'},
+          {name:'Crosslink plasticity',relation:'parallel test',node:'g5-e'},
+          {name:'One-factor ablation',relation:'parallel test',node:'g5-ablation'}
+        ]
+      }
     ]
   }
 };
