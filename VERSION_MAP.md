@@ -10,26 +10,38 @@ under every version, open the [research notebook](https://gl0008.github.io/motor
 ## The lineage
 
 ```text
-G1 V0  →  G1 V1  →  G1 V2  →  G1 V3  →  G1 V4
-                                      │
-                                      └── G2 corrected baseline
-                                           G2 V2 → G2 V3 → G2 V4
-                                                       │
-                                                       └── G3 emergent guidance
-                                                            G3 spheroid remodelling
-                                                                 │
-                                                                 └── G4 calibration v1 (preserved)
-                                                                      G4A → G4B → G4C → G4D
-                                                                                  │
-                                                                                  └── G4 v2 long-time/multiscale
-                                                                                       G4A → G4B → G4C → G4D
-                                                                                       ├── G4 v3 random-to-aligned (preserved)
-                                                                                       │    └── G4 v4 fixed-radius single cell
-                                                                                       │         A → B → C → D → E0/E1/E2/E3
-                                                                                       └── G5-0A → G5-0B → G5-0C → organoid A–E
-                                                                                                                    ├── G5D v2 → v3
-                                                                                                                    └── G5 ablation
+G1 cumulative prototype path
+V0 → V1 → V2 → V3 → V4
+
+G2 shared corrected engine (parallel controls, not a V2→V3→V4 chain)
+├── V2 transmission
+├── V3 migration
+└── V4 plasticity
+       │
+       └── G3 spheroid-guided radial remodelling
+
+G4 repeated experiment blocks
+├── A mechanics:     v1A ⇢ v2A
+├── B transmission:  v1B ⇢ v2B
+├── C clutch failure: v1C ⇢ v2C
+└── D cell motion:    v1D ⇢ v2D
+                         │
+                         ├── single-cell ECM branch
+                         │   v3 → v4A → v4B → v4C → v4D → v4E ⇢ v4F
+                         │
+                         └── multicellular branch becomes G5
+
+G5 convergence and branches
+0A scale → 0B cell number → 0C adhesion ─┐
+A scaffold → B pull → C stiffness ──────┴→ D v1 ⇢ D v2
+                                                     ├── D v3 leader test
+                                                     ├── E plasticity test
+                                                     └── one-factor ablation
 ```
+
+In this diagram, `→` means that the next experimental block inherits and adds a
+mechanism, while `⇢` means a revision of the same scientific question. Forks are
+parallel questions and must not be rendered as a single linear upgrade chain.
 
 Generation 1 is the conceptual mainline: it records how the question developed
 from the SLS prototype to elastic fibres, crosslinks, cell motion and the first
@@ -164,6 +176,9 @@ is still the stable scientific checkpoint.
    question → change → result → limitation → next-question chain.
 6. Add the version to the website and to
    [`references/README.md`](references/README.md) only after that evidence exists.
+   Declare whether its map edge adds an experimental block, revises the same
+   question, or creates a parallel branch; never infer lineage from array or
+   commit order.
 7. After tests pass, merge to `main`, retain the generation and important working
    branches, and create an immutable model tag when a release is declared.
 

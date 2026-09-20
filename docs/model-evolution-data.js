@@ -8,7 +8,7 @@ window.EVOLUTION_GROUPS=[
     edge:'Prototype boundaries and units were ambiguous, so G2 rebuilt the same questions on a calibrated, boundary-connected network.'
   },
   {
-    id:'g2',label:'G2',title:'Corrected collagen baseline',phase:'Elastic transmission → constrained migration → plasticity control',
+    id:'g2',label:'G2',title:'Corrected collagen baseline',phase:'One shared corrected engine · three parallel controls: transmission, migration and plasticity',
     factors:['outer-boundary anchoring','connectivity gate','nN–µm–s units','compression softening','speed calibration'],
     inherited:'G1 bead–spring geometry, contact weighting and motor–clutch concepts.',
     limitation:'Directional migration still used a prescribed left/right preference, and the network response remained too stiff and local for the experimental movies.',
@@ -24,7 +24,7 @@ window.EVOLUTION_GROUPS=[
     edge:'Radial remodelling appeared only in a softened demonstration; G4 separated transmission, clutch slip and cell motion into controls.'
   },
   {
-    id:'g4',label:'G4',title:'Calibrate, transmit, slip, move',phase:'v1 A–D → v2 long-time → v3 random ECM → v4A–D → v4E → v4F corrected OFAT',
+    id:'g4',label:'G4',title:'Calibrate, transmit, slip, move',phase:'A–D question families across v1/v2 · v3/v4 single-cell branch · v4E/v4F guidance revisions',
     factors:['one-factor calibration','random finite-fibre ECM','fixed-radius biological cell','motor–clutch cycling','contact-created front memory'],
     inherited:'G2 network mechanics and the questions exposed by the G3 remodelling demonstration.',
     limitation:'v4F corrects v4E\'s steric, contact-search and hidden-memory omissions. Its baseline is unbiased and memory increases ensemble persistence, but cue direction is not supported; timestep-direction, 180° cue-rotation and domain gates remain not passed.',
@@ -32,7 +32,7 @@ window.EVOLUTION_GROUPS=[
     edge:'G4 v2 seeded two distinct branches: G4 v3/v4 refined the single-cell ECM mechanism, while G5 independently introduced many interacting cells and lineage controls.'
   },
   {
-    id:'g5',label:'G5',title:'Multicellular organoid invasion',phase:'0A scale → 0B cell number → 0C adhesion → A–E core → one-factor ablation',
+    id:'g5',label:'G5',title:'Multicellular organoid invasion',phase:'0A–0C lineage controls · A–D core build · D-series revisions · E and ablation branches',
     factors:['G4-frozen molecular clutch','43-cell organoid','cell–cell adhesion','corona collagen coverage','eight-way mechanism ablation'],
     inherited:'G2 collagen engine, G3 organoid-gap concept and G4 reaction/slippage logic.',
     limitation:'The clutch baseline produces a cohesive front and clean one-factor differences, but all current values are two-dimensional, seed-specific personal tests without direct experimental parameter calibration.',
@@ -107,3 +107,96 @@ window.EVOLUTION_VERSIONS=[
   {id:'g5-e',group:'g5',label:'G5E',title:'Stress-dependent crosslink plasticity',change:'Let loaded crosslinks rupture by a Bell rate and re-weld at current crossings, changing network topology.',factors:['crosslink rupture','re-welding','topology memory','one-factor invasion test'],equation:'\\[k_{off,x}=k_{off,x}^0\\exp(F_x/F_{b,x})\\]',parameter:'Plasticity gives about 25 µm invasion versus 25 µm in the matched clutch baseline; topology still changes even though invasion does not.',limitation:'A matched two-hour invasion distance cannot establish long-term plastic memory, and the load–unload κ remains confounded by slow relaxation.',next:'Calibrate the baseline first, then compare topology memory with an experimental load–unload or relaxation measurement.',status:'implemented plasticity stage · current ablation shows little invasion effect',lab:'g5.html#clutch-baseline',source:'../generations/g5_organoid/parameter_provenance.md',feedback:noSpecificFeedback},
   {id:'g5-ablation',group:'g5',label:'G5 ablation',title:'One-factor mechanism ablation',change:'Run eight matched two-hour conditions around the molecular-clutch collective baseline, changing one mechanism at a time.',factors:['clutch','adhesion','crosslinks','stiffening','plasticity','leaders','high adhesion'],equation:'\\[\\Delta Y_{(-m)}=Y_{baseline}-Y_{mechanism\\;m\\;removed}\\]',parameter:'Baseline 25 µm; no clutch 4.7; no adhesion 68; no crosslinks 7.7; stiffening 24; plasticity 25; leaders 60; high adhesion 22 µm.',limitation:'The causal comparisons are internal to one 2D seed and parameter set; they are not yet calibrated to measured force, speed or cohesion.',next:'Use organoid movies and matrix measurements to calibrate the three dominant controls—clutch, adhesion and crosslink transmission—before expanding the biology.',status:'newest G5 result · personal testing',lab:'g5.html#clutch-baseline',source:'../output/ablation/g5_ablation_clutch_2h.gif',feedback:noSpecificFeedback}
 ];
+
+// Scientific relationships are explicit because file order and commit order do not
+// necessarily describe the experimental lineage. Each edge below must be supported
+// by the version records, VERSION_MAP.md and the experiment log.
+window.EVOLUTION_RELATIONSHIPS={
+  g1:{
+    title:'One cumulative prototype sequence',
+    note:'G1 is the one generation whose recorded versions form a largely cumulative question-building path. The arrows mean “the limitation opened the next question,” not “the earlier result was deleted.”',
+    sections:[
+      {type:'tracks',label:'Question-building path',tracks:[
+        {name:'Prototype sequence',description:'Each step adds a new modelling question to the previous prototype.',nodes:['g1-v0','g1-v1','g1-v2','g1-v3','g1-v4'],edges:[
+          {type:'stage',label:'add visible fibres'},
+          {type:'stage',label:'add network coupling'},
+          {type:'stage',label:'release cell motion'},
+          {type:'stage',label:'test material memory'}
+        ]}
+      ]}
+    ]
+  },
+  g2:{
+    title:'Three parallel corrections on one shared engine',
+    note:'G2 V2, V3 and V4 are not a single V2 → V3 → V4 upgrade chain. They reuse the same corrected collagen foundation to answer three different questions.',
+    sections:[
+      {type:'branch',label:'Shared corrected G2 foundation',root:{label:'G2 shared engine',title:'Physical units, outer-boundary anchors and a connectivity gate',status:'common parent for all three controls'},arms:[
+        {name:'Transmission',description:'Corrects the G1 V2 force-transmission question.',relation:'parallel experiment',nodes:['g2-v2']},
+        {name:'Migration',description:'Corrects and calibrates the G1 V3 motion question.',relation:'parallel experiment',nodes:['g2-v3']},
+        {name:'Plasticity',description:'Re-tests the G1 V4 memory claim against an elastic control.',relation:'parallel experiment',nodes:['g2-v4']}
+      ]}
+    ]
+  },
+  g3:{
+    title:'One preserved mechanism demonstration',
+    note:'G3 has one accepted version. Its internal gap → protrusion → grip-and-reel → radial-order sequence is a mechanism sequence inside the model, not four separate model versions.',
+    sections:[
+      {type:'tracks',label:'Accepted G3 record',tracks:[
+        {name:'Spheroid guidance',description:'One model record with several internal mechanism stages.',nodes:['g3'],edges:[]}
+      ]}
+    ]
+  },
+  g4:{
+    title:'Repeated experiment blocks plus a later single-cell branch',
+    note:'A, B, C and D are experimental blocks. The vertical history is v1 → v2 for the same question; the later v3/v4 line is a separate single-cell ECM refinement branch. It should not be read as one fourteen-step chain.',
+    sections:[
+      {type:'tracks',label:'The same four questions improved from v1 to v2',note:'Each row compares the short-time implementation with its long-time or event-resolved revision.',tracks:[
+        {name:'A · ECM mechanics',description:'Fixed-cell mechanics calibration.',nodes:['g4-v1-a','g4-v2-a'],edges:[{type:'revision',label:'longer observation + multiscale readout'}]},
+        {name:'B · Transmission',description:'Crosslink-mediated indirect motion.',nodes:['g4-v1-b','g4-v2-b'],edges:[{type:'revision',label:'long-time + mobile-boundary controls'}]},
+        {name:'C · Clutch failure',description:'Loading, slip and recoil.',nodes:['g4-v1-c','g4-v2-c'],edges:[{type:'revision',label:'resolve events + compare load sharing'}]},
+        {name:'D · Cell motion',description:'Reaction-driven translation and rotation.',nodes:['g4-v1-d','g4-v2-d'],edges:[{type:'revision',label:'two-hour matched motion controls'}]}
+      ]},
+      {type:'branch',layout:'stacked',label:'After G4 v2, the scientific path forked',root:{label:'G4 v2 A–D',title:'Long-time single-cell calibration laboratory',status:'branch point; the alternative branch becomes G5'},arms:[
+        {name:'Single-cell ECM refinement',description:'Rebuild the ECM, then add biological-cell mechanics one controlled block at a time.',relation:'G4 branch',nodes:['g4-v3','g4-v4-a','g4-v4-b','g4-v4-c','g4-v4-d'],edges:[
+          {type:'stage',label:'separate cavity from biological cell'},
+          {type:'stage',label:'add finite-band force direction'},
+          {type:'stage',label:'add clutch cycling'},
+          {type:'stage',label:'release translation'}
+        ]},
+        {name:'Multicellular scale-up',description:'The other v2 outcome was not another G4 letter; it became the separate G5 generation.',relation:'new-generation branch',nodes:[{label:'G5',title:'Many-cell organoid model',status:'continue in the outer generation map'}]}
+      ]},
+      {type:'tracks',label:'G4 v4D then opens a guidance revision path',note:'This path begins at v4D—not directly at the older v2 branch point.',tracks:[
+        {name:'Guidance revisions',description:'Preserve v4D, test guidance in v4E, then repair the common mechanics and re-test in v4F.',nodes:['g4-v4-d','g4-v4-e','g4-v4-f'],edges:[
+          {type:'stage',label:'add cue + contact-created memory'},
+          {type:'revision',label:'correct sterics, contact search and control memory'}
+        ]}
+      ]}
+    ]
+  },
+  g5:{
+    title:'Two paths converge, then the invasion baseline branches',
+    note:'The 0-series audits inheritance from G4. A–D build the organoid model. Both support the molecular-clutch invasion baseline; later D, E and ablation records test different questions and are not one linear upgrade chain.',
+    sections:[
+      {type:'tracks',label:'Two evidence paths converge on G5D v1',note:'The repeated G5D v1 node marks a scientific convergence, not a duplicated model.',tracks:[
+        {name:'Lineage controls',description:'Freeze inherited physics, then isolate cell number and adhesion.',nodes:['g5-0a','g5-0b','g5-0c','g5-d'],edges:[
+          {type:'stage',label:'vary cell number only'},
+          {type:'stage',label:'release cells; remove adhesion'},
+          {type:'evidence',label:'supports the matched invasion baseline'}
+        ]},
+        {name:'Core construction',description:'Build the organoid, traction, matrix response and released-cell baseline.',nodes:['g5-a','g5-b','g5-c','g5-d'],edges:[
+          {type:'stage',label:'add collective traction'},
+          {type:'stage',label:'test stiffness and stiffening'},
+          {type:'stage',label:'release the organoid'}
+        ]}
+      ]},
+      {type:'tracks',label:'The D invasion question has its own revision history',tracks:[
+        {name:'Invasion modes',description:'The model changes only the invasion question while preserving the other G5 blocks.',nodes:['g5-d','g5-d2'],edges:[{type:'revision',label:'separate adhesion-controlled modes'}]}
+      ]},
+      {type:'branch',label:'G5D v2 opens three parallel mechanism tests',root:'g5-d2',arms:[
+        {name:'Leader traction',description:'Archived high-traction leader test; retained as a negative result.',relation:'parallel mechanism test',nodes:['g5-d3']},
+        {name:'Crosslink plasticity',description:'Tests topology memory without claiming faster invasion.',relation:'parallel mechanism test',nodes:['g5-e']},
+        {name:'One-factor ablation',description:'Removes or adds one mechanism around the collective baseline.',relation:'parallel mechanism test',nodes:['g5-ablation']}
+      ]}
+    ]
+  }
+};
