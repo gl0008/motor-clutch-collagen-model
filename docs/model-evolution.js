@@ -4,6 +4,7 @@
   const logs=window.EXPERIMENT_LOG || [];
   const branches=window.REPOSITORY_BRANCHES || [];
   const evidenceByVersion=window.VERSION_EVIDENCE || {};
+  const relationships=window.EVOLUTION_RELATIONSHIPS || {};
   const byGroup=Object.fromEntries(groups.map(group=>[group.id,versions.filter(version=>version.group===group.id)]));
   const groupMap=document.querySelector('#generationMap');
   const story=document.querySelector('#generationStory');
@@ -13,9 +14,10 @@
   const detail=document.querySelector('#versionDetail');
   const branchRegistry=document.querySelector('#branchRegistry');
   const experimentLog=document.querySelector('#experimentLog');
-  let activeMapGroup='g5';
+  const requestedGroup=new URLSearchParams(location.search).get('generation');
+  let activeMapGroup=groups.some(group=>group.id===requestedGroup)?requestedGroup:'g5';
   let activeFilter='all';
-  let activeVersion='g5-ablation';
+  let activeVersion=byGroup[activeMapGroup]?.[byGroup[activeMapGroup].length-1]?.id || versions[0]?.id;
 
   const repository='https://github.com/gl0008/motor-clutch-collagen-model';
   const escapeHtml=value=>String(value ?? '').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -38,7 +40,7 @@
     if(!group)return;
     story.innerHTML=`
       <div class="story-title"><span>${group.label}</span><div><small>Selected generation</small><h3>${escapeHtml(group.title)}</h3></div></div>
-      <p class="story-phase">Internal path: ${escapeHtml(group.phase)}</p>
+      <p class="story-phase">Generation structure: ${escapeHtml(group.phase)}</p>
       <div class="story-columns">
         <div><b>Inherited</b><p>${escapeHtml(group.inherited)}</p></div>
         <div class="limitation"><b>Limitation</b><p>${escapeHtml(group.limitation)}</p></div>
@@ -47,23 +49,70 @@
       <div class="factor-row">${group.factors.map(factor=>`<span>${escapeHtml(factor)}</span>`).join('')}</div>`;
   }
 
+  function relationshipNode(reference){
+    const referenceId=typeof reference==='string'?reference:reference.id;
+    const version=referenceId?versions.find(item=>item.id===referenceId):null;
+    if(!version){
+      const node=typeof reference==='object'?reference:{};
+      return `<div class="relationship-node synthetic-node"><span class="version-map-label">${escapeHtml(node.label || 'Shared parent')}</span><b>${escapeHtml(node.title || '')}</b><small>${escapeHtml(node.status || '')}</small></div>`;
+    }
+    const evidence=evidenceByVersion[version.id];
+    const evidenceLine=evidence?`<span class="node-evidence" title="${escapeHtml(evidence.branch)}">evidence ${escapeHtml(evidence.commit)}</span>`:'';
+    return `<button class="version-map-node relationship-node" type="button" data-version="${version.id}" aria-pressed="${version.id===activeVersion}"><span class="version-map-label">${escapeHtml(version.label)}</span><b>${escapeHtml(version.title)}</b><small>${escapeHtml(version.status)}</small>${evidenceLine}</button>`;
+  }
+
+  function relationshipEdge(edge={}){
+    const validTypes=['stage','revision','evidence','branch'];
+    const type=validTypes.includes(edge.type)?edge.type:'stage';
+    return `<div class="relationship-edge edge-${type}"><span aria-hidden="true">→</span><small>${escapeHtml(edge.label || 'next question')}</small></div>`;
+  }
+
+  function relationshipFlow(nodes=[],edges=[]){
+    return `<div class="relationship-flow">${nodes.map((node,index)=>{
+      const connector=index<nodes.length-1?relationshipEdge(edges[index] || {}):'';
+      return `${relationshipNode(node)}${connector}`;
+    }).join('')}</div>`;
+  }
+
+  function renderTrackSection(section){
+    return `<section class="relationship-section">
+      <header class="relationship-section-head"><div><small>Research tracks</small><h4>${escapeHtml(section.label)}</h4></div>${section.note?`<p>${escapeHtml(section.note)}</p>`:''}</header>
+      <div class="relationship-tracks">${section.tracks.map(track=>`
+        <article class="relationship-track">
+          <div class="track-copy"><b>${escapeHtml(track.name)}</b><p>${escapeHtml(track.description)}</p></div>
+          <div class="track-scroll">${relationshipFlow(track.nodes,track.edges)}</div>
+        </article>`).join('')}</div>
+    </section>`;
+  }
+
+  function renderBranchSection(section){
+    return `<section class="relationship-section branch-section">
+      <header class="relationship-section-head"><div><small>Branch point</small><h4>${escapeHtml(section.label)}</h4></div>${section.note?`<p>${escapeHtml(section.note)}</p>`:''}</header>
+      <div class="branch-root">${relationshipNode(section.root)}<div class="branch-stem"><span>branches into</span></div></div>
+      <div class="branch-arms arms-${Math.min(3,section.arms.length)} ${section.layout==='stacked'?'layout-stacked':''}">${section.arms.map(arm=>`
+        <article class="branch-arm">
+          <header><span aria-hidden="true">↳</span><div><b>${escapeHtml(arm.name)}</b><small>${escapeHtml(arm.relation)}</small><p>${escapeHtml(arm.description)}</p></div></header>
+          <div class="track-scroll">${relationshipFlow(arm.nodes,arm.edges)}</div>
+        </article>`).join('')}</div>
+    </section>`;
+  }
+
   function renderVersionEvolution(groupId){
     const group=groups.find(item=>item.id===groupId);
-    const chain=byGroup[groupId] || [];
-    if(!group)return;
+    const map=relationships[groupId];
+    if(!group || !map)return;
     versionEvolution.innerHTML=`
       <div class="version-evolution-head">
-        <b>Evolution within ${escapeHtml(group.label)}</b>
-        <span>This follows the scientific reasoning, not raw Git order. Select a version to open its evidence-linked record.</span>
+        <div><b>Relationships within ${escapeHtml(group.label)}</b><h3>${escapeHtml(map.title)}</h3></div>
+        <span>${escapeHtml(map.note)}</span>
       </div>
-      <div class="version-map-scroll">
-        <div class="version-map-track">
-          ${chain.map((version,index)=>{
-            const node=`<button class="version-map-node" type="button" data-version="${version.id}" aria-pressed="${version.id===activeVersion}"><span class="version-map-label">${escapeHtml(version.label)}</span><b>${escapeHtml(version.title)}</b><small>${escapeHtml(version.status)}</small></button>`;
-            if(index===chain.length-1)return node;
-            return `${node}<div class="version-map-edge" title="${escapeHtml(version.next)}"><span aria-hidden="true">→</span><p><b>Why ${escapeHtml(chain[index+1].label)}?</b>${escapeHtml(version.next)}</p></div>`;
-          }).join('')}
-        </div>
+      <div class="relationship-key" aria-label="Relationship legend">
+        <span class="key-stage"><i></i>Adds the next experimental block</span>
+        <span class="key-revision"><i></i>Revises the same question</span>
+        <span class="key-branch"><i></i>Parallel branch</span>
+      </div>
+      <div class="relationship-map">
+        ${map.sections.map(section=>section.type==='branch'?renderBranchSection(section):renderTrackSection(section)).join('')}
       </div>`;
   }
 
@@ -173,6 +222,9 @@
   function selectGroup(groupId){
     if(!byGroup[groupId])return;
     activeMapGroup=groupId;
+    const url=new URL(location.href);
+    url.searchParams.set('generation',groupId);
+    history.replaceState(null,'',url);
     if(!byGroup[groupId].some(version=>version.id===activeVersion))activeVersion=byGroup[groupId][0].id;
     renderMap();
     renderStory(groupId);
