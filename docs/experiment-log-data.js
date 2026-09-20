@@ -36,7 +36,7 @@ window.VERSION_EVIDENCE = {
   'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'d49858b'},
   'g4-v4-f':{branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'921e8fc'},
   'g4-v4-f-new':{branch:'revision/g4-v4f-new-lineage-audit',commit:'3a8bf68'},
-  'g4-v4-f-causal':{branch:'revision/g4-v4f-causal-rebuild',commit:'pending'},
+  'g4-v4-f-causal':{branch:'revision/g4-v4f-causal-rebuild',commit:'072d1ca'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -47,7 +47,7 @@ window.VERSION_EVIDENCE = {
 
 window.EXPERIMENT_LOG = [
   {
-    date:'2026-09-20',generation:'G4',version:'G4 F_causal quick validation',branch:'revision/g4-v4f-causal-rebuild',commit:'pending',
+    date:'2026-09-20',generation:'G4',version:'G4 F_causal quick validation',branch:'revision/g4-v4f-causal-rebuild',commit:'072d1ca',
     parent:'Frozen v4E plus the F_new nine-change audit',
     question:'Can the v4E → v4F transition be reconstructed from an identical parent and separated into declared numerical and mechanics factors?',
     change:'Implemented an exact v4E replay, an N1–N5 cumulative numerical/design staircase, and an eight-arm S × C × M mechanics factorial. Existing v4E, v4F and F_new files remain unchanged.',
