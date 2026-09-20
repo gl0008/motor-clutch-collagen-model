@@ -226,6 +226,26 @@ def per_cell_clutch_reaction(patches: list, site_force: np.ndarray, n_sec: int,
     return reaction
 
 
+def _current_site_geometry(patches: list, edges: np.ndarray, r: np.ndarray):
+    """Per-site (grip point, inward-normal) on the CURRENT bead positions ``r``.
+
+    Grip point = interpolate the patch's fibre segment (``edge``, ``alpha``) on ``r`` so
+    the point tracks the deforming fibre; ``normal_in`` is the patch's inward unit vector
+    (used only for Gloria-style traction-arrow rendering, not for dynamics).  Empty sites
+    (``patch is None``) return NaN points and zero normals so the renderer can skip them.
+    """
+    S = len(patches)
+    pts = np.full((S, 2), np.nan)
+    nrm = np.zeros((S, 2))
+    for s, patch in enumerate(patches):
+        if patch is None:
+            continue
+        i, j = edges[patch.edge]
+        pts[s] = (1.0 - patch.alpha) * r[i] + patch.alpha * r[j]
+        nrm[s] = patch.normal_in
+    return pts, nrm
+
+
 def _contact_tangent(network, patch) -> np.ndarray:
     """Unit tangent of the gripped fibre segment (G4D ``_contact_tangent``)."""
     i, j = network.edges[patch.edge]
@@ -445,6 +465,17 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
     frames: list[dict] = []
     bead_snaps: list[np.ndarray] = []
     cell_snaps: list[np.ndarray] = []
+    # Rich per-site snapshots (Gloria g4-v4e-style rendering only; populated iff snapshots).
+    # site force / grip point / inward normal per sampled frame + per-interval failure flags.
+    sf_snaps: list[np.ndarray] = []
+    spt_snaps: list[np.ndarray] = []
+    snrm_snaps: list[np.ndarray] = []
+    sfail_snaps: list[np.ndarray] = []
+    fail_accum = np.zeros(S, dtype=bool)         # site failures since the last sampled frame
+    # crosslink material points (edge_a, alpha_a) so the renderer can track gold dots on beads
+    if snapshots:
+        xl_edge = np.asarray([xl.edge_a for xl in network.crosslinks], dtype=int)
+        xl_alpha = np.asarray([xl.alpha_a for xl in network.crosslinks], dtype=float)
     max_residual = 0.0
 
     def sample_frame(time: float) -> dict:
@@ -495,6 +526,12 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
             if snapshots:
                 bead_snaps.append(network.r.copy())
                 cell_snaps.append(centers.copy())
+                pts, nrm = _current_site_geometry(patches, network.edges, network.r)
+                sf_snaps.append(site_force.copy())
+                spt_snaps.append(pts)
+                snrm_snaps.append(nrm)
+                sfail_snaps.append(fail_accum.copy())
+                fail_accum[:] = False               # reset per-interval failure accumulator
         if step == nsteps:
             break
 
@@ -507,6 +544,8 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
         else:
             _, site_force, breaks, binds, site_fail = _clutch_step_stall(
                 cfg, state, substrate, step, active_mask, site_stall)
+        if snapshots and site_fail.any():
+            fail_accum |= site_fail               # remember failures between sampled frames
 
         # 2) project the emergent clutch traction onto the ECM
         active = _project_site_forces(network, patches, site_force)
@@ -567,6 +606,14 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
         "frames": frames,
         "bead_snapshots": np.asarray(bead_snaps) if snapshots else None,
         "cell_snapshots": np.asarray(cell_snaps) if snapshots else None,
+        # Gloria g4-v4e-style per-site rendering data (None unless snapshots):
+        "site_force_snapshots": np.asarray(sf_snaps) if snapshots else None,      # (F, S)
+        "site_point_snapshots": np.asarray(spt_snaps) if snapshots else None,     # (F, S, 2)
+        "site_normal_snapshots": np.asarray(snrm_snaps) if snapshots else None,   # (F, S, 2)
+        "site_failed_snapshots": np.asarray(sfail_snaps) if snapshots else None,  # (F, S) bool
+        "crosslink_edge": xl_edge if snapshots else None,                          # (L,) int edge_a
+        "crosslink_alpha": xl_alpha if snapshots else None,                        # (L,) float alpha_a
+        "n_contact_sectors": n_sec,
         "final_positions": network.r.copy(),
         "initial_positions": network.r0.copy(),
         "edges": network.edges.copy(),
@@ -1478,6 +1525,15 @@ def run_r3_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
     frames: list = []
     bead_snaps: list = []
     cell_snaps: list = []
+    # Gloria g4-v4e-style per-site rendering data (populated iff snapshots; see run_r0_invasion).
+    sf_snaps: list = []
+    spt_snaps: list = []
+    snrm_snaps: list = []
+    sfail_snaps: list = []
+    fail_accum = np.zeros(S, dtype=bool)
+    if snapshots:
+        xl_edge = np.asarray([xl.edge_a for xl in network.crosslinks], dtype=int)
+        xl_alpha = np.asarray([xl.alpha_a for xl in network.crosslinks], dtype=float)
     max_residual = 0.0
 
     def front_advance():
@@ -1525,6 +1581,12 @@ def run_r3_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
             if snapshots:
                 bead_snaps.append(network.r.copy())
                 cell_snaps.append(centers.copy())
+                pts, nrm = _current_site_geometry(patches, network.edges, network.r)
+                sf_snaps.append(site_force.copy())
+                spt_snaps.append(pts)
+                snrm_snaps.append(nrm)
+                sfail_snaps.append(fail_accum.copy())
+                fail_accum[:] = False
         if step == nsteps:
             break
 
@@ -1534,6 +1596,8 @@ def run_r3_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
         # 1) clutch step (per-site stall) -> emergent traction
         _, site_force, breaks, binds, site_fail = _clutch_step_stall(
             cfg, state, substrate, step, active_mask, site_stall)
+        if snapshots and site_fail.any():
+            fail_accum |= site_fail
         # 2) project onto ECM
         active = _project_site_forces(network, patches, site_force)
         # 3) force-pair reaction + capped overdamped motion
@@ -1594,6 +1658,14 @@ def run_r3_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
         "frames": frames,
         "bead_snapshots": np.asarray(bead_snaps) if snapshots else None,
         "cell_snapshots": np.asarray(cell_snaps) if snapshots else None,
+        # Gloria g4-v4e-style per-site rendering data (None unless snapshots):
+        "site_force_snapshots": np.asarray(sf_snaps) if snapshots else None,
+        "site_point_snapshots": np.asarray(spt_snaps) if snapshots else None,
+        "site_normal_snapshots": np.asarray(snrm_snaps) if snapshots else None,
+        "site_failed_snapshots": np.asarray(sfail_snaps) if snapshots else None,
+        "crosslink_edge": xl_edge if snapshots else None,
+        "crosslink_alpha": xl_alpha if snapshots else None,
+        "n_contact_sectors": n_sec,
         "final_positions": network.r.copy(), "initial_positions": network.r0.copy(),
         "edges": network.edges.copy(),
         # R3 summary
