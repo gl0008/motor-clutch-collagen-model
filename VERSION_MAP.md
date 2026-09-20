@@ -20,28 +20,33 @@ G2 shared corrected engine (parallel controls, not a V2→V3→V4 chain)
        │
        └── G3 spheroid-guided radial remodelling
 
-G4 repeated experiment blocks
-├── A mechanics:     v1A ⇢ v2A
-├── B transmission:  v1B ⇢ v2B
-├── C clutch failure: v1C ⇢ v2C
-└── D cell motion:    v1D ⇢ v2D
-                         │
-                         ├── single-cell ECM branch
-                         │   v3 → v4A → v4B → v4C → v4D → v4E ⇢ v4F
-                         │
-                         └── multicellular branch becomes G5
+G4: read large revisions across; read experiment stages down
 
-G5 convergence and branches
-0A scale → 0B cell number → 0C adhesion ─┐
-A scaffold → B pull → C stiffness ──────┴→ D v1 ⇢ D v2
-                                                     ├── D v3 leader test
-                                                     ├── E plasticity test
-                                                     └── one-factor ablation
+v1 short-time       ⇢ v2 long-time      → v3/v4 rebuild       ⇢ guidance revisions
+A mechanics           A mechanics         v3 random ECM          v4E guidance test
+↓                     ↓                   ↓                      ↓
+B transmission        B transmission      v4A controls           v4F corrected OFAT
+↓                     ↓                   ↓
+C clutch              C clutch            v4B force direction
+↓                     ↓                   ↓
+D motion              D motion            v4C clutch cycling
+                      └─→ G5 branch        ↓
+                                           v4D motion
+
+G5: read evidence blocks across; read their stages down
+
+A–C core build      → 0-series audit     → D revisions          → parallel tests
+A scaffold             0A scale             D v1 baseline          ├ D v3 leader
+↓                      ↓                    ↓                       ├ E plasticity
+B pull                 0B cell number       D v2 modes             └ ablation
+↓                      ↓
+C stiffness            0C adhesion
 ```
 
-In this diagram, `→` means that the next experimental block inherits and adds a
-mechanism, while `⇢` means a revision of the same scientific question. Forks are
-parallel questions and must not be rendered as a single linear upgrade chain.
+In this diagram, horizontal `→` means a major model change and horizontal `⇢`
+means a revision of the same broad question. Vertical `↓` means the experimental
+stages inside that release. Forks are parallel questions and must not be rendered
+as a single linear upgrade chain.
 
 Generation 1 is the conceptual mainline: it records how the question developed
 from the SLS prototype to elastic fibres, crosslinks, cell motion and the first
