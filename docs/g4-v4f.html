@@ -14,7 +14,7 @@
 </head>
 <body>
   <header class="hero">
-    <nav><a href="index.html">Model notebook</a><a href="g4-v4e.html">Frozen G4 v4E</a><a href="https://github.com/gl0008/motor-clutch-collagen-model/tree/main/generations/g4_v4f_corrected_ofat_guidance">Source notes</a></nav>
+    <nav><a href="index.html">Model notebook</a><a href="g4-v4e.html">Frozen G4 v4E</a><a href="g4-v4f-new.html">F_new lineage audit</a><a href="https://github.com/gl0008/motor-clutch-collagen-model/tree/main/generations/g4_v4f_corrected_ofat_guidance">Source notes</a></nav>
     <p class="eyebrow">Generation 4 · corrected revision F</p>
     <h1>A clean baseline before testing directional guidance</h1>
     <p class="lede">All four conditions now include two-way collagen steric reaction and contact search around the current cell. E0/E1 have no directional memory. E1 adds matrix orientation only, E2 adds protrusion memory only, and E3 combines them.</p>
@@ -22,6 +22,13 @@
   </header>
 
   <main>
+    <section class="card" style="border-left:7px solid #a53e39">
+      <span class="tag assumption">F_new audit notice</span>
+      <h2>v4E → v4F is not a one-factor parent–child comparison</h2>
+      <p>v4F bundled the requested steric, dynamic-contact and memory corrections with contact-reach harmonisation, a new RNG mixer, all-site front competition, matched initial contacts, an integrator-order correction and a different representative seed. The E0–E3 contrasts below remain comparisons inside the shared v4F baseline, but the large v4E/v4F trajectory difference cannot be assigned to steric reaction alone.</p>
+      <p><a href="g4-v4f-new.html"><strong>Open the complete nine-change lineage audit →</strong></a></p>
+    </section>
+
     <section class="question card">
       <div><span class="tag direct">Primary question</span><h2>One factor at a time</h2><p>After correcting the mechanics shared by every condition, does matrix geometry alone (E1−E0), protrusion memory alone (E2−E0), or their combination (E3) change displacement and persistence?</p></div>
       <div class="clock"><strong>6 h</strong><span>single-cell observation</span><strong>0.05 s</strong><span>physics timestep</span><strong>10 min</strong><span>overview frame</span></div>

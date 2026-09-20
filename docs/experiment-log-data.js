@@ -8,6 +8,7 @@ window.REPOSITORY_BRANCHES = [
   {name:'revision/g4-v4-single-cell-force-alignment',role:'G4 v4 review',state:'current',description:'Literature-gated constant-radius single-cell force–alignment model and website.'},
   {name:'revision/g4-v4e-contact-guided-single-cell',role:'G4 v4E review',state:'current',description:'Additive E0–E3 matrix-cue and protrusion-memory experiment; G4 v4A–D remains frozen.'},
   {name:'revision/g4-v4f-corrected-ofat-guidance',role:'G4 v4F corrected review',state:'current',description:'Preserves v4E, repairs shared cell–ECM mechanics, and compares matrix cue and protrusion memory one factor at a time.'},
+  {name:'revision/g4-v4f-new-lineage-audit',role:'G4 v4F_new lineage audit',state:'current audit',description:'Adds no physics; records all requested and implementation-added differences between the frozen v4E and v4F checkpoints.'},
   {name:'generation/g5',role:'Generation 5 checkpoint',state:'preserved',description:'Permanent G5 model branch at the current molecular-clutch and ablation evidence state.'},
   {name:'agent/g5-organoid-plan',role:'G5 working history',state:'active history',description:'The model-development branch remains visible after merge so its experiment sequence can be audited.'},
   {name:'codex/model-evolution-notebook',role:'Notebook working history',state:'active history',description:'The website-development branch remains visible after merge so documentation changes can be audited.'}
@@ -33,6 +34,7 @@ window.VERSION_EVIDENCE = {
   'g4-v4-d':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'d49858b'},
   'g4-v4-f':{branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'921e8fc'},
+  'g4-v4-f-new':{branch:'revision/g4-v4f-new-lineage-audit',commit:'3a8bf68'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -43,12 +45,22 @@ window.VERSION_EVIDENCE = {
 
 window.EXPERIMENT_LOG = [
   {
+    date:'2026-09-20',generation:'G4',version:'G4 v4F_new lineage audit',branch:'revision/g4-v4f-new-lineage-audit',commit:'3a8bf68',
+    parent:'Frozen v4E (d49858b) and v4F (921e8fc) evidence checkpoints',
+    question:'Did v4F rerun v4E while changing only the mechanics explicitly requested for the corrected baseline?',
+    change:'No simulation was changed or rerun. The source, manifests and Git history were audited and every parent–child difference was classified as requested mechanics, baseline harmonisation, numerical/bias correction, initial-condition correction or presentation/statistics.',
+    result:'Git ancestry and inherited scalar parameters are valid, but v4F bundled nine relevant changes. The displayed v4E and v4F runs also use different representative seeds (45 and 51). Therefore the parent–child trajectory difference is compound and cannot estimate the effect of steric reaction alone.',
+    limitation:'This audit does not retroactively isolate any individual v4F correction. Existing v4E and v4F simulations remain unchanged historical evidence.',
+    next:'Use fixed seed 45 for lineage views, seeds 41–60 for inference, and introduce RNG, integrator, initial-contact and bias corrections as separately committed microstages.',
+    evidence:[{label:'Human-readable F_new audit',href:'g4-v4f-new.html'},{label:'Machine-readable change contract',href:'https://github.com/gl0008/motor-clutch-collagen-model/blob/revision/g4-v4f-new-lineage-audit/generations/g4_v4f_new_lineage_audit/lineage_audit.json'},{label:'Audit source record',href:'https://github.com/gl0008/motor-clutch-collagen-model/tree/revision/g4-v4f-new-lineage-audit/generations/g4_v4f_new_lineage_audit'}]
+  },
+  {
     date:'2026-09-19',generation:'G4',version:'G4 v4F E0–E3',branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'921e8fc',
     parent:'Preserved G4 v4E negative result (d49858b)',
     question:'After repairing mechanics that belong in every condition, do matrix orientation and contact-created protrusion memory have separable effects on single-cell movement?',
-    change:'Added equal-and-opposite collagen steric reaction to the cell, dynamic material-point search around the current cell and distance-only memoryless control rebinding. E1 changes only matrix geometry, E2 changes only the memory module, and E3 combines both.',
+    change:'Added equal-and-opposite collagen steric reaction, current-position contact search and memoryless E0/E1. The implementation also changed contact reach, RNG tuple mixing, front-site selection, guided initial contacts and cell/ECM update order. E1, E2 and E3 are OFAT contrasts only within the resulting shared v4F baseline.',
     result:'In 20 matched six-hour seeds, E0 has no fixed-axis bias. E2−E0 increases net displacement by 6.20 µm (95% CI 4.12–8.27) and persistence by 0.493 (0.379–0.607), but does not select a world direction. E1−E0 cue-axis displacement and the E3 positive-cue endpoint both retain CIs containing zero, so directed migration is not established.',
-    limitation:'The cell is still a rigid 2D circle. The linear steric penalty, 5 s search clock, 120 s memory clock and guidance gains are explicit provisional assumptions. The short audit passes force balance, contact reach, event order and pre-memory identity, but fails timestep displacement direction, 180° cue rotation and the <5% domain criterion.',
+    limitation:'The v4E→v4F delta is not a one-factor comparison because requested mechanics were bundled with numerical and initial-state corrections, and the displayed seeds differ. Within v4F, the cell is still a rigid 2D circle; the penalty/search/memory assumptions remain provisional, and timestep direction, cue rotation and domain gates fail.',
     next:'Accept directionality only if paired contrasts, coordinate rotation, timestep and domain checks agree; retain negative outcomes.',
     evidence:[{label:'Interactive G4 v4F laboratory',href:'g4-v4f.html'},{label:'Corrected model, paper and assumption ledgers',href:'https://github.com/gl0008/motor-clutch-collagen-model/tree/revision/g4-v4f-corrected-ofat-guidance/generations/g4_v4f_corrected_ofat_guidance'},{label:'First-front RNG bias diagnostic',href:'https://github.com/gl0008/motor-clutch-collagen-model/blob/revision/g4-v4f-corrected-ofat-guidance/generations/g4_v4f_corrected_ofat_guidance/front_bias_diagnostic.json'}]
   },
