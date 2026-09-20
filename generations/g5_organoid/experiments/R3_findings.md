@@ -4,6 +4,16 @@
 > consumption" proxy is an explicit **HYPOTHESIS**, not a measured/calibrated law. Imposed cue = NOT
 > swirling. Built on R0/R1/R2; `model.py`/`visualize.py`/`test_g5.py` byte-for-byte untouched.
 
+> ## ⚠️ CORRECTION (2026-09-19) — no follower strand here either; timescale off
+> Adhesion-graph re-audit of `r3_switching_2h`: the switching relay fires (leaders on/off; a promoted
+> leader briefly advances ~+23 µm) but **followers never advance along the cue axis (~0) and scatter**;
+> the cluster fragments to 6 components at 2 h — **no persistent follower strand**. The premise "R3 is a
+> persistence layer on top of an R1×R2 directional strand" is **wrong**: R1×R2 produced no strand (see
+> `R1x2_coupling_findings.md` correction). Also **Zhang 2019 leader lifetime is 120–480 min** (2–8 h),
+> so at a 2 h scale switching is minor — R3's compressed-to-minutes calibration over-weights it. The
+> missing "followers follow" mechanism is **R4 follower contact-guidance** (`R4_findings.md`), which is
+> a prerequisite, not R3. Re-run R3 ON TOP OF R4 once R4 is settled.
+
 ## What R3 adds (`consistency.py`, additive; R0/R1/R2 unchanged)
 A per-cell energy that drains as the cell does motor work and recovers when idle, driving a **relay**:
 a tired front leader demotes and a fresher front-follower takes over (Zhang et al. 2019 relay-like

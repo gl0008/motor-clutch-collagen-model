@@ -4,6 +4,17 @@
 > (EMT/adhesion) + R2 (localized per-site-stall leaders) code via `consistency.run_r2_invasion` on the
 > cued network — no new model code. Imposed cue, NOT swirling.
 
+> ## ⚠️ CORRECTION (2026-09-19) — the "directional strand" below is a METRIC ARTIFACT
+> A visual + adhesion-graph re-audit of `r1x2_lowadh_leaders_2h` shows **NO follower strand forms**:
+> the 3 leaders **DETACH and escape**, followers scatter/retreat. `leader_follower_separation` (+34.8 µm)
+> and `aspect_ratio` (1.28) are large **even when leaders escape alone** — they are a difference of
+> outward advances with NO connectivity, so they cannot distinguish "connected strand" from "leaders
+> gone". Adhesion-graph trace: leaders → **2-cell island with 0 followers by frame 90** (8 components
+> at 2 h; `leaders_detached=True`). Use `strand_report` (`connected_components`), NOT sep/aspect. The
+> real "followers follow" fix is **R4 follower contact-guidance** (`R4_findings.md`): with guidance the
+> leaders keep **10 followers** and stay connected (LCC 0.47→0.63). Treat the "YES for DIRECTIONALITY"
+> claim and the phase-map `sep` values below as **superseded** by that audit.
+
 ## Question
 R2 showed strong STATIC leaders at *cohesive* adhesion don't pull a strand. Does **low cell–cell
 adhesion + localized cue-front leaders** — combining the two knobs — make a directional strand

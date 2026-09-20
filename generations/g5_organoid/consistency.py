@@ -376,7 +376,8 @@ def floppiness_index(network) -> float:
 # =================================================================================
 def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = False,
                     adhesion_scale=None, pair_rule: str = "min",
-                    network_mode: str = "random", site_stall=None) -> dict:
+                    network_mode: str = "random", site_stall=None,
+                    guidance_force=None) -> dict:
     """Force-consistent multicellular Stage-D-with-clutch invasion (the G5-R0 gate).
 
     Ports G4D's ``run_motor_clutch`` loop ORDER to M cells: sample frame -> clutch step
@@ -432,6 +433,11 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
     v_cell = np.zeros((M, 2))
     reaction = np.zeros((M, 2))
     n_relocations = 0
+    # R4 follower contact-guidance (guidance_force is None for R0/R1/R2/R3 -> exact old path).
+    # Refreshed on the contact cadence (the aligned track evolves slowly); zero otherwise.
+    guidance_vec = np.zeros((M, 2))
+    if guidance_force is not None:
+        guidance_vec = guidance_force(centers, network, centers0, cfg)
 
     nsteps = int(round(cfg.duration / cfg.dt))
     every = max(1, int(round(cfg.sample_interval / cfg.dt)))
@@ -505,9 +511,10 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
         # 2) project the emergent clutch traction onto the ECM
         active = _project_site_forces(network, patches, site_force)
 
-        # 3) force-pair: cell receives -(the traction it applied); move overdamped + capped
+        # 3) force-pair: cell receives -(the traction it applied); move overdamped + capped.
+        # R4: + follower contact-guidance along the leader-remodelled aligned track (0 if off).
         reaction = per_cell_clutch_reaction(patches, site_force, n_sec, M)
-        f_cell = reaction + cc_force(centers)
+        f_cell = reaction + cc_force(centers) + guidance_vec
         v_cell = f_cell / cfg.cell_drag
         speed = np.linalg.norm(v_cell, axis=1)
         over = speed > cfg.max_cell_speed
@@ -526,6 +533,8 @@ def run_r0_invasion(cfg: OrganoidConfig = None, seed=None, snapshots: bool = Fal
         # cheap eligibility refresh only (does NOT touch patches/state)
         if step and step % contact_every == 0:
             candidates = cell_candidate_fibers(network, centers, reach)
+            if guidance_force is not None:      # R4: refresh guidance as the track evolves
+                guidance_vec = guidance_force(centers, network, centers0, cfg)
 
         # 5) event-driven relocation + reset of ONLY fully-failed sites
         if np.any(site_fail):
@@ -619,6 +628,22 @@ class G5RevisionConfig(OrganoidConfig):
                                        #   demonstration; calibrated to LIFETIME, not measured ATP).
     energy_on: float = 0.5             # promote a candidate only if E > energy_on ...
     energy_off: float = 0.3            # ... demote an active leader when E < energy_off (hysteresis)
+
+    # --- R4: FOLLOWER contact-guidance along the leader-remodelled aligned collagen track ---
+    # The missing "followers follow" mechanism (R1xR2 / R3 diagnosis: leaders detach, followers
+    # scatter -> no strand).  Biology: leaders specialise in CREATING an aligned ECM path
+    # (force-bundled radial fibres / TACS-3 + proteolytic microtracks); followers specialise in
+    # RESPONDING to that path by contact guidance / cryptic-lamellipodia migration ALONG it
+    # (Friedl & Gilmour 2009; Ray 2017 Biophys J; PLOS One 2024 "leader cells mechanically
+    # respond to aligned collagen"; Nat Rev Cancer 2021).  Implemented as a per-cell force along
+    # the LOCAL collagen nematic director, oriented outward, scaled by the local alignment order
+    # S in [0,1] -- ZERO on isotropic matrix, so it is LOCALIZED to genuine tracks (does NOT
+    # just isotropically inflate the organoid).  off -> R0..R3 byte-for-byte unchanged.
+    follower_guidance: bool = False
+    guidance_strength: float = 0.0     # nN, contact-guidance force scale (at S=1)
+    guidance_range: float = 25.0       # um, near-field radius over which local fibre alignment is read
+    guidance_align_min: float = 0.15   # activation threshold on the local nematic order S (below -> 0)
+    guidance_leaders: bool = False     # leaders also feel guidance (default: followers only)
 
 
 def r1_config(base: OrganoidConfig | None = None, **overrides) -> "G5RevisionConfig":
@@ -1105,6 +1130,65 @@ def strand_metrics(centers: np.ndarray, cfg):
     return len(sizes), float(np.mean(sizes)), int(max(sizes))
 
 
+def contact_guidance_forces(centers, network, centers0, cfg) -> np.ndarray:
+    """R4 per-cell FOLLOWER contact-guidance force (nN) along the local collagen nematic
+    director, oriented outward from the organoid centre.
+
+    Mechanism (literature-grounded): leaders create an aligned ECM path; followers migrate
+    ALONG it by contact guidance rather than being purely towed (Friedl & Gilmour 2009 Nat Rev
+    Mol Cell Biol; Ray et al. 2017 Biophys J contact guidance on aligned collagen; PLOS One 2024
+    "Leader cells mechanically respond to aligned collagen architecture").  For each cell we read
+    the 2D nematic order ``S`` of the fibre segments within ``guidance_range`` and its dominant
+    director; the force is ``guidance_strength * max(0, S - guidance_align_min) * n_hat`` with
+    ``n_hat`` the director flipped to point away from the organoid centre (outward = the invasion
+    axis / TACS-3 radial track).  ``S~0`` on isotropic matrix -> no force, so guidance is
+    LOCALIZED to real tracks and does not isotropically inflate the organoid.  Applied to
+    FOLLOWERS only unless ``guidance_leaders`` (leaders build the track, they do not need it).
+    """
+    centers = np.asarray(centers, dtype=float)
+    M = len(centers)
+    out = np.zeros((M, 2))
+    g = float(getattr(cfg, "guidance_strength", 0.0))
+    if not getattr(cfg, "follower_guidance", False) or g <= 0.0 or M == 0:
+        return out
+    R = float(getattr(cfg, "guidance_range", 25.0))
+    smin = float(getattr(cfg, "guidance_align_min", 0.0))
+    lead = set(int(x) for x in leader_ids(np.asarray(centers0, dtype=float), cfg).tolist())
+    guide_lead = bool(getattr(cfg, "guidance_leaders", False))
+
+    r = network.r
+    edges = network.edges
+    seg = r[edges[:, 1]] - r[edges[:, 0]]
+    L = np.linalg.norm(seg, axis=1)
+    ok = L > 1e-9
+    t = np.zeros_like(seg)
+    t[ok] = seg[ok] / L[ok, None]
+    mid = 0.5 * (r[edges[:, 0]] + r[edges[:, 1]])
+    # 2D nematic components per segment (double-angle so +t and -t are equivalent):
+    c2 = t[:, 0] ** 2 - t[:, 1] ** 2
+    s2 = 2.0 * t[:, 0] * t[:, 1]
+    R2 = R * R
+    for i in range(M):
+        if (i in lead) and not guide_lead:
+            continue
+        dx = mid[:, 0] - centers[i, 0]
+        dy = mid[:, 1] - centers[i, 1]
+        near = ok & ((dx * dx + dy * dy) <= R2)
+        if int(near.sum()) < 3:
+            continue
+        mc = float(c2[near].mean())
+        ms = float(s2[near].mean())
+        S = math.hypot(mc, ms)                       # nematic order in [0, 1]
+        if S <= smin:
+            continue
+        theta = 0.5 * math.atan2(ms, mc)             # dominant director angle
+        nhat = np.array([math.cos(theta), math.sin(theta)])
+        if float(nhat @ centers[i]) < 0.0:           # organoid centre = origin -> orient outward
+            nhat = -nhat
+        out[i] = g * (S - smin) * nhat
+    return out
+
+
 def run_r2_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool = False) -> dict:
     """R2: force-consistent invasion with LOCALIZED leaders (number + location) whose higher
     traction EMERGES from per-site motor capacity (:func:`leader_site_stall`), optionally on a
@@ -1134,6 +1218,109 @@ def run_r2_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool =
     out["leader_follower_separation"] = leader_follower_separation(cf, c0, cfg)
     out["aspect_ratio"] = aspect_ratio(cf)
     return out
+
+
+def run_r4_invasion(cfg: "G5RevisionConfig" = None, seed=None, snapshots: bool = False) -> dict:
+    """R4: R2 localized leaders + FOLLOWER CONTACT-GUIDANCE along the leader-remodelled aligned
+    collagen track (:func:`contact_guidance_forces`).  This adds the missing "followers follow"
+    mechanism that R1xR2 / R3 lacked (leaders detached, followers scattered -> no strand).  All
+    other machinery is identical to :func:`run_r2_invasion`; force-pair stays 0 (guidance is an
+    external motility force on the CELL only, never projected onto the ECM, so the clutch
+    reaction pair is untouched).  ``follower_guidance=False`` -> identical to R2.
+    """
+    if cfg is None:
+        cfg = r1_config()
+    net_mode = "cued" if getattr(cfg, "radial_cue", False) else "random"
+    adh = emt_phenotype if float(getattr(cfg, "emt_fraction", 0.0)) > 0.0 else None
+    boost = (int(getattr(cfg, "n_leaders", 0)) > 0
+             and float(getattr(cfg, "leader_stall_factor", 1.0)) != 1.0)
+    ss = leader_site_stall if boost else None
+    gf = contact_guidance_forces if getattr(cfg, "follower_guidance", False) else None
+    out = run_r0_invasion(cfg, seed=seed, snapshots=snapshots, adhesion_scale=adh,
+                          pair_rule=getattr(cfg, "emt_pair_rule", "min"),
+                          network_mode=net_mode, site_stall=ss, guidance_force=gf)
+    c0, cf = out["centers0"], out["centers_final"]
+    out["leader_ids"] = leader_ids(c0, cfg).tolist()
+    out["site_stall"] = leader_site_stall(c0, cfg) if boost else None
+    out["cue_report"] = out.get("connectivity", {}).get("cue")
+    n_strands, mean_len, max_len = strand_metrics(cf, cfg)
+    out["strand_count"] = int(n_strands)
+    out["strand_mean_len"] = float(mean_len)
+    out["strand_max_len"] = int(max_len)
+    out["leader_follower_separation"] = leader_follower_separation(cf, c0, cfg)
+    out["aspect_ratio"] = aspect_ratio(cf)
+    rep = strand_report(cf, c0, cfg)
+    out.update(rep)
+    return out
+
+
+def connected_components(centers: np.ndarray, cfg) -> list:
+    """Adhesion-graph connected components: cells within ``cell_spacing + cc_adhesion_range``
+    of each other are linked (the exact cohesion cutoff; beyond it adhesion is zero).  Returns
+    a list of index lists, largest first.  The honest strand/detachment test (a large
+    leader_follower_separation can be pure leader ESCAPE, not a connected strand)."""
+    c = np.asarray(centers, dtype=float)
+    M = len(c)
+    if M == 0:
+        return []
+    cutoff = cfg.cell_spacing + cfg.cc_adhesion_range
+    d = np.linalg.norm(c[None, :, :] - c[:, None, :], axis=2)
+    adj = (d > 0.0) & (d <= cutoff)
+    seen = np.zeros(M, dtype=bool)
+    comps: list = []
+    for s in range(M):
+        if seen[s]:
+            continue
+        stack = [s]
+        seen[s] = True
+        comp = []
+        while stack:
+            u = stack.pop()
+            comp.append(int(u))
+            for v in np.flatnonzero(adj[u]):
+                if not seen[v]:
+                    seen[v] = True
+                    stack.append(int(v))
+        comps.append(sorted(comp))
+    comps.sort(key=len, reverse=True)
+    return comps
+
+
+def strand_report(centers: np.ndarray, centers0: np.ndarray, cfg) -> dict:
+    """Honest strand vs escape readout from the adhesion graph (see :func:`connected_components`).
+
+    A genuine leader-led STRAND = the connected component that contains the leaders also carries
+    FOLLOWERS and reaches outward.  Reports: number of components, largest-component fraction,
+    number of followers in the leaders' component (``leader_comp_followers``), whether the leaders
+    are isolated from all followers (``leaders_detached``), and the outward reach of the leaders'
+    component along the cue axis (``strand_reach_um``).
+    """
+    c = np.asarray(centers, dtype=float)
+    c0 = np.asarray(centers0, dtype=float)
+    M = len(c)
+    lead = set(int(x) for x in leader_ids(c0, cfg).tolist())
+    comps = connected_components(c, cfg)
+    axis = np.array([math.cos(cfg.cue_angle), math.sin(cfg.cue_angle)])
+    if not comps or not lead:
+        return {"n_components": len(comps),
+                "largest_comp_fraction": (len(comps[0]) / M if comps and M else 0.0),
+                "leader_comp_size": 0, "leader_comp_followers": 0,
+                "leaders_detached": False, "strand_reach_um": 0.0}
+    # the component holding the most leaders
+    lcomp = max(comps, key=lambda comp: len(set(comp) & lead))
+    lset = set(lcomp)
+    nfoll = len(lset - lead)
+    nlead_in = len(lset & lead)
+    adv = (c - c0) @ axis
+    reach = float(adv[list(lset)].max()) if lset else 0.0
+    return {
+        "n_components": len(comps),
+        "largest_comp_fraction": len(comps[0]) / M,
+        "leader_comp_size": len(lcomp),
+        "leader_comp_followers": nfoll,
+        "leaders_detached": bool(nlead_in >= 1 and nfoll == 0),
+        "strand_reach_um": reach,
+    }
 
 
 # =================================================================================
