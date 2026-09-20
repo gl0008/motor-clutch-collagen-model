@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 v4F · Corrected OFAT guidance experiment</title>
+  <link rel="stylesheet" href="g4-v4e.css?v=1">
+  <style>.event-lab canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:#f7f4ec}.eyebrow.dark{color:var(--orange);margin:0 0 4px}.event-lab h2{margin:.1rem 0}</style>
+  <script>window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']]},svg:{fontCache:'global'}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="g4-v4f-manifest.js?v=1"></script>
+  <script defer src="g4-v4f-validation.js?v=1"></script>
+  <script defer src="g4-v4f.js?v=1"></script>
+</head>
+<body>
+  <header class="hero">
+    <nav><a href="index.html">Model notebook</a><a href="g4-v4e.html">Frozen G4 v4E</a><a href="https://github.com/gl0008/motor-clutch-collagen-model/tree/main/generations/g4_v4f_corrected_ofat_guidance">Source notes</a></nav>
+    <p class="eyebrow">Generation 4 · corrected revision F</p>
+    <h1>A clean baseline before testing directional guidance</h1>
+    <p class="lede">All four conditions now include two-way collagen steric reaction and contact search around the current cell. E0/E1 have no directional memory. E1 adds matrix orientation only, E2 adds protrusion memory only, and E3 combines them.</p>
+    <div id="buildStatus" class="status">Loading generated experiment…</div>
+  </header>
+
+  <main>
+    <section class="question card">
+      <div><span class="tag direct">Primary question</span><h2>One factor at a time</h2><p>After correcting the mechanics shared by every condition, does matrix geometry alone (E1−E0), protrusion memory alone (E2−E0), or their combination (E3) change displacement and persistence?</p></div>
+      <div class="clock"><strong>6 h</strong><span>single-cell observation</span><strong>0.05 s</strong><span>physics timestep</span><strong>10 min</strong><span>overview frame</span></div>
+    </section>
+
+    <section class="lab card">
+      <div class="toolbar">
+        <button id="play">Play</button><button id="step">Step</button><button id="reset">Reset</button>
+        <label>Time <input id="time" type="range" min="0" max="1" value="0"><output id="timeLabel">0 h</output></label>
+        <label>Speed <select id="speed"><option value="900">0.5×</option><option value="450" selected>1×</option><option value="180">2.5×</option></select></label>
+        <label class="check"><input id="ghost" type="checkbox" checked> initial ghost</label>
+        <label class="check"><input id="links" type="checkbox" checked> crosslinks</label>
+        <label class="check"><input id="components" type="checkbox"> force components</label>
+      </div>
+      <div class="compare">
+        <article class="panel"><label>Left condition <select id="leftMode"></select></label><canvas id="leftCanvas" width="720" height="620"></canvas><div id="leftMetrics" class="metrics"></div><div id="leftWhy" class="why"></div></article>
+        <article class="panel"><label>Right condition <select id="rightMode"></select></label><canvas id="rightCanvas" width="720" height="620"></canvas><div id="rightMetrics" class="metrics"></div><div id="rightWhy" class="why"></div></article>
+      </div>
+      <div class="legend">
+        <span><i class="fiber"></i>random collagen bead-chain</span><span><i class="tract"></i>radial-cue fiber</span><span><i class="cross"></i>permanent elastic crosslink</span><span><i class="probe"></i>probing protrusion</span><span><i class="front"></i>front memory (E2/E3 only)</span><span><i class="total"></i>clutch force</span><span style="color:#2b9b83">→ steric reaction</span><span><i class="para"></i>parallel</span><span><i class="perp"></i>perpendicular</span>
+      </div>
+      <p class="scale-note">Geometry and cell path are drawn at true scale. Force/velocity arrows have a capped display scale and do not alter the simulation.</p>
+    </section>
+
+    <section class="card event-lab">
+      <div>
+        <p class="eyebrow dark">Event microscope</p>
+        <h2>Five-minute pull–slip–rebind window</h2>
+        <p>This close view starts at the first complete site failure or front establishment. It stores one frame per second so a disappearing clutch site cannot be hidden by the 10-minute overview sampling.</p>
+      </div>
+      <div class="toolbar">
+        <label>Condition <select id="eventMode"></select></label>
+        <button id="eventPlay">Play</button>
+        <label>Event time <input id="eventTime" type="range" min="0" max="1" value="0"><output id="eventTimeLabel">0 s</output></label>
+      </div>
+      <canvas id="eventCanvas" width="1180" height="520"></canvas>
+      <div id="eventMetrics" class="why"></div>
+      <p class="scale-note">Each spoke is one currently bound effective clutch. A red × marks a site that fell from bound to zero during the preceding one-second interval; a green ring marks binding after a zero-bound state.</p>
+    </section>
+
+    <section class="card">
+      <h2>Four cumulative conditions</h2>
+      <div class="conditions">
+        <article><b>E0 · Corrected baseline</b><p>Random ECM, dynamic contact search, two-way steric coupling and distance-only memoryless rebinding.</p></article>
+        <article><b>E1 · Matrix cue only</b><p>The only changed factor is a right-side 60° radial collagen tract. There is still no cell memory.</p></article>
+        <article><b>E2 · Protrusion memory only</b><p>The ECM stays random. A front can emerge only after a real contact survives the maturation clock.</p></article>
+        <article><b>E3 · Combined</b><p>Radial tract plus the E2 response module. This is the deliberate two-factor exception.</p></article>
+      </div>
+      <table>
+        <thead><tr><th>Condition</th><th>Shared steric + dynamic contacts</th><th>One-sided matrix cue</th><th>Contact-created front memory</th></tr></thead>
+        <tbody>
+          <tr><td>E0</td><td>Yes</td><td>No</td><td>No</td></tr>
+          <tr><td>E1</td><td>Yes</td><td><b>Yes — only added factor</b></td><td>No</td></tr>
+          <tr><td>E2</td><td>Yes</td><td>No</td><td><b>Yes — only added factor</b></td></tr>
+          <tr><td>E3</td><td>Yes</td><td>Yes</td><td>Yes — declared combination</td></tr>
+        </tbody>
+      </table>
+      <div id="ensemble" class="ensemble"></div>
+    </section>
+
+    <section class="card equations">
+      <h2>Equations actually used</h2>
+      <article class="key"><span>Shared two-way force balance</span>\[\zeta_b\dot{\mathbf r}_i=\mathbf F_i^{stretch}+\mathbf F_i^{bend}+\mathbf F_i^{crosslink}+\mathbf F_i^{clutch}+\mathbf F_i^{steric}\]\[\zeta_c\dot{\mathbf r}_c=-\sum_i\mathbf F_i^{clutch}-\sum_i\mathbf F_i^{steric}\]</article>
+      <article class="key"><span>E0/E1 memoryless rebinding</span>\[P_s^0=\frac{I_s\exp(-d_s^2/\sigma_c^2)}{\sum_q I_q\exp(-d_q^2/\sigma_c^2)}\]</article>
+      <article class="key"><span>E2/E3 only, after memory emerges</span>\[P_s^{memory}=\frac{I_sw_s\exp\!\left[\beta_a(\hat{\mathbf t}_s\cdot\hat{\mathbf e}_s)^2+\beta_m\hat{\mathbf p}\cdot\hat{\mathbf e}_s\right]}{\sum_qI_qw_q\exp\!\left[\beta_a(\hat{\mathbf t}_q\cdot\hat{\mathbf e}_q)^2+\beta_m\hat{\mathbf p}\cdot\hat{\mathbf e}_q\right]}\]</article>
+      <article><span>Retained clutch loading and Bell rupture</span>\[\dot x_s=v_0\max\!\left(0,1-\frac{F_s}{F_{stall}}\right)-\mathbf v_{ECM,s}\cdot\hat{\boldsymbol\ell}_s,\qquad F_s=k_cx_s\]\[k_{off}(F_s)=k_{off}^0\exp\!\left(\frac{F_s}{F_b}\right)\]</article>
+      <article><span>Predeclared endpoints</span>\[D_{cue}=[\mathbf r_c(T)-\mathbf r_c(0)]\cdot\hat{\mathbf e}_{cue},\qquad P=\frac{D_{net}}{L_{path}},\qquad C_t=\left\langle|\hat{\mathbf v}_c\cdot\hat{\mathbf t}_{contact}|\right\rangle\]</article>
+    </section>
+
+    <section class="card">
+      <h2>Numerical and coordinate-bias audit</h2>
+      <div id="validation"><p>Loading the predeclared validation checks…</p></div>
+    </section>
+
+    <section class="card evidence">
+      <h2>What is evidence, and what is an assumption?</h2>
+      <div class="evidence-grid">
+        <article><span class="tag direct">Direct mechanism support</span><h3>Aligned collagen can guide MDA-MB-231 migration</h3><p>Riching et al. found more persistent motion and constrained protrusions along aligned collagen. Carey et al. observed radially aligned fibers stabilize and enlarge nearby probing protrusions.</p></article>
+        <article><span class="tag indirect">Indirect support</span><h3>A successful protrusion can define a front</h3><p>Aligned matrices reduce protrusion number and prolong the dominant protrusion, but the exact 120 s memory clock is not measured by these papers.</p></article>
+        <article><span class="tag direct">Mechanical correction</span><h3>Two-way steric coupling</h3><p>Collagen pore size and steric hindrance constrain MDA-MB-231 invasion. The equal-and-opposite reaction is required by the model mechanics; its inherited linear penalty stiffness remains provisional.</p></article>
+        <article><span class="tag assumption">Model assumption</span><h3>Current-position contact search</h3><p>A bound site retains material identity. Only after complete failure does it search the deformed network around the current cell, every 5 s if no point is initially reachable. This is shorter than the effective ~18 s binding time and is checked over 0.5/2/5 s.</p></article>
+        <article><span class="tag direct">Numerical correction</span><h3>Independent counter addresses</h3><p>Seed, timestep, event type and clutch index are hashed separately. The 20-seed first-front directional resultant fell from 0.675 before this correction to 0.221 after it. This removes the old seed/site alias without adding a biological direction; matched E0–E3 cases still receive the same variate at the same stochastic address.</p></article>
+        <article><span class="tag assumption">Provisional parameters</span><h3>Probability gains and cone widths</h3><p>\(\beta_a=\beta_m=2\), 45° front cone, 15° tract SD, and 120 s memory are declared sensitivity variables—not literature-fitted values.</p></article>
+      </div>
+      <ul id="references"></ul>
+    </section>
+
+    <section class="card however">
+      <h2>However — what v4F still cannot claim</h2>
+      <p>The corrected steric term prevents barrier-free passage in this 2D model, but it is not a calibrated 3D pore-crossing law. The cell remains a rigid circle and the memory clock and gains are provisional. There is no deformability, nuclear mechanics, proteolysis, plasticity or crosslink rupture.</p>
+      <p><strong>Current result:</strong> protrusion memory increases net displacement and persistence, but does not choose a reproducible world direction. Matrix cue alone and the cue-plus-memory combination do not pass the paired cue-direction endpoint.</p>
+      <p><strong>Numerical limits:</strong> the short audit preserves front-event order and exact pair-force balance, but does not pass displacement-direction agreement after halving the timestep, 180° cue rotation, or the &lt;5% domain criterion. v4F is therefore an exploratory mechanism result—not a validated directional-migration model.</p>
+    </section>
+  </main>
+</body>
+</html>

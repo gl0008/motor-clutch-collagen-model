@@ -53,6 +53,14 @@ their combination. It adds neither global polarity nor extra force. Its
 predeclared E3 cue-direction endpoint is not supported, while E2/E3 show higher
 mean persistence; failed cue-rotation and domain gates keep the result
 exploratory.
+G4 v4F preserves v4E and repairs its shared baseline: two-way collagen steric
+reaction, current-position material-point search and memoryless E0/E1
+rebinding. E1 and E2 then each add exactly one factor; E3 is their declared
+combination. Its 20-seed experiment finds that memory increases displacement
+and persistence without selecting a reproducible direction. The matrix-cue
+effect is not supported, and timestep-direction, 180-degree cue-rotation and
+domain gates remain not passed; v4F is therefore preserved as an exploratory
+mechanism result rather than accepted directional migration.
 Generation 5 first runs G5-0A scale-transfer, G5-0B cell-number-only and G5-0C
 adhesion controls with the G4 molecular clutch frozen. Its A–E sequence then
 adds the organoid scaffold, collective contraction, strain stiffening,
@@ -96,6 +104,7 @@ can compare them, but it never replaces their permanent checkpoints.
 | `revision/g4-v3-random-to-aligned` | Preserved random-to-aligned mechanics branch | do not overwrite |
 | `revision/g4-v4-single-cell-force-alignment` | G4 v4 literature-grounded fixed-radius single-cell branch | current review branch |
 | `revision/g4-v4e-contact-guided-single-cell` | G4 v4E one-sided matrix cue + contact-created front-memory branch | current review branch |
+| `revision/g4-v4f-corrected-ofat-guidance` | G4 v4F corrected shared baseline + OFAT guidance branch | current review branch |
 | `agent/g5-organoid-plan` | G5-0A–0C lineage controls, molecular-clutch organoid A–E, mode comparison and ablation | preserve staged results; merge after review |
 | `codex/model-evolution-notebook` | Human-readable website and experiment-record development | preserve documentation history after merge |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
@@ -135,6 +144,7 @@ is still the stable scientific checkpoint.
 | G4 v3 | [`generations/g4_v3_random_to_aligned/`](generations/g4_v3_random_to_aligned/) | [random-to-aligned benchmark](https://gl0008.github.io/motor-clutch-collagen-model/g4-v3.html) | preserved parent of v4 |
 | G4 v4 A–D | [`generations/g4_v4_single_cell_force_alignment/`](generations/g4_v4_single_cell_force_alignment/) | [single-cell force–alignment lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4.html) | current review branch |
 | G4 v4E E0–E3 | [`generations/g4_v4e_contact_guided_single_cell/`](generations/g4_v4e_contact_guided_single_cell/) | [contact-guided persistence lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4e.html) | additive review branch |
+| G4 v4F E0–E3 | [`generations/g4_v4f_corrected_ofat_guidance/`](generations/g4_v4f_corrected_ofat_guidance/) | [corrected OFAT guidance lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f.html) | corrected review branch |
 | G5-0A / 0B / 0C | [`generations/g5_organoid/lineage.py`](generations/g5_organoid/lineage.py) | [scale-transfer, cell-number and adhesion controls](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#lineage-controls) | latest lineage audit |
 | G5 A–E | [`generations/g5_organoid/`](generations/g5_organoid/) | [organoid stages](https://gl0008.github.io/motor-clutch-collagen-model/g5.html) | implemented organoid sequence |
 | G5D v2 / v3 | [`generations/g5_organoid/`](generations/g5_organoid/) | [current adhesion modes and preserved leader-traction test](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#leader-update) | current mode comparison + earlier ablation |

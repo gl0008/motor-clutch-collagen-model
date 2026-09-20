@@ -207,6 +207,25 @@ is exploratory rather than a validated migration mechanism. See the
 [`implementation and assumption ledger`](generations/g4_v4e_contact_guided_single_cell/)
 and the [interactive v4E laboratory](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4e.html).
 
+**G4 v4F** preserves that negative result and corrects omissions that should
+have belonged to every v4E condition: the cell now receives collagen's steric
+reaction, a detached site searches the deformed network around the current
+cell position, and E0/E1 rebinding is truly memoryless. The comparison is now
+explicitly one-factor-at-a-time: E1 adds only the radial matrix cue, E2 adds
+only contact-created protrusion memory, and E3 combines them. The provisional
+contact-search clock is 5 s (shorter than the effective \(1/k_{on}\approx18\,s\)
+binding time) and is checked at 0.5, 2 and 5 s; it is an explicit numerical
+assumption, not a value inferred from an experiment. See the
+[`corrected implementation and evidence ledger`](generations/g4_v4f_corrected_ofat_guidance/)
+and the [interactive v4F laboratory](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f.html).
+
+Across 20 matched six-hour seeds, E0 has no fixed-axis bias. Protrusion memory
+in E2 increases paired net displacement by 6.20 µm (95% CI 4.12–8.27) and
+persistence by 0.493 (0.379–0.607), but its direction remains seed-dependent.
+The E1−E0 cue-axis displacement CI includes zero, as does the E3 cue-direction
+endpoint. Thus v4F supports a persistence effect of the response module, not a
+validated cue-directed migration mechanism.
+
 ## Generation 5 — tumour organoid remodels and invades collagen
 
 Generation 5 scales the single-cell core up to a multicellular **organoid**: N motor–clutch

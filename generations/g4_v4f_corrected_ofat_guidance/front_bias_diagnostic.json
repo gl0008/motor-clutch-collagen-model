@@ -1,0 +1,369 @@
+{
+  "rows": [
+    {
+      "seed": 41,
+      "event": {
+        "time": 120.45,
+        "kind": "front_established",
+        "site": 3,
+        "direction": [
+          -0.002906780189699413,
+          0.9999957753055404
+        ],
+        "selected_alignment_score": 0.9947127236269618,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9999914272627382
+      },
+      "final_direction_angle": -1.9700578238364594,
+      "net_displacement": 0.12400089123044916
+    },
+    {
+      "seed": 42,
+      "event": {
+        "time": 120.05000000000001,
+        "kind": "front_established",
+        "site": 1,
+        "direction": [
+          0.9067827483632065,
+          0.4215982059625844
+        ],
+        "selected_alignment_score": 0.9991035038068594,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9999811709478067
+      },
+      "final_direction_angle": -0.4060383964670662,
+      "net_displacement": 0.37832839712899263
+    },
+    {
+      "seed": 43,
+      "event": {
+        "time": 120.15,
+        "kind": "front_established",
+        "site": 7,
+        "direction": [
+          -0.8570148694288519,
+          -0.5152916781569911
+        ],
+        "selected_alignment_score": 0.884016919548138,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9998818084534916
+      },
+      "final_direction_angle": 2.177821224479016,
+      "net_displacement": 0.1660064145403967
+    },
+    {
+      "seed": 44,
+      "event": {
+        "time": 120.05000000000001,
+        "kind": "front_established",
+        "site": 0,
+        "direction": [
+          0.9622022723488283,
+          0.2723357983937316
+        ],
+        "selected_alignment_score": 0.7908690428761184,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.998177017733413
+      },
+      "final_direction_angle": -2.430450704314445,
+      "net_displacement": 0.03839027152394505
+    },
+    {
+      "seed": 45,
+      "event": {
+        "time": 120.5,
+        "kind": "front_established",
+        "site": 0,
+        "direction": [
+          0.9999998673411951,
+          -0.0005150898876554891
+        ],
+        "selected_alignment_score": 0.9588174365356393,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9434820816937336
+      },
+      "final_direction_angle": 1.8651785096377251,
+      "net_displacement": 0.02945260288763864
+    },
+    {
+      "seed": 46,
+      "event": {
+        "time": 120.10000000000001,
+        "kind": "front_established",
+        "site": 8,
+        "direction": [
+          -0.5503021636111775,
+          -0.8349655853535862
+        ],
+        "selected_alignment_score": 0.800033207436664,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.998308364250322
+      },
+      "final_direction_angle": 0.2951823688243213,
+      "net_displacement": 0.8837537673698148
+    },
+    {
+      "seed": 47,
+      "event": {
+        "time": 120.10000000000001,
+        "kind": "front_established",
+        "site": 2,
+        "direction": [
+          0.5670167633358821,
+          0.8237062523109194
+        ],
+        "selected_alignment_score": 3.671837434532077e-06,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9688314934946866
+      },
+      "final_direction_angle": 0.7338745303226498,
+      "net_displacement": 0.3136665696879222
+    },
+    {
+      "seed": 48,
+      "event": {
+        "time": 120.0,
+        "kind": "front_established",
+        "site": 9,
+        "direction": [
+          0.25278838123409303,
+          -0.967521593719255
+        ],
+        "selected_alignment_score": 0.1992452925623528,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9999986164908945
+      },
+      "final_direction_angle": -1.5706606914944705,
+      "net_displacement": 0.04109494625491845
+    },
+    {
+      "seed": 49,
+      "event": {
+        "time": 120.15,
+        "kind": "front_established",
+        "site": 1,
+        "direction": [
+          0.8774900136721479,
+          0.4795949081314914
+        ],
+        "selected_alignment_score": 0.6481915694704053,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9724723127358659
+      },
+      "final_direction_angle": 2.3290303584693532,
+      "net_displacement": 0.25036629145226197
+    },
+    {
+      "seed": 50,
+      "event": {
+        "time": 120.0,
+        "kind": "front_established",
+        "site": 6,
+        "direction": [
+          -0.9976751821586004,
+          0.06814859429807447
+        ],
+        "selected_alignment_score": 0.984627051179898,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9999688882474391
+      },
+      "final_direction_angle": 2.9330620011018524,
+      "net_displacement": 0.5393613735044734
+    },
+    {
+      "seed": 51,
+      "event": {
+        "time": 120.25,
+        "kind": "front_established",
+        "site": 0,
+        "direction": [
+          0.9984934870022651,
+          0.05487036006859554
+        ],
+        "selected_alignment_score": 0.5915366612336266,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.8748334306347836
+      },
+      "final_direction_angle": -1.1061723891507798,
+      "net_displacement": 0.00300750332113298
+    },
+    {
+      "seed": 52,
+      "event": {
+        "time": 120.0,
+        "kind": "front_established",
+        "site": 1,
+        "direction": [
+          0.838348677656775,
+          0.5451343822133555
+        ],
+        "selected_alignment_score": 0.9413876766820498,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9551746719313633
+      },
+      "final_direction_angle": -1.048326900712234,
+      "net_displacement": 0.138780331942967
+    },
+    {
+      "seed": 53,
+      "event": {
+        "time": 120.15,
+        "kind": "front_established",
+        "site": 5,
+        "direction": [
+          -0.8314524723069002,
+          0.555595883979303
+        ],
+        "selected_alignment_score": 0.7606333766515144,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9879257160610934
+      },
+      "final_direction_angle": -1.8936502622316893,
+      "net_displacement": 0.21146173688076442
+    },
+    {
+      "seed": 54,
+      "event": {
+        "time": 120.2,
+        "kind": "front_established",
+        "site": 8,
+        "direction": [
+          -0.47035872153234254,
+          -0.8824753101806647
+        ],
+        "selected_alignment_score": 0.9769018174278922,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9975290158726905
+      },
+      "final_direction_angle": 2.599117292376195,
+      "net_displacement": 0.4853068870719299
+    },
+    {
+      "seed": 55,
+      "event": {
+        "time": 120.10000000000001,
+        "kind": "front_established",
+        "site": 8,
+        "direction": [
+          0.9543348241533373,
+          -0.29873908918690056
+        ],
+        "selected_alignment_score": 0.7959613767503438,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9999888342654475
+      },
+      "final_direction_angle": 0.24971774468227428,
+      "net_displacement": 0.45965929163047636
+    },
+    {
+      "seed": 56,
+      "event": {
+        "time": 120.60000000000001,
+        "kind": "front_established",
+        "site": 6,
+        "direction": [
+          0.3322528824171472,
+          -0.943190342468315
+        ],
+        "selected_alignment_score": 0.885968868253509,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9842511205170734
+      },
+      "final_direction_angle": 3.1015424460239975,
+      "net_displacement": 0.2317662345432079
+    },
+    {
+      "seed": 57,
+      "event": {
+        "time": 120.35000000000001,
+        "kind": "front_established",
+        "site": 4,
+        "direction": [
+          -0.5810572616712122,
+          0.8138626780109482
+        ],
+        "selected_alignment_score": 0.9278525786060249,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9799307814751467
+      },
+      "final_direction_angle": -1.9077480006811969,
+      "net_displacement": 0.34959919324298333
+    },
+    {
+      "seed": 58,
+      "event": {
+        "time": 120.55000000000001,
+        "kind": "front_established",
+        "site": 10,
+        "direction": [
+          0.5113601230620506,
+          -0.8593665251462641
+        ],
+        "selected_alignment_score": 0.6792067000973439,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9998629586957662
+      },
+      "final_direction_angle": -1.7586262010026916,
+      "net_displacement": 0.007896730386771893
+    },
+    {
+      "seed": 59,
+      "event": {
+        "time": 120.05000000000001,
+        "kind": "front_established",
+        "site": 1,
+        "direction": [
+          0.8062580739019066,
+          0.5915639595749453
+        ],
+        "selected_alignment_score": 0.7317529684160872,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9941972869840076
+      },
+      "final_direction_angle": -1.0585111553494404,
+      "net_displacement": 0.707898304423017
+    },
+    {
+      "seed": 60,
+      "event": {
+        "time": 120.60000000000001,
+        "kind": "front_established",
+        "site": 7,
+        "direction": [
+          -0.3368696973424057,
+          -0.9415512768895998
+        ],
+        "selected_alignment_score": 0.1799567052177248,
+        "contact_lifetime": 120.0,
+        "radial_tract_influenced": false,
+        "largest_competing_alignment_score": 0.9973523789380009
+      },
+      "final_direction_angle": -0.07632036595515984,
+      "net_displacement": 0.012383059035176423
+    }
+  ],
+  "front_resultant": 0.22114837080930036,
+  "front_mean_vector": [
+    0.2189845483123823,
+    -0.030860484636987123
+  ]
+}
