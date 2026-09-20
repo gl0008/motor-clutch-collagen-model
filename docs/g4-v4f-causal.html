@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G4 F_causal · v4E → v4F causal reconstruction</title>
+  <meta name="description" content="An exact v4E replay, one-change numerical staircase, and paired mechanics factorial for the v4E to v4F transition.">
+  <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    :root{--ink:#17252b;--muted:#5b6b70;--paper:#f5f1e8;--card:#fffdf8;--line:#d8d1c4;--orange:#d85736;--teal:#287f78;--blue:#315d8c;--green:#40754e;--red:#a53e39;--gold:#a96f0b}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue)}
+    nav{display:flex;gap:18px;flex-wrap:wrap;padding:15px max(24px,calc((100vw - 1180px)/2));background:#183038;color:white}nav a{color:white;text-decoration:none;font-weight:650}
+    header{padding:62px max(24px,calc((100vw - 1180px)/2)) 45px;background:linear-gradient(130deg,#173139,#285a5a);color:white}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:.78rem;font-weight:800;color:#ffb18e}h1{font-size:clamp(2.2rem,5vw,4.2rem);line-height:1.04;margin:.25rem 0 1rem;max-width:1000px}header p{max-width:880px;font-size:1.15rem;color:#e3eeee}
+    main{max-width:1180px;margin:auto;padding:26px 24px 80px}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:26px;margin:20px 0;box-shadow:0 6px 20px #283d3b0c}h2{font-size:1.55rem;margin:.1rem 0 1rem}h3{margin:.2rem 0 .35rem}.gate{border-left:7px solid var(--teal)}.warning{border-left:7px solid var(--gold)}
+    .status{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.pass{color:#255c35;background:#e6f3e8}.fail{color:#7e2925;background:#fae8e6}.pending{color:#73500c;background:#fff0cc}
+    .stage-grid,.factor-grid,.principles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.stage,.factor,.principles article{padding:16px;border:1px solid var(--line);border-radius:12px;background:white}.stage b,.factor b{color:var(--teal)}
+    .chain{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.chain span{padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:white;font:700 .82rem ui-monospace,SFMono-Regular,Menlo,monospace}.chain i{font-style:normal;color:var(--orange);font-weight:900}
+    .table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#eee8dc}code{background:#eee9df;padding:1px 5px;border-radius:5px}.formula{padding:8px 15px;background:#f0f5f4;border-radius:12px;overflow-x:auto}.muted{color:var(--muted)}
+    @media(max-width:760px){.stage-grid,.factor-grid,.principles{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Research notebook</a>
+    <a href="g4-v4e.html">Frozen v4E</a>
+    <a href="g4-v4f-new.html">F_new audit</a>
+    <a href="g4-v4f.html">Frozen v4F</a>
+  </nav>
+  <header>
+    <div class="eyebrow">Generation 4 · F_causal</div>
+    <h1>Same parent first. One declared change next.</h1>
+    <p>This page rebuilds v4E → v4F without bundling unrelated changes. It first proves an exact replay, then isolates numerical repairs, and only then tests three shared mechanics assumptions.</p>
+  </header>
+  <main>
+    <section class="card gate">
+      <h2>Gate 0 · exact v4E replay <span id="replayStatus" class="status pending">loading</span></h2>
+      <p>With every new switch off, the reconstructed model must reproduce the frozen v4E cell path, every collagen bead, traction, clutch count, and front state.</p>
+      <div id="replayDetails" class="muted">Loading recorded evidence…</div>
+    </section>
+
+    <section class="card">
+      <h2>Gate 1 · numerical staircase</h2>
+      <p>Each box enables exactly one additional repair. These are not biological treatments.</p>
+      <div class="chain"><span>E_REPLAY</span><i>→</i><span>N1 · RNG</span><i>→</i><span>N2 · integrator</span><i>→</i><span>N3 · front selection</span><i>→</i><span>N4 · initial contacts</span><i>→</i><span>N5 · shared reach</span></div>
+      <div class="stage-grid" style="margin-top:16px">
+        <article class="stage"><b>N1 · RNG</b><br>Remove seed–clutch-index address aliasing.</article>
+        <article class="stage"><b>N2 · integrator</b><br>Advance cell and ECM from the same time-level geometry.</article>
+        <article class="stage"><b>N3 · front selection</b><br>Allow all mature sites—not fixed site 0—to compete.</article>
+        <article class="stage"><b>N4 · initial contacts</b><br>Use identical contacts before guidance is allowed to act.</article>
+        <article class="stage"><b>N5 · shared reach</b><br>Give all E conditions the same physical probing reach.</article>
+        <article class="stage"><b>Sentinel modes</b><br>Run both E0 and E2 because front changes are invisible in E0.</article>
+      </div>
+      <div class="table-wrap" style="margin-top:18px"><table id="ladderTable"><thead><tr><th>Stage</th><th>Mode</th><th>Net displacement</th><th>Δ from previous</th><th>Force-balance residual</th></tr></thead><tbody><tr><td colspan="5">Loading recorded evidence…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="card">
+      <h2>Gate 2 · \(2\times2\times2\) shared-mechanics experiment</h2>
+      <div class="factor-grid">
+        <article class="factor"><b>S · steric reaction</b><p>Does the cell receive the equal-and-opposite reaction when it overlaps/pushes collagen?</p></article>
+        <article class="factor"><b>C · dynamic-contact module</b><p>After site failure, eligible material points are recomputed around the current cell. If none exists, the site waits and retries every 5 s. That clock is an explicit, uncalibrated assumption.</p></article>
+        <article class="factor"><b>M · memoryless control</b><p>Does unguided rebinding use distance only, without an inherited directional rule?</p></article>
+        <article class="factor"><b>All else locked</b><p>N1–N5, ECM, motor, clutch, force, drag, seed list, and clock are identical in all eight arms.</p></article>
+      </div>
+      <div class="formula">
+        \[\zeta_c\dot{\mathbf r}_c=-\sum_i\mathbf F_i^{\mathrm{clutch}}-S\sum_i\mathbf F_i^{\mathrm{steric}}\]
+        \[P_s^{0}=\frac{I_s\exp(-d_s^2/\sigma_c^2)}{\sum_q I_q\exp(-d_q^2/\sigma_c^2)}\qquad(M=1)\]
+      </div>
+      <div class="table-wrap"><table id="factorTable"><thead><tr><th>Arm</th><th>S</th><th>C</th><th>M</th><th>Mean net displacement</th><th>Mean force residual</th></tr></thead><tbody><tr><td colspan="6">Loading recorded evidence…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="card warning">
+      <h2>What can and cannot be concluded</h2>
+      <div class="principles">
+        <article><h3>Can conclude</h3><p>An effect is attributable to a declared switch only after replay identity, a locked numerical baseline, paired seeds, and interaction reporting.</p></article>
+        <article><h3>Cannot conclude</h3><p>The difference between the old v4E and old v4F animations is “the steric effect.” Those versions bundled nine changes and used different representative seeds.</p></article>
+      </div>
+      <p id="analysisLevel" class="muted">Loading analysis level…</p>
+      <p id="activationWarning" class="muted"></p>
+    </section>
+  </main>
+  <script>
+    const fmt=(x,d=4)=>Number(x).toFixed(d);
+    fetch('g4-v4f-causal-results.json').then(r=>r.json()).then(data=>{
+      const replay=data.exact_e_replay;
+      const badge=document.getElementById('replayStatus');
+      badge.textContent=replay.passed?'passed':'failed';
+      badge.className='status '+(replay.passed?'pass':'fail');
+      const maxima=Object.values(replay.comparisons).flatMap(x=>Object.values(x));
+      document.getElementById('replayDetails').textContent=`Seed ${replay.seed}; ${replay.duration} s replay; maximum absolute difference ${Math.max(...maxima).toExponential(3)}; tolerance ${replay.tolerance.toExponential(1)}.`;
+      document.querySelector('#ladderTable tbody').innerHTML=data.microstage_ladder.rows.map(row=>`<tr><td><code>${row.stage}</code></td><td>${row.mode}</td><td>${fmt(row.metrics.net_displacement)} µm</td><td>${fmt(row.delta_from_previous_stage.net_displacement)} µm</td><td>${Number(row.metrics.max_force_balance_error).toExponential(2)}</td></tr>`).join('');
+      document.querySelector('#factorTable tbody').innerHTML=Object.entries(data.mechanics_factorial.summary).map(([arm,m])=>`<tr><td><code>${arm}</code></td><td>${arm[1]}</td><td>${arm[3]}</td><td>${arm[5]}</td><td>${fmt(m.net_displacement.mean)} µm</td><td>${Number(m.max_force_balance_error.mean).toExponential(2)}</td></tr>`).join('');
+      document.getElementById('analysisLevel').innerHTML=`Recorded dataset: <b>${data.analysis_level}</b>. A quick smoke test verifies wiring only; it is not biological inference.`;
+      const failures=Object.values(data.mechanics_factorial.summary).map(x=>x.site_failures.mean);
+      if(Math.max(...failures)===0){document.getElementById('activationWarning').innerHTML='<b>Activation warning:</b> no complete clutch-site failure occurred during this short run. C and M therefore never activated; their zero effects are not negative biological results.';}
+    }).catch(error=>{document.getElementById('replayDetails').textContent='Recorded data could not be loaded: '+error;});
+  </script>
+</body>
+</html>

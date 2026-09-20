@@ -1,0 +1,1497 @@
+{
+  "analysis_level": "quick smoke test",
+  "exact_e_replay": {
+    "passed": true,
+    "seed": 45,
+    "duration": 2.0,
+    "tolerance": 1e-10,
+    "comparisons": {
+      "d_control": {
+        "centers": 5.421010862427522e-20,
+        "positions": 0.0,
+        "site_force": 0.0,
+        "bound_count": 0.0,
+        "fronts": 0.0
+      },
+      "protrusion_guidance": {
+        "centers": 2.168404344971009e-19,
+        "positions": 0.0,
+        "site_force": 0.0,
+        "bound_count": 0.0,
+        "fronts": 0.0
+      }
+    }
+  },
+  "microstage_ladder": {
+    "design": "cumulative numerical-correction staircase",
+    "seed": 45,
+    "duration": 2.0,
+    "modes": [
+      "d_control",
+      "protrusion_guidance"
+    ],
+    "rows": [
+      {
+        "stage": "E_REPLAY",
+        "mode": "d_control",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": false,
+          "same_time_level_update": false,
+          "all_site_front_selection": false,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": -0.0003031763469578783,
+          "net_displacement": 0.0006395065324679113,
+          "path_length": 0.0006506238371915558,
+          "persistence": 0.9829128536519154,
+          "contact_guidance_Ct": 0.3556934784926826,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.9901331150058521
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      },
+      {
+        "stage": "E_REPLAY",
+        "mode": "protrusion_guidance",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": false,
+          "same_time_level_update": false,
+          "all_site_front_selection": false,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0008507563689318809,
+          "net_displacement": 0.002072578441239631,
+          "path_length": 0.0020980618873423728,
+          "persistence": 0.9878538158209328,
+          "contact_guidance_Ct": 0.41204874646712286,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 3.6116864290859767
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      },
+      {
+        "stage": "N1_RNG",
+        "mode": "d_control",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": false,
+          "all_site_front_selection": false,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024458258871179668,
+          "net_displacement": 0.002646551549140037,
+          "path_length": 0.0026823317323297854,
+          "persistence": 0.9866607911473086,
+          "contact_guidance_Ct": 0.08139213394485834,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.2902286575398723
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.002749002234075845,
+          "net_displacement": 0.0020070450166721253,
+          "path_length": 0.00203170789513823,
+          "persistence": 0.003747937495393261,
+          "contact_guidance_Ct": -0.2743013445478243,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 1.3000955425340202
+        }
+      },
+      {
+        "stage": "N1_RNG",
+        "mode": "protrusion_guidance",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": false,
+          "all_site_front_selection": false,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0014629182129889168,
+          "net_displacement": 0.0028330817125701937,
+          "path_length": 0.0028348095073822506,
+          "persistence": 0.9993905076134543,
+          "contact_guidance_Ct": 0.43809097927422475,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 4.419637437514963
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0006121618440570359,
+          "net_displacement": 0.0007605032713305627,
+          "path_length": 0.0007367476200398778,
+          "persistence": 0.01153669179252148,
+          "contact_guidance_Ct": 0.026042232807101884,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.807951008428986
+        }
+      },
+      {
+        "stage": "N2_INTEGRATOR",
+        "mode": "d_control",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": false,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024408709412031978,
+          "net_displacement": 0.002641841727210043,
+          "path_length": 0.002677520429093293,
+          "persistence": 0.9866747228160898,
+          "contact_guidance_Ct": 0.08065837727950463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.45922812679944
+        },
+        "delta_from_previous_stage": {
+          "D_cue": -4.954945914768978e-06,
+          "net_displacement": -4.7098219299939945e-06,
+          "path_length": -4.811303236492304e-06,
+          "persistence": 1.3931668781164142e-05,
+          "contact_guidance_Ct": -0.0007337566653537048,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.16899946925956755
+        }
+      },
+      {
+        "stage": "N2_INTEGRATOR",
+        "mode": "protrusion_guidance",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": false,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0014582644908887044,
+          "net_displacement": 0.002824960678216949,
+          "path_length": 0.002826684973814111,
+          "persistence": 0.9993899937159126,
+          "contact_guidance_Ct": 0.43797521012429463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 4.837545205403501
+        },
+        "delta_from_previous_stage": {
+          "D_cue": -4.653722100212386e-06,
+          "net_displacement": -8.121034353244898e-06,
+          "path_length": -8.124533568139736e-06,
+          "persistence": -5.138975416318914e-07,
+          "contact_guidance_Ct": -0.00011576914993011167,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.4179077678885381
+        }
+      },
+      {
+        "stage": "N3_FRONT_SELECTION",
+        "mode": "d_control",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": true,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024408709412031978,
+          "net_displacement": 0.002641841727210043,
+          "path_length": 0.002677520429093293,
+          "persistence": 0.9866747228160898,
+          "contact_guidance_Ct": 0.08065837727950463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.45922812679944
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      },
+      {
+        "stage": "N3_FRONT_SELECTION",
+        "mode": "protrusion_guidance",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": true,
+          "matched_initial_contacts": false,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0014582644908887044,
+          "net_displacement": 0.002824960678216949,
+          "path_length": 0.002826684973814111,
+          "persistence": 0.9993899937159126,
+          "contact_guidance_Ct": 0.43797521012429463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 4.837545205403501
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      },
+      {
+        "stage": "N4_INITIAL_CONTACTS",
+        "mode": "d_control",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": true,
+          "matched_initial_contacts": true,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024408709412031978,
+          "net_displacement": 0.002641841727210043,
+          "path_length": 0.002677520429093293,
+          "persistence": 0.9866747228160898,
+          "contact_guidance_Ct": 0.08065837727950463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.45922812679944
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      },
+      {
+        "stage": "N4_INITIAL_CONTACTS",
+        "mode": "protrusion_guidance",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": true,
+          "matched_initial_contacts": true,
+          "shared_probing_reach": false,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024408709412031978,
+          "net_displacement": 0.002641841727210043,
+          "path_length": 0.002677520429093293,
+          "persistence": 0.9866747228160898,
+          "contact_guidance_Ct": 0.08065837727950463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.45922812679944
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0009826064503144934,
+          "net_displacement": -0.00018311895100690595,
+          "path_length": -0.00014916454472081774,
+          "persistence": -0.012715270899822828,
+          "contact_guidance_Ct": -0.35731683284479,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": -2.378317078604061
+        }
+      },
+      {
+        "stage": "N5_SHARED_REACH",
+        "mode": "d_control",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": true,
+          "matched_initial_contacts": true,
+          "shared_probing_reach": true,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024408709412031978,
+          "net_displacement": 0.002641841727210043,
+          "path_length": 0.002677520429093293,
+          "persistence": 0.9866747228160898,
+          "contact_guidance_Ct": 0.08065837727950463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.45922812679944
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      },
+      {
+        "stage": "N5_SHARED_REACH",
+        "mode": "protrusion_guidance",
+        "seed": 45,
+        "duration": 2.0,
+        "switches": {
+          "independent_rng": true,
+          "same_time_level_update": true,
+          "all_site_front_selection": true,
+          "matched_initial_contacts": true,
+          "shared_probing_reach": true,
+          "steric_reaction_to_cell": false,
+          "dynamic_contact_search": false,
+          "memoryless_controls": false
+        },
+        "metrics": {
+          "D_cue": 0.0024408709412031978,
+          "net_displacement": 0.002641841727210043,
+          "path_length": 0.002677520429093293,
+          "persistence": 0.9866747228160898,
+          "contact_guidance_Ct": 0.08065837727950463,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.45922812679944
+        },
+        "delta_from_previous_stage": {
+          "D_cue": 0.0,
+          "net_displacement": 0.0,
+          "path_length": 0.0,
+          "persistence": 0.0,
+          "contact_guidance_Ct": 0.0,
+          "site_failures": 0.0,
+          "successful_relocations": 0.0,
+          "max_force_balance_error": 0.0
+        }
+      }
+    ]
+  },
+  "mechanics_factorial": {
+    "design": "paired 2x2x2 mechanics factorial",
+    "factor_definitions": {
+      "S": "equal-and-opposite collagen steric reaction acts on cell",
+      "C": "dynamic-contact module: eligible material points recomputed from current cell position; unavailable sites retry at the declared search interval",
+      "M": "unguided control rebinding uses distance only, with no inherited direction"
+    },
+    "held_constant": "N1--N5 numerical baseline, ECM, clutch, motor, force, drag",
+    "mode": "d_control",
+    "duration": 2.0,
+    "seeds": [
+      41,
+      42
+    ],
+    "arms": {
+      "S0C0M0": [
+        {
+          "seed": 41,
+          "D_cue": -0.00033891302823737743,
+          "net_displacement": 0.0017425089709794189,
+          "path_length": 0.0017515494086813145,
+          "persistence": 0.994838605375853,
+          "contact_guidance_Ct": 0.4634052300699155,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.6577575862830076
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0008704096443781117,
+          "net_displacement": 0.0008782618393746588,
+          "path_length": 0.0010671331722458199,
+          "persistence": 0.8230105315968441,
+          "contact_guidance_Ct": 0.458137806917188,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.40888775860013776
+        }
+      ],
+      "S0C0M1": [
+        {
+          "seed": 41,
+          "D_cue": -0.00033891302823737743,
+          "net_displacement": 0.0017425089709794189,
+          "path_length": 0.0017515494086813145,
+          "persistence": 0.994838605375853,
+          "contact_guidance_Ct": 0.4634052300699155,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.6577575862830076
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0008704096443781117,
+          "net_displacement": 0.0008782618393746588,
+          "path_length": 0.0010671331722458199,
+          "persistence": 0.8230105315968441,
+          "contact_guidance_Ct": 0.458137806917188,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.40888775860013776
+        }
+      ],
+      "S0C1M0": [
+        {
+          "seed": 41,
+          "D_cue": -0.00033891302823737743,
+          "net_displacement": 0.0017425089709794189,
+          "path_length": 0.0017515494086813145,
+          "persistence": 0.994838605375853,
+          "contact_guidance_Ct": 0.4634052300699155,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.6577575862830076
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0008704096443781117,
+          "net_displacement": 0.0008782618393746588,
+          "path_length": 0.0010671331722458199,
+          "persistence": 0.8230105315968441,
+          "contact_guidance_Ct": 0.458137806917188,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.40888775860013776
+        }
+      ],
+      "S0C1M1": [
+        {
+          "seed": 41,
+          "D_cue": -0.00033891302823737743,
+          "net_displacement": 0.0017425089709794189,
+          "path_length": 0.0017515494086813145,
+          "persistence": 0.994838605375853,
+          "contact_guidance_Ct": 0.4634052300699155,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 2.6577575862830076
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0008704096443781117,
+          "net_displacement": 0.0008782618393746588,
+          "path_length": 0.0010671331722458199,
+          "persistence": 0.8230105315968441,
+          "contact_guidance_Ct": 0.458137806917188,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.40888775860013776
+        }
+      ],
+      "S1C0M0": [
+        {
+          "seed": 41,
+          "D_cue": -0.0004166475837707071,
+          "net_displacement": 0.0005164907602131528,
+          "path_length": 0.000561273343620761,
+          "persistence": 0.9202125240462752,
+          "contact_guidance_Ct": 0.34184915864638826,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0006239801452582211,
+          "net_displacement": 0.0006712786381319107,
+          "path_length": 0.0007508890645092555,
+          "persistence": 0.8939784448327606,
+          "contact_guidance_Ct": 0.4908776235840599,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        }
+      ],
+      "S1C0M1": [
+        {
+          "seed": 41,
+          "D_cue": -0.0004166475837707071,
+          "net_displacement": 0.0005164907602131528,
+          "path_length": 0.000561273343620761,
+          "persistence": 0.9202125240462752,
+          "contact_guidance_Ct": 0.34184915864638826,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0006239801452582211,
+          "net_displacement": 0.0006712786381319107,
+          "path_length": 0.0007508890645092555,
+          "persistence": 0.8939784448327606,
+          "contact_guidance_Ct": 0.4908776235840599,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        }
+      ],
+      "S1C1M0": [
+        {
+          "seed": 41,
+          "D_cue": -0.0004166475837707071,
+          "net_displacement": 0.0005164907602131528,
+          "path_length": 0.000561273343620761,
+          "persistence": 0.9202125240462752,
+          "contact_guidance_Ct": 0.34184915864638826,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0006239801452582211,
+          "net_displacement": 0.0006712786381319107,
+          "path_length": 0.0007508890645092555,
+          "persistence": 0.8939784448327606,
+          "contact_guidance_Ct": 0.4908776235840599,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        }
+      ],
+      "S1C1M1": [
+        {
+          "seed": 41,
+          "D_cue": -0.0004166475837707071,
+          "net_displacement": 0.0005164907602131528,
+          "path_length": 0.000561273343620761,
+          "persistence": 0.9202125240462752,
+          "contact_guidance_Ct": 0.34184915864638826,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        },
+        {
+          "seed": 42,
+          "D_cue": 0.0006239801452582211,
+          "net_displacement": 0.0006712786381319107,
+          "path_length": 0.0007508890645092555,
+          "persistence": 0.8939784448327606,
+          "contact_guidance_Ct": 0.4908776235840599,
+          "site_failures": 0,
+          "successful_relocations": 0,
+          "max_force_balance_error": 0.0
+        }
+      ]
+    },
+    "summary": {
+      "S0C0M0": {
+        "D_cue": {
+          "mean": 0.0002657483080703671,
+          "ci95": [
+            -0.0009193879110928121,
+            0.0014508845272335463
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.001310385405177039,
+          "ci95": [
+            0.0004634232162043741,
+            0.002157347594149704
+          ]
+        },
+        "path_length": {
+          "mean": 0.0014093412904635672,
+          "ci95": [
+            0.0007386133787567825,
+            0.002080069202170352
+          ]
+        },
+        "persistence": {
+          "mean": 0.9089245684863485,
+          "ci95": [
+            0.7405330561829198,
+            1.0773160807897773
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.46077151849355175,
+          "ci95": [
+            0.45560944380387874,
+            0.46593359318322475
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 1.5333226724415727,
+          "ci95": [
+            -0.6705697586876398,
+            3.7372151035707852
+          ]
+        }
+      },
+      "S0C0M1": {
+        "D_cue": {
+          "mean": 0.0002657483080703671,
+          "ci95": [
+            -0.0009193879110928121,
+            0.0014508845272335463
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.001310385405177039,
+          "ci95": [
+            0.0004634232162043741,
+            0.002157347594149704
+          ]
+        },
+        "path_length": {
+          "mean": 0.0014093412904635672,
+          "ci95": [
+            0.0007386133787567825,
+            0.002080069202170352
+          ]
+        },
+        "persistence": {
+          "mean": 0.9089245684863485,
+          "ci95": [
+            0.7405330561829198,
+            1.0773160807897773
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.46077151849355175,
+          "ci95": [
+            0.45560944380387874,
+            0.46593359318322475
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 1.5333226724415727,
+          "ci95": [
+            -0.6705697586876398,
+            3.7372151035707852
+          ]
+        }
+      },
+      "S0C1M0": {
+        "D_cue": {
+          "mean": 0.0002657483080703671,
+          "ci95": [
+            -0.0009193879110928121,
+            0.0014508845272335463
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.001310385405177039,
+          "ci95": [
+            0.0004634232162043741,
+            0.002157347594149704
+          ]
+        },
+        "path_length": {
+          "mean": 0.0014093412904635672,
+          "ci95": [
+            0.0007386133787567825,
+            0.002080069202170352
+          ]
+        },
+        "persistence": {
+          "mean": 0.9089245684863485,
+          "ci95": [
+            0.7405330561829198,
+            1.0773160807897773
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.46077151849355175,
+          "ci95": [
+            0.45560944380387874,
+            0.46593359318322475
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 1.5333226724415727,
+          "ci95": [
+            -0.6705697586876398,
+            3.7372151035707852
+          ]
+        }
+      },
+      "S0C1M1": {
+        "D_cue": {
+          "mean": 0.0002657483080703671,
+          "ci95": [
+            -0.0009193879110928121,
+            0.0014508845272335463
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.001310385405177039,
+          "ci95": [
+            0.0004634232162043741,
+            0.002157347594149704
+          ]
+        },
+        "path_length": {
+          "mean": 0.0014093412904635672,
+          "ci95": [
+            0.0007386133787567825,
+            0.002080069202170352
+          ]
+        },
+        "persistence": {
+          "mean": 0.9089245684863485,
+          "ci95": [
+            0.7405330561829198,
+            1.0773160807897773
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.46077151849355175,
+          "ci95": [
+            0.45560944380387874,
+            0.46593359318322475
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 1.5333226724415727,
+          "ci95": [
+            -0.6705697586876398,
+            3.7372151035707852
+          ]
+        }
+      },
+      "S1C0M0": {
+        "D_cue": {
+          "mean": 0.00010366628074375702,
+          "ci95": [
+            -0.0009161488937045927,
+            0.0011234814551921068
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.0005938846991725318,
+          "ci95": [
+            0.00044219257881214903,
+            0.0007455768195329145
+          ]
+        },
+        "path_length": {
+          "mean": 0.0006560812040650083,
+          "ci95": [
+            0.00047025779759428366,
+            0.0008419046105357328
+          ]
+        },
+        "persistence": {
+          "mean": 0.9070954844395178,
+          "ci95": [
+            0.8813860868102735,
+            0.9328048820687621
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.4163633911152241,
+          "ci95": [
+            0.27031549547630584,
+            0.5624112867541423
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "S1C0M1": {
+        "D_cue": {
+          "mean": 0.00010366628074375702,
+          "ci95": [
+            -0.0009161488937045927,
+            0.0011234814551921068
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.0005938846991725318,
+          "ci95": [
+            0.00044219257881214903,
+            0.0007455768195329145
+          ]
+        },
+        "path_length": {
+          "mean": 0.0006560812040650083,
+          "ci95": [
+            0.00047025779759428366,
+            0.0008419046105357328
+          ]
+        },
+        "persistence": {
+          "mean": 0.9070954844395178,
+          "ci95": [
+            0.8813860868102735,
+            0.9328048820687621
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.4163633911152241,
+          "ci95": [
+            0.27031549547630584,
+            0.5624112867541423
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "S1C1M0": {
+        "D_cue": {
+          "mean": 0.00010366628074375702,
+          "ci95": [
+            -0.0009161488937045927,
+            0.0011234814551921068
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.0005938846991725318,
+          "ci95": [
+            0.00044219257881214903,
+            0.0007455768195329145
+          ]
+        },
+        "path_length": {
+          "mean": 0.0006560812040650083,
+          "ci95": [
+            0.00047025779759428366,
+            0.0008419046105357328
+          ]
+        },
+        "persistence": {
+          "mean": 0.9070954844395178,
+          "ci95": [
+            0.8813860868102735,
+            0.9328048820687621
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.4163633911152241,
+          "ci95": [
+            0.27031549547630584,
+            0.5624112867541423
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "S1C1M1": {
+        "D_cue": {
+          "mean": 0.00010366628074375702,
+          "ci95": [
+            -0.0009161488937045927,
+            0.0011234814551921068
+          ]
+        },
+        "net_displacement": {
+          "mean": 0.0005938846991725318,
+          "ci95": [
+            0.00044219257881214903,
+            0.0007455768195329145
+          ]
+        },
+        "path_length": {
+          "mean": 0.0006560812040650083,
+          "ci95": [
+            0.00047025779759428366,
+            0.0008419046105357328
+          ]
+        },
+        "persistence": {
+          "mean": 0.9070954844395178,
+          "ci95": [
+            0.8813860868102735,
+            0.9328048820687621
+          ]
+        },
+        "contact_guidance_Ct": {
+          "mean": 0.4163633911152241,
+          "ci95": [
+            0.27031549547630584,
+            0.5624112867541423
+          ]
+        },
+        "site_failures": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "successful_relocations": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "max_force_balance_error": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "effects": {
+      "D_cue": {
+        "S_steric": {
+          "mean": -0.0001620820273266101,
+          "ci95": [
+            -0.00032740307204143974,
+            3.2390173882195406e-06
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "net_displacement": {
+        "S_steric": {
+          "mean": -0.0007165007060045071,
+          "ci95": [
+            -0.0017151550153375547,
+            0.0002821536033285404
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "path_length": {
+        "S_steric": {
+          "mean": -0.0007532600863985588,
+          "ci95": [
+            -0.001609811404576068,
+            0.00010329123177895035
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "persistence": {
+        "S_steric": {
+          "mean": -0.0018290840468306868,
+          "ci95": [
+            -0.14451119872101506,
+            0.1408530306273537
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "contact_guidance_Ct": {
+        "S_steric": {
+          "mean": -0.044408127378327666,
+          "ci95": [
+            -0.19561809770691885,
+            0.10680184295026351
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "site_failures": {
+        "S_steric": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "successful_relocations": {
+        "S_steric": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "max_force_balance_error": {
+        "S_steric": {
+          "mean": -1.5333226724415727,
+          "ci95": [
+            -3.7372151035707852,
+            0.6705697586876398
+          ]
+        },
+        "C_dynamic_contact": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "M_memoryless_control": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxC": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "SxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CxM": {
+          "mean": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  }
+}

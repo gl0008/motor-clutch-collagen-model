@@ -226,6 +226,15 @@ The E1−E0 cue-axis displacement CI includes zero, as does the E3 cue-direction
 endpoint. Thus v4F supports a persistence effect of the response module, not a
 validated cue-directed migration mechanism.
 
+**G4 v4F_new** then audits the lineage and shows that the historical v4E →
+v4F jump bundled nine requested, numerical, initial-condition and presentation
+changes. **G4 F_causal** implements the corrective workflow without overwriting
+either model: an exact v4E replay, five one-change numerical microstages, then
+a paired 2 × 2 × 2 mechanics experiment for steric reaction (S),
+current-position contact search (C), and memoryless control rebinding (M).
+Read the [audit](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f-new.html)
+and [causal reconstruction](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f-causal.html).
+
 ## Generation 5 — tumour organoid remodels and invades collagen
 
 Generation 5 scales the single-cell core up to a multicellular **organoid**: N motor–clutch

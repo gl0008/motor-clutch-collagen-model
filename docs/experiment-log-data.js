@@ -9,6 +9,7 @@ window.REPOSITORY_BRANCHES = [
   {name:'revision/g4-v4e-contact-guided-single-cell',role:'G4 v4E review',state:'current',description:'Additive E0–E3 matrix-cue and protrusion-memory experiment; G4 v4A–D remains frozen.'},
   {name:'revision/g4-v4f-corrected-ofat-guidance',role:'G4 v4F corrected review',state:'current',description:'Preserves v4E, repairs shared cell–ECM mechanics, and compares matrix cue and protrusion memory one factor at a time.'},
   {name:'revision/g4-v4f-new-lineage-audit',role:'G4 v4F_new lineage audit',state:'current audit',description:'Adds no physics; records all requested and implementation-added differences between the frozen v4E and v4F checkpoints.'},
+  {name:'revision/g4-v4f-causal-rebuild',role:'G4 F_causal reconstruction',state:'current causal build',description:'Exact v4E replay, N1–N5 numerical staircase and paired S × C × M mechanics experiment.'},
   {name:'generation/g5',role:'Generation 5 checkpoint',state:'preserved',description:'Permanent G5 model branch at the current molecular-clutch and ablation evidence state.'},
   {name:'agent/g5-organoid-plan',role:'G5 working history',state:'active history',description:'The model-development branch remains visible after merge so its experiment sequence can be audited.'},
   {name:'codex/model-evolution-notebook',role:'Notebook working history',state:'active history',description:'The website-development branch remains visible after merge so documentation changes can be audited.'}
@@ -35,6 +36,7 @@ window.VERSION_EVIDENCE = {
   'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'d49858b'},
   'g4-v4-f':{branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'921e8fc'},
   'g4-v4-f-new':{branch:'revision/g4-v4f-new-lineage-audit',commit:'3a8bf68'},
+  'g4-v4-f-causal':{branch:'revision/g4-v4f-causal-rebuild',commit:'pending'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -44,6 +46,16 @@ window.VERSION_EVIDENCE = {
 };
 
 window.EXPERIMENT_LOG = [
+  {
+    date:'2026-09-20',generation:'G4',version:'G4 F_causal quick validation',branch:'revision/g4-v4f-causal-rebuild',commit:'pending',
+    parent:'Frozen v4E plus the F_new nine-change audit',
+    question:'Can the v4E → v4F transition be reconstructed from an identical parent and separated into declared numerical and mechanics factors?',
+    change:'Implemented an exact v4E replay, an N1–N5 cumulative numerical/design staircase, and an eight-arm S × C × M mechanics factorial. Existing v4E, v4F and F_new files remain unchanged.',
+    result:'The 2 s replay matches frozen v4E to floating-point tolerance across cell, collagen, traction, clutch and front states. The quick eight-arm run confirms steric force pairing, but contains no complete site failure; C and M therefore do not activate and no biological effect size is claimed.',
+    limitation:'This is a wiring smoke test, not the planned 20-seed long-clock inference. C is a dynamic-contact module that includes a provisional 5 s retry clock.',
+    next:'Run the long-clock paired S × C × M ensemble, report main effects and interactions, lock the accepted shared baseline, and only then repeat E0–E3 guidance.',
+    evidence:[{label:'Causal reconstruction page',href:'g4-v4f-causal.html'},{label:'Implementation and interpretation contract',href:'https://github.com/gl0008/motor-clutch-collagen-model/tree/revision/g4-v4f-causal-rebuild/generations/g4_v4f_causal_rebuild'}]
+  },
   {
     date:'2026-09-20',generation:'G4',version:'G4 v4F_new lineage audit',branch:'revision/g4-v4f-new-lineage-audit',commit:'3a8bf68',
     parent:'Frozen v4E (d49858b) and v4F (921e8fc) evidence checkpoints',

@@ -85,6 +85,11 @@ matched initial contacts, an integrator-order correction and a different
 representative seed. The parent-child result is therefore not a one-factor
 comparison. F_new also establishes a fixed lineage seed, a separate matched
 ensemble and mandatory microstages for future numerical corrections.
+G4 F_causal implements that contract. It starts with an exact v4E replay,
+introduces RNG, integrator, front-selection, initial-contact and shared-reach
+repairs one at a time, and then runs a paired 2 × 2 × 2 comparison of cell
+steric reaction, current-position contact search and memoryless control
+rebinding. The old v4E, old v4F and F_new audit remain unchanged.
 Generation 5 first runs G5-0A scale-transfer, G5-0B cell-number-only and G5-0C
 adhesion controls with the G4 molecular clutch frozen. Its A–E sequence then
 adds the organoid scaffold, collective contraction, strain stiffening,
@@ -130,6 +135,7 @@ can compare them, but it never replaces their permanent checkpoints.
 | `revision/g4-v4e-contact-guided-single-cell` | G4 v4E one-sided matrix cue + contact-created front-memory branch | current review branch |
 | `revision/g4-v4f-corrected-ofat-guidance` | G4 v4F corrected shared baseline + OFAT guidance branch | current review branch |
 | `revision/g4-v4f-new-lineage-audit` | Audit-only record of every v4E → v4F change; no new physics | preserve after review |
+| `revision/g4-v4f-causal-rebuild` | Exact v4E replay, numerical staircase and S × C × M mechanics factorial | current causal reconstruction branch |
 | `agent/g5-organoid-plan` | G5-0A–0C lineage controls, molecular-clutch organoid A–E, mode comparison and ablation | preserve staged results; merge after review |
 | `codex/model-evolution-notebook` | Human-readable website and experiment-record development | preserve documentation history after merge |
 | `g1-v0` … `g1-v4` | Stable pointers to the archived G1 release | immutable tags |
@@ -171,6 +177,7 @@ is still the stable scientific checkpoint.
 | G4 v4E E0–E3 | [`generations/g4_v4e_contact_guided_single_cell/`](generations/g4_v4e_contact_guided_single_cell/) | [contact-guided persistence lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4e.html) | additive review branch |
 | G4 v4F E0–E3 | [`generations/g4_v4f_corrected_ofat_guidance/`](generations/g4_v4f_corrected_ofat_guidance/) | [corrected OFAT guidance lab](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f.html) | corrected review branch |
 | G4 v4F_new audit | [`generations/g4_v4f_new_lineage_audit/`](generations/g4_v4f_new_lineage_audit/) | [v4E → v4F lineage audit](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f-new.html) | audit-only branch |
+| G4 F_causal | [`generations/g4_v4f_causal_rebuild/`](generations/g4_v4f_causal_rebuild/) | [causal reconstruction](https://gl0008.github.io/motor-clutch-collagen-model/g4-v4f-causal.html) | current causal branch |
 | G5-0A / 0B / 0C | [`generations/g5_organoid/lineage.py`](generations/g5_organoid/lineage.py) | [scale-transfer, cell-number and adhesion controls](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#lineage-controls) | latest lineage audit |
 | G5 A–E | [`generations/g5_organoid/`](generations/g5_organoid/) | [organoid stages](https://gl0008.github.io/motor-clutch-collagen-model/g5.html) | implemented organoid sequence |
 | G5D v2 / v3 | [`generations/g5_organoid/`](generations/g5_organoid/) | [current adhesion modes and preserved leader-traction test](https://gl0008.github.io/motor-clutch-collagen-model/g5.html#leader-update) | current mode comparison + earlier ablation |
