@@ -32,7 +32,7 @@ window.VERSION_EVIDENCE = {
   'g4-v4-c':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-d':{branch:'revision/g4-v4-single-cell-force-alignment',commit:'d5639a1'},
   'g4-v4-e':{branch:'revision/g4-v4e-contact-guided-single-cell',commit:'d49858b'},
-  'g4-v4-f':{branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'current review branch'},
+  'g4-v4-f':{branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'921e8fc'},
   'g5-0a':{branch:'generation/g5',commit:'2227642'},'g5-0b':{branch:'generation/g5',commit:'8287490'},
   'g5-0c':{branch:'generation/g5',commit:'60f7a75'},'g5-a':{branch:'generation/g5',commit:'3d2706a'},
   'g5-b':{branch:'generation/g5',commit:'3d2706a'},'g5-c':{branch:'generation/g5',commit:'9f5f68b'},
@@ -43,7 +43,7 @@ window.VERSION_EVIDENCE = {
 
 window.EXPERIMENT_LOG = [
   {
-    date:'2026-09-19',generation:'G4',version:'G4 v4F E0–E3',branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'current review branch',
+    date:'2026-09-19',generation:'G4',version:'G4 v4F E0–E3',branch:'revision/g4-v4f-corrected-ofat-guidance',commit:'921e8fc',
     parent:'Preserved G4 v4E negative result (d49858b)',
     question:'After repairing mechanics that belong in every condition, do matrix orientation and contact-created protrusion memory have separable effects on single-cell movement?',
     change:'Added equal-and-opposite collagen steric reaction to the cell, dynamic material-point search around the current cell and distance-only memoryless control rebinding. E1 changes only matrix geometry, E2 changes only the memory module, and E3 combines both.',
