@@ -8,3 +8,4 @@ results/g3_validation/pre_optimization_*/
 
 # large regenerable solver dumps
 results/**/frames.pkl
+generations/g4_v4f_corrected_ofat_guidance/.panel-cache.json

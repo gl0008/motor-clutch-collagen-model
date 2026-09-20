@@ -1,0 +1,211 @@
+{
+  "version": "G4 v4F \u00b7 corrected OFAT contact-guidance experiment",
+  "quick": 0,
+  "duration": 21600.0,
+  "representative_seed": 51,
+  "topology": {
+    "eligible_attempts": 12,
+    "tract_fibers": 8,
+    "max_contour_length_change": 0.0,
+    "centers_and_lengths_rule": "centroid-preserving rigid rotation; invalid rotations skipped",
+    "random_crosslink_probability": 0.35,
+    "cue_crosslink_probability": 0.35,
+    "probability_adjustment_reason": "predeclared topology matching only",
+    "topology_comparison": {
+      "link_density_relative_difference": 0.008287,
+      "connected_fraction_relative_difference": 0.009302,
+      "within_five_percent": 1
+    }
+  },
+  "ensemble": {
+    "d_control": {
+      "D_cue": {
+        "mean": 0.124944,
+        "ci95": [
+          -0.172135,
+          0.422022
+        ]
+      },
+      "persistence": {
+        "mean": 0.127424,
+        "ci95": [
+          0.085773,
+          0.169076
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.616274,
+        "ci95": [
+          0.599784,
+          0.632764
+        ]
+      },
+      "D_cue_positive_ci": false
+    },
+    "matrix_cue": {
+      "D_cue": {
+        "mean": 0.522027,
+        "ci95": [
+          0.00924,
+          1.034814
+        ]
+      },
+      "persistence": {
+        "mean": 0.178908,
+        "ci95": [
+          0.111193,
+          0.246623
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.624516,
+        "ci95": [
+          0.603287,
+          0.645745
+        ]
+      },
+      "D_cue_positive_ci": true
+    },
+    "protrusion_guidance": {
+      "D_cue": {
+        "mean": 1.98027,
+        "ci95": [
+          -0.924378,
+          4.884917
+        ]
+      },
+      "persistence": {
+        "mean": 0.620693,
+        "ci95": [
+          0.512617,
+          0.72877
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.617208,
+        "ci95": [
+          0.569482,
+          0.664933
+        ]
+      },
+      "D_cue_positive_ci": false
+    },
+    "combined": {
+      "D_cue": {
+        "mean": 1.97737,
+        "ci95": [
+          -0.961525,
+          4.916266
+        ]
+      },
+      "persistence": {
+        "mean": 0.622265,
+        "ci95": [
+          0.566164,
+          0.678365
+        ]
+      },
+      "contact_guidance_Ct": {
+        "mean": 0.64205,
+        "ci95": [
+          0.59635,
+          0.68775
+        ]
+      },
+      "D_cue_positive_ci": false
+    }
+  },
+  "gates": {
+    "E0_projected_ci_contains_zero": true,
+    "E0_no_fixed_world_axis": true,
+    "E2_no_fixed_world_axis": true,
+    "E3_positive_cue_displacement": false,
+    "negative_results_are_retained": 1
+  },
+  "representative_metrics": {
+    "d_control": {
+      "D_cue": -0.071224,
+      "net_displacement": 0.405236,
+      "path_length": 2.530366,
+      "persistence": 0.160149,
+      "contact_guidance_Ct": 0.617423,
+      "final_direction_angle": -1.747474,
+      "front_establishments": 0,
+      "front_losses": 0,
+      "ruptures": 71247,
+      "site_failures": 826,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0,
+      "contact_searches": 826,
+      "successful_relocations": 826,
+      "max_relocation_gap": 3.085238,
+      "contact_search_limit": 8.0,
+      "dynamic_contact_search": 1,
+      "baseline_directional_memory": 0,
+      "front_memory_enabled": 0
+    },
+    "combined": {
+      "D_cue": 3.804845,
+      "net_displacement": 4.199775,
+      "path_length": 6.723588,
+      "persistence": 0.624633,
+      "contact_guidance_Ct": 0.676794,
+      "final_direction_angle": -0.437145,
+      "front_establishments": 1,
+      "front_losses": 0,
+      "ruptures": 71103,
+      "site_failures": 817,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0,
+      "contact_searches": 817,
+      "successful_relocations": 817,
+      "max_relocation_gap": 3.839514,
+      "contact_search_limit": 8.0,
+      "dynamic_contact_search": 1,
+      "baseline_directional_memory": 0,
+      "front_memory_enabled": 1
+    },
+    "matrix_cue": {
+      "D_cue": 0.882063,
+      "net_displacement": 1.164977,
+      "path_length": 3.970456,
+      "persistence": 0.293411,
+      "contact_guidance_Ct": 0.651464,
+      "final_direction_angle": 0.711855,
+      "front_establishments": 0,
+      "front_losses": 0,
+      "ruptures": 71228,
+      "site_failures": 824,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0,
+      "contact_searches": 824,
+      "successful_relocations": 824,
+      "max_relocation_gap": 2.820428,
+      "contact_search_limit": 8.0,
+      "dynamic_contact_search": 1,
+      "baseline_directional_memory": 0,
+      "front_memory_enabled": 0
+    },
+    "protrusion_guidance": {
+      "D_cue": 3.409433,
+      "net_displacement": 4.275842,
+      "path_length": 5.611876,
+      "persistence": 0.761927,
+      "contact_guidance_Ct": 0.529906,
+      "final_direction_angle": -0.64787,
+      "front_establishments": 1,
+      "front_losses": 0,
+      "ruptures": 59911,
+      "site_failures": 698,
+      "cell_radius_constant": 1,
+      "max_force_balance_error": 0.0,
+      "contact_searches": 8921,
+      "successful_relocations": 696,
+      "max_relocation_gap": 5.705456,
+      "contact_search_limit": 8.0,
+      "dynamic_contact_search": 1,
+      "baseline_directional_memory": 0,
+      "front_memory_enabled": 1
+    }
+  }
+}
