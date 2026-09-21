@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>G5 organoid · interactive invasion viewer</title>
+  <style>
+    :root{--bg:#f7f4ec;--ink:#17232b;--muted:#637078;--line:#d8d0c2;--blue:#2c5f80;--red:#a83d35;}
+    *{box-sizing:border-box}
+    body{margin:0;font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif;color:var(--ink);background:#efeadf}
+    header{padding:20px 24px 8px}
+    h1{margin:0 0 4px;font-size:20px}
+    .eyebrow{color:var(--red);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin:0}
+    .lede{color:var(--muted);max-width:900px;margin:6px 0 0}
+    main{padding:12px 24px 40px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:10px}
+    button{font:inherit;padding:6px 14px;border:1px solid var(--line);border-radius:9px;background:#faf8f3;cursor:pointer}
+    button:hover{background:#f0ebe0}
+    button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+    select,input[type=range]{font:inherit}
+    label{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+    label.check{color:var(--ink)}
+    canvas{width:100%;height:auto;max-width:760px;display:block;margin:0 auto;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+    .metrics{color:var(--muted);font-size:13.5px;margin-top:8px;text-align:center}
+    .legend{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:13px;margin-top:10px;justify-content:center}
+    .legend i{display:inline-block;width:22px;height:0;vertical-align:middle;margin-right:5px}
+    .swatch{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle;margin-right:5px}
+    .status{color:var(--muted);font-size:13px}
+    .note{color:var(--muted);font-size:12.5px;margin-top:8px}
+  </style>
+  <script defer src="g5-organoid-manifest.js"></script>
+  <script defer src="g5-organoid.js"></script>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">G5 · tumour-organoid invasion (personal testing)</p>
+    <h1>Collagen invasion viewer — R0→R3, Gloria g4-v4e style</h1>
+    <p class="lede">Same interactive canvas idea as the G4 v4E page: geometry and cell paths are drawn at
+      true scale; each frame is redrawn from packed data. <b>What's robust:</b> cell–cell adhesion sets
+      collective (①) vs single-cell escape (②). <b>What's fragile:</b> the leader-led follower strand and
+      its contact-guidance rescue are <b>gated by ECM crosslink density</b> — in DENSE collagen the leaders
+      detach and guidance rescues a follower group (④→⑤), but in SPARSE G4D-parity collagen the organoid
+      holds together on its own, so guidance only over-scatters (⑥→⑦). Personal testing, not a confirmed
+      finding. No swirling is assumed.</p>
+  </header>
+  <main>
+    <section class="card">
+      <div class="toolbar">
+        <label>Condition <select id="mode"></select></label>
+        <button id="play" class="primary">Play</button>
+        <button id="step">Step</button>
+        <button id="reset">Reset</button>
+        <label>Time <input id="time" type="range" min="0" max="1" value="0" style="width:220px"><output id="timeLabel">0 min</output></label>
+        <label>Speed <select id="speed"><option value="120">0.5×</option><option value="60" selected>1×</option><option value="24">2.5×</option></select></label>
+      </div>
+      <div class="toolbar">
+        <label class="check"><input id="ghost" type="checkbox"> initial ghost</label>
+        <label class="check"><input id="trails" type="checkbox" checked> cell paths</label>
+        <label class="check"><input id="links" type="checkbox"> crosslinks</label>
+        <label class="check"><input id="arrows" type="checkbox"> net traction arrows</label>
+        <span id="status" class="status">Loading…</span>
+      </div>
+      <canvas id="view" width="760" height="760"></canvas>
+      <div id="metrics" class="metrics"></div>
+      <div class="legend">
+        <span><i style="border-top:2px solid #6b8ba8"></i>collagen fibre</span>
+        <span><span class="swatch" style="background:#7fa8c9"></span>cohesive cell</span>
+        <span><span class="swatch" style="background:#d98a7a"></span>partial-EMT / leader</span>
+        <span><i style="border-top:2px solid #9a8f80"></i>cell path</span>
+        <span><i style="border-top:2px solid #2b9b83"></i>crosslink</span>
+      </div>
+      <p class="note">Tip: use the toggles to declutter — everything but fibres + cells is optional. The
+        "net traction arrow" is one resultant vector per cell (which way it is pulling), not 200+ per-grip arrows.</p>
+    </section>
+  </main>
+</body>
+</html>
