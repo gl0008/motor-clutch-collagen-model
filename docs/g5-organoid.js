@@ -10,7 +10,7 @@
   var frame = 0, playing = false, lastT = 0, acc = 0;
 
   var COL = {
-    bg: "#f7f4ec", fibre: "#6b8ba8", ghost: "#c9c1b2", link: "#2b9b83",
+    bg: "#f7f4ec", fibre: "#476f91", ghost: "#b7afa2", link: "#2b9b83",
     trail: "#9a8f80", arrow: "#17232b",
     cohFill: "rgba(127,168,201,.55)", cohEdge: "#2c5f80",
     emtFill: "rgba(217,138,122,.65)", emtEdge: "#a83d35",
@@ -63,6 +63,13 @@
       ctx.lineTo(W / 2 + pos[2 * a1] * s, H / 2 - pos[2 * a1 + 1] * s);
     }
     ctx.stroke(); ctx.globalAlpha = 1;
+
+    // bead dots along fibres (Gloria's beaded-fibre texture; every 2nd bead)
+    ctx.fillStyle = COL.fibre; ctx.globalAlpha = 0.75;
+    for (var bd = 0; bd < pos.length; bd += 4) {
+      ctx.fillRect(W / 2 + pos[bd] * s - 0.55, H / 2 - pos[bd + 1] * s - 0.55, 1.1, 1.1);
+    }
+    ctx.globalAlpha = 1;
 
     // crosslinks (dots on the moving fibres)
     if ($("links").checked) {
